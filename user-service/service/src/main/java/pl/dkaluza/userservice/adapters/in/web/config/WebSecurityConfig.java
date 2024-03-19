@@ -15,8 +15,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationEndpointFilter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,6 +37,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
@@ -135,6 +142,7 @@ class WebSecurityConfig {
             )
             .authorizeHttpRequests(authorize ->
                 authorize
+                    .requestMatchers("/user/secured").authenticated()
                     .requestMatchers("/user/**").permitAll()
                     .anyRequest().authenticated()
             )
@@ -178,5 +186,25 @@ class WebSecurityConfig {
     @Bean
     CsrfTokenRequestAttributeHandler csrfTokenReqAttrHandler() {
         return new CsrfTokenRequestAttributeHandler();
+    }
+
+    @Bean
+    public RegisteredClientRepository registeredClientRepository(WebAppSettings webAppSettings) {
+        RegisteredClient webappClient = RegisteredClient.withId(UUID.randomUUID().toString())
+            .clientId("ciy-web")
+            .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .redirectUri(webAppSettings.getSignInUri())
+            .postLogoutRedirectUri(webAppSettings.getSignOutUri())
+            .scope("openid").scope("profile")
+            .clientSettings(
+                ClientSettings.builder()
+                    .requireProofKey(true)
+                    .requireAuthorizationConsent(false)
+                    .build()
+            )
+            .build();
+
+        return new InMemoryRegisteredClientRepository(webappClient);
     }
 }

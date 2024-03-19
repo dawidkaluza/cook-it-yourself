@@ -23,7 +23,7 @@ class SignInUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        if (webAppSettings.isWebAppEmbedded()) {
+        if (!webAppSettings.isWebAppEmbedded()) {
             var token = tokenRepository.generateToken(request);
             tokenRepository.saveToken(token, request, response);
         }

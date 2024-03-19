@@ -11,4 +11,9 @@ class UserController {
     String helloWorld() {
         return "Hello world";
     }
+
+    @GetMapping("/secured")
+    String secured() {
+        return "Hello world";
+    }
 }
