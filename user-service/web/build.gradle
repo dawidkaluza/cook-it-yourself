@@ -1,0 +1,20 @@
+plugins {
+    id "com.github.node-gradle.node" version "7.0.2"
+}
+
+node {
+    download = true
+    version = "18.16.1"
+}
+
+tasks.register('npmCi', NpmTask) {
+    args = [ 'ci' ]
+}
+
+tasks.register('npmStart', NpmTask) {
+    args = [ 'start' ]
+}
+
+tasks.register('npmBuild', NpmTask) {
+    args = [ 'run', 'build' ]
+}

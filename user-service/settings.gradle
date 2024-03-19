@@ -1,0 +1,4 @@
+rootProject.name = 'user-service'
+include 'web'
+include 'service'
+
