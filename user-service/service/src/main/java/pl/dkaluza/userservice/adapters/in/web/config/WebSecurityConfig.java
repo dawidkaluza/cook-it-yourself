@@ -6,17 +6,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationEndpointFilter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -28,6 +29,8 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.lang.reflect.Field;
 
 @Configuration
 @EnableWebSecurity
@@ -53,12 +56,24 @@ class WebSecurityConfig {
             // Accept access tokens for User Info and/or Client Registration
             .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
 
-        return http.build();
+        // Trick to use custom redirectStrategy
+        var filterChain = http.build();
+        var authorizationEndpointFilter = (OAuth2AuthorizationEndpointFilter) filterChain.getFilters().stream()
+            .filter(filter -> filter instanceof OAuth2AuthorizationEndpointFilter)
+            .findAny().orElseThrow();
+
+        var redirectStrategy = new RestfulRedirectStrategy();
+        Field field = OAuth2AuthorizationEndpointFilter.class.getDeclaredField("redirectStrategy");
+        field.setAccessible(true);
+        field.set(authorizationEndpointFilter, redirectStrategy);
+
+        return filterChain;
     }
 
     @Bean
     @Order(2)
-    public SecurityFilterChain userAuthSecurityFilterChain(HttpSecurity http, CookieCsrfTokenRepository tokenRepository, CsrfTokenRequestAttributeHandler tokenReqAttrHandler, CsrfGenerateCookieFilter generateCookieFilter) throws Exception {
+    public SecurityFilterChain userAuthSecurityFilterChain(HttpSecurity http, WebAppSettings webAppSettings, CookieCsrfTokenRepository tokenRepository, CsrfTokenRequestAttributeHandler tokenReqAttrHandler, CsrfGenerateCookieFilter generateCookieFilter, RestfulRedirectStrategy redirectStrategy) throws Exception {
+        // TODO configure session to be stored in redis
         http
             .securityMatcher("/sign-in", "/sign-out")
             .cors(Customizer.withDefaults())
@@ -68,19 +83,11 @@ class WebSecurityConfig {
             )
             .addFilterAfter(generateCookieFilter, BasicAuthenticationFilter.class)
             .formLogin(form -> form
-                .loginPage("http://localhost:9090/sign-in")
+                .loginPage(webAppSettings.getSignInUri())
                 .loginProcessingUrl("/sign-in")
                 .successHandler((req, res, auth) -> {
-                    res.resetBuffer();
-                    res.setStatus(HttpServletResponse.SC_OK);
-                    res.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
                     var savedReq = new HttpSessionRequestCache().getRequest(req, res);
-                    res.getWriter()
-                        .append("{\"redirectUrl\": \"")
-                        .append(savedReq == null ? "" : savedReq.getRedirectUrl())
-                        .append("\"}");
-                    res.flushBuffer();
+                    redirectStrategy.sendRedirect(req, res, savedReq == null ? "" : savedReq.getRedirectUrl());
                 })
                 .failureHandler((req, res, ex) ->
                     res.sendError(HttpServletResponse.SC_UNAUTHORIZED)
@@ -88,7 +95,7 @@ class WebSecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/sign-out")
-                .logoutSuccessUrl("http://localhost:9090/sign-in?logout")
+                .logoutSuccessUrl(webAppSettings.getSignOutUri())
             )
             .exceptionHandling(handler -> handler
                 .authenticationEntryPoint(
@@ -115,6 +122,7 @@ class WebSecurityConfig {
         http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(handler -> handler
                 .defaultAuthenticationEntryPointFor(
                     signInUrlAuthEntryPoint,
@@ -127,19 +135,21 @@ class WebSecurityConfig {
             )
             .authorizeHttpRequests(authorize ->
                 authorize
-                    .anyRequest().permitAll()
-            );
+                    .requestMatchers("/user/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(WebAppSettings webAppSettings) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.addAllowedOrigin("http://localhost:9090");
+        config.addAllowedOrigin(webAppSettings.getBaseUri());
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
@@ -158,16 +168,6 @@ class WebSecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    SignInUrlAuthenticationEntryPoint signInUrlAuthenticationEntryPoint(CookieCsrfTokenRepository cookieCsrfTokenRepository) {
-        return new SignInUrlAuthenticationEntryPoint(cookieCsrfTokenRepository);
-    }
-
-    @Bean
-    CsrfGenerateCookieFilter csrfGenerateCookieFilter(CookieCsrfTokenRepository tokenRepository) {
-        return new CsrfGenerateCookieFilter(tokenRepository);
     }
 
     @Bean
