@@ -99,8 +99,9 @@ class WebSecurityConfig {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 })
             )
-            .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated()
+            .authorizeHttpRequests(authorize ->
+                authorize
+                    .anyRequest().authenticated()
             );
 
         return http.build();
@@ -124,10 +125,10 @@ class WebSecurityConfig {
                     new MediaTypeRequestMatcher(MediaType.ALL)
                 )
             )
-            .authorizeHttpRequests(authorize -> {
+            .authorizeHttpRequests(authorize ->
                 authorize
-                    .anyRequest().permitAll();
-            });
+                    .anyRequest().permitAll()
+            );
 
         return http.build();
     }
