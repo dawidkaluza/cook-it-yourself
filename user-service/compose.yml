@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider localhost:8080/actuator/health || exit 1
+      interval: 2s
+      timeout: 5s
+      retries: 45
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./service/src/:/app/service/src/
+    networks:
+      - main
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=user
+      - DATABASE_USER=developer
+      - DATABASE_PASSWORD=developer
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=developer
+      - RABBITMQ_PASSWORD=developer
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./web/src/:/app/web/src/
+    networks:
+      - main
+    ports:
+      - "9090:9090"
+    depends_on:
+      service:
+        condition: service_healthy
+
+  database:
+    image: postgres:15.2-alpine
+    healthcheck:
+      test: pg_isready -d user -U developer
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    networks:
+      - main
+    volumes:
+      - database:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=developer
+      - POSTGRES_DB=user
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3.11.11-management-alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_port_connectivity
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    networks:
+      - main
+    environment:
+      - RABBITMQ_DEFAULT_USER=developer
+      - RABBITMQ_DEFAULT_PASS=developer
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  database: {}
+
+networks:
+  main: {}

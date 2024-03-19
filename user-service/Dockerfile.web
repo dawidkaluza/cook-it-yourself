@@ -1,0 +1,13 @@
+FROM eclipse-temurin:17-jdk@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e
+WORKDIR /app
+#RUN addgroup --system javauser && adduser --system --ingroup javauser javauser
+#RUN chown -R javauser:javauser ./
+#USER javauser
+COPY gradle ./gradle
+COPY settings.gradle gradlew ./
+
+COPY web/build.gradle web/package.json web/package-lock.json web/.env.dev web/webpack.config.js ./web/
+RUN ./gradlew :web:npmCi
+
+VOLUME [ "/root/.gradle", "/app/web/.gradle", "/app/web/node_modules" ]
+CMD ["./gradlew", ":web:npmStart"]

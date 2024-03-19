@@ -16,13 +16,47 @@ repositories {
 }
 
 dependencies {
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+def currentEnv() {
+    return properties.get('appEnv', 'dev')
+}
+
+tasks.register('resolveDependencies') {
+    doLast {
+        rootProject.allprojects { project ->
+            Set<Configuration> configurations = project.buildscript.configurations + project.configurations
+            configurations.findAll { c -> c.canBeResolved }
+                    .forEach { c -> c.resolve() }
+        }
+    }
+}
+
+tasks.register('copyWebApp', Copy) {
+    from "$rootDir/web/dist"
+    into "$buildDir/resources/main/static/web/."
+}
+
+tasks.named('compileJava') {
+    if (currentEnv() == 'prod') {
+        dependsOn(':web:npmBuild')
+    }
+}
+
+tasks.named('processResources') {
+    if (currentEnv() == 'prod') {
+        dependsOn('copyWebApp')
+    }
 }
 
 tasks.named('test') {
