@@ -26,16 +26,23 @@ class WebAppSettings {
      */
     private final String signOutPath;
 
+    /**
+     * A path where users will be redirected to consent access to clients.
+     */
+    private final String consentPath;
+
     public WebAppSettings(
         @Value("${ciy.web-app.public-path:}") String publicPath,
         @Value("${ciy.web-app.base-uri:http://localhost:9090/}") String baseUri,
         @Value("${ciy.web-app.sign-in-path:/sign-in}") String signInPath,
-        @Value("${ciy.web-app.sign-out-path:/sign-in?logout}") String signOutPath
+        @Value("${ciy.web-app.sign-out-path:/sign-in?logout}") String signOutPath,
+        @Value("${ciy.web-app.consent-path:/consent}") String consentPath
     ) {
         this.publicPath = publicPath;
         this.baseUri = baseUri;
         this.signInPath = signInPath;
         this.signOutPath = signOutPath;
+        this.consentPath = consentPath;
     }
 
     public String getPublicPath() {
@@ -60,6 +67,14 @@ class WebAppSettings {
 
     public String getSignOutUri() {
         return baseUri + signOutPath;
+    }
+
+    public String getConsentPath() {
+        return consentPath;
+    }
+
+    public String getConsentUri() {
+        return baseUri + consentPath;
     }
 
     public boolean isWebAppEmbedded() {

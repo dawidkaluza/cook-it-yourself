@@ -46,9 +46,12 @@ class WebSecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, SignInUrlAuthenticationEntryPoint authEntryPoint) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, WebAppSettings webAppSettings, SignInUrlAuthenticationEntryPoint authEntryPoint) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+            .authorizationEndpoint(authorization ->
+                authorization.consentPage(webAppSettings.getConsentUri())
+            )
             .oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
         http
             .cors(Customizer.withDefaults())
@@ -200,7 +203,7 @@ class WebSecurityConfig {
             .clientSettings(
                 ClientSettings.builder()
                     .requireProofKey(true)
-                    .requireAuthorizationConsent(false)
+                    .requireAuthorizationConsent(true)
                     .build()
             )
             .build();

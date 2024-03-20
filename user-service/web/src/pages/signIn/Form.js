@@ -18,6 +18,8 @@ const Form = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // TODO depending on redirectUrl (if it's web uri OR oauth uri OR client uri) perform proper logic
     signIn(fields)
       .then(result => {
         if (result.success) {
