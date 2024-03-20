@@ -15,6 +15,8 @@ const useSignIn = () => {
       setSuccess("");
       setError("");
       setFieldsErrors({});
+
+      // TODO what if cookie does not exist?
       const csrfToken = cookies['XSRF-TOKEN'];
 
       return userService
