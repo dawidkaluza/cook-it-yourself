@@ -142,6 +142,7 @@ class WebSecurityConfig {
             )
             .authorizeHttpRequests(authorize ->
                 authorize
+                    .requestMatchers("/actuator/health").permitAll()
                     .requestMatchers("/user/secured").authenticated()
                     .requestMatchers("/user/**").permitAll()
                     .anyRequest().authenticated()
