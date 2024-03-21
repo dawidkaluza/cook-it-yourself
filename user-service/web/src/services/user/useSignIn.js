@@ -1,6 +1,7 @@
 import {useCallback, useState} from "react";
 import {userService} from "./userService";
 import {useCookies} from "react-cookie";
+import {useNavigate} from "react-router-dom";
 
 const useSignIn = () => {
   const [loading, setLoading] = useState(false);
@@ -8,6 +9,7 @@ const useSignIn = () => {
   const [error, setError] = useState("");
   const [fieldsErrors, setFieldsErrors] = useState({});
   const [cookies] = useCookies();
+  const navigate = useNavigate();
 
   const signIn = useCallback(
     ({username, password}) => {
@@ -26,11 +28,21 @@ const useSignIn = () => {
             const response = result.response;
             setError(response.message ?? "");
             setFieldsErrors(response.fields ?? {});
-          } else {
-            setSuccess("Signing in proceeded successfully.");
+            return result;
           }
 
-          return result;
+          setSuccess("Signing in proceeded successfully.");
+
+          const response = result.response;
+          if (response.external) {
+            setTimeout(() => {
+              window.location.assign(response.redirectUrl);
+            }, 800);
+          } else {
+            setTimeout(() => {
+              navigate(response.redirectUrl);
+            }, 800);
+          }
         })
         .finally(() => {
           setLoading(false);

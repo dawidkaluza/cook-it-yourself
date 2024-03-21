@@ -35,6 +35,45 @@ const validateSignInFields = (fields, errors) => {
   return result;
 };
 
+const handleRedirect = (redirectUrlAsString) => {
+  if (!redirectUrlAsString) {
+    return buildSuccessResponse({
+      redirectUrl: "",
+      external: false
+    });
+  }
+
+  const redirectUrl = new URL(redirectUrlAsString);
+  const userServiceBaseUrl = new URL(process.env.USER_SERVICE_BASEURL);
+
+  switch (redirectUrl.host) {
+    case window.location.host: {
+      return buildSuccessResponse({
+        redirectUrl: redirectUrl.pathname + redirectUrl.search,
+        external: false
+      });
+    }
+
+    case userServiceBaseUrl.host: {
+      return authorize(redirectUrl.href)
+        .then(result => {
+          if (!result.success) {
+            return result;
+          }
+
+          return handleRedirect(result.response.redirectUrl);
+        });
+    }
+
+    default: {
+      return buildSuccessResponse({
+        redirectUrl: redirectUrl.href,
+        external: true
+      });
+    }
+  }
+}
+
 const signIn = (fields) => {
   const errors = {};
   const validationResult = validateSignInFields(fields, errors);
@@ -60,9 +99,7 @@ const signIn = (fields) => {
       switch (response.status) {
         case 200: {
           const body = response.data;
-          return buildSuccessResponse({
-            redirectUrl: body.redirectUrl
-          });
+          return handleRedirect(body.redirectUrl);
         }
 
         default: {
@@ -77,10 +114,6 @@ const signIn = (fields) => {
           case 403: {
             return buildErrorResponse({ message: "Invalid e-mail or password."});
           }
-
-          default: {
-            return buildErrorResponse({ message: "Unable to process the request. Try again later." });
-          }
         }
       }
 
@@ -88,8 +121,37 @@ const signIn = (fields) => {
     });
 };
 
+const authorize = (request) => {
+  if (!request) {
+    return buildErrorResponse({ message: "Authorization request is empty."})
+  }
+
+  axiosInstance.get(
+    request,
+    {
+      withCredentials: true
+    }
+  ).then(response => {
+    switch (response.status) {
+      case 200: {
+        const body = response.data;
+        return buildSuccessResponse({
+          redirectUrl: body.redirectUrl
+        });
+      }
+
+      default: {
+        return buildErrorResponse({ message: "Unable to process the request. Try again later."});
+      }
+    }
+  }).catch(() => {
+    return buildErrorResponse({message: "Unable to process the request. Try again later."});
+  });
+};
+
 const userService = {
-  signIn
+  signIn,
+  authorize,
 };
 
 export { userService };

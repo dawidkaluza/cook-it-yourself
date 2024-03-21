@@ -1,6 +1,5 @@
 import React, {useState} from "react"
-import {Alert, AlertTitle, Box, Button, CircularProgress, TextField, Typography} from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import {Alert, Box, Button, CircularProgress, TextField, Typography} from "@mui/material";
 import LoginIcon from '@mui/icons-material/Login';
 import {useSignIn} from "../../services/user/useSignIn";
 
@@ -19,16 +18,8 @@ const Form = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // TODO depending on redirectUrl (if it's web uri OR oauth uri OR client uri) perform proper logic
-    signIn(fields)
-      .then(result => {
-        if (result.success) {
-          const redirectUrl = result.response.redirectUrl;
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-          }
-        }
-      });
+    // noinspection JSIgnoredPromiseFromCall
+    signIn(fields);
   };
 
   return (
