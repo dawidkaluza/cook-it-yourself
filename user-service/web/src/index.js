@@ -1,8 +1,9 @@
 import React from "react";
-import {createRoot} from "react-dom";
 import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import {SignIn} from "./pages/signIn/SignIn";
 import {CookiesProvider} from "react-cookie";
+import {Consent} from "./pages/consent/Consent";
+import {createRoot} from "react-dom/client";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: "/sign-in",
     element: <SignIn />
+  },
+  {
+    path: "/consent",
+    element: <Consent />
   }
 ]);
 
