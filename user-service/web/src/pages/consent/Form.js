@@ -1,14 +1,4 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  FormGroup,
-  TextField,
-  Typography
-} from "@mui/material";
+import {Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Typography} from "@mui/material";
 import React, {useState} from "react";
 import SendIcon from "@mui/icons-material/Send";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -107,7 +97,7 @@ const Form = () => {
         justifyContent: "center"
       }}>
         <ApproveButton loading={false} sx={{ m: 1 }} />
-        <RejectButton loading={false} sx={{ m: 1 }} />
+        <DeclineButton loading={false} sx={{ m: 1 }} />
       </Box>
     </Box>
   );
@@ -130,7 +120,7 @@ const ApproveButton = ({
   );
 };
 
-const RejectButton = ({
+const DeclineButton = ({
   loading, ...props
 }) => {
   return (
@@ -141,7 +131,7 @@ const RejectButton = ({
       disabled={loading}
       {...props}
     >
-      Reject
+      Decline
     </Button>
   );
 };
