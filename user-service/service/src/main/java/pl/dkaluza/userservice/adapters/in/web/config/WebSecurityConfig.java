@@ -46,7 +46,7 @@ class WebSecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, WebAppSettings webAppSettings, SignInUrlAuthenticationEntryPoint authEntryPoint) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, WebAppSettings webAppSettings, SignInUrlAuthenticationEntryPoint authEntryPoint, ExtendedRedirectStrategy redirectStrategy) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
             .authorizationEndpoint(authorization ->
@@ -72,7 +72,6 @@ class WebSecurityConfig {
             .filter(filter -> filter instanceof OAuth2AuthorizationEndpointFilter)
             .findAny().orElseThrow();
 
-        var redirectStrategy = new RestfulRedirectStrategy();
         Field field = OAuth2AuthorizationEndpointFilter.class.getDeclaredField("redirectStrategy");
         field.setAccessible(true);
         field.set(authorizationEndpointFilter, redirectStrategy);
@@ -192,13 +191,13 @@ class WebSecurityConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(WebAppSettings webAppSettings) {
+    public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient webappClient = RegisteredClient.withId(UUID.randomUUID().toString())
             .clientId("ciy-web")
             .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .redirectUri(webAppSettings.getSignInUri())
-            .postLogoutRedirectUri(webAppSettings.getSignOutUri())
+            .redirectUri("http://webapp/sign-in")
+            .postLogoutRedirectUri("http://webapp/sign-in?sign-out")
             .scope("openid").scope("profile")
             .clientSettings(
                 ClientSettings.builder()
