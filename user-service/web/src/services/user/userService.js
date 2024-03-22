@@ -76,6 +76,7 @@ const handleRedirect = (redirectUrlAsString) => {
 
 const signIn = (fields) => {
   const errors = {};
+  // TODO the whole validation could have been implemented better, it does not check if username is even there
   const validationResult = validateSignInFields(fields, errors);
   if (!validationResult) {
     return Promise.resolve(
@@ -84,10 +85,14 @@ const signIn = (fields) => {
   }
 
   const { username, password, csrfToken } = fields;
+  const requestData = new URLSearchParams();
+  requestData.append("username", username);
+  requestData.append("password", password);
+
   return axiosInstance
     .post(
       "/sign-in",
-      `username=${username}&password=${password}`,
+      requestData,
       {
         withCredentials: true,
         headers: {
@@ -126,32 +131,91 @@ const authorize = (request) => {
     return buildErrorResponse({ message: "Authorization request is empty."})
   }
 
-  axiosInstance.get(
-    request,
-    {
-      withCredentials: true
-    }
-  ).then(response => {
-    switch (response.status) {
-      case 200: {
-        const body = response.data;
-        return buildSuccessResponse({
-          redirectUrl: body.redirectUrl
-        });
+  return axiosInstance
+    .get(
+      request,
+      {
+        withCredentials: true
       }
+    ).then(response => {
+      switch (response.status) {
+        case 200: {
+          const body = response.data;
+          return buildSuccessResponse({
+            redirectUrl: body.redirectUrl
+          });
+        }
 
-      default: {
-        return buildErrorResponse({ message: "Unable to process the request. Try again later."});
+        default: {
+          return buildErrorResponse({ message: "Unable to process the request. Try again later."});
+        }
       }
+    }).catch(() => {
+      return buildErrorResponse({message: "Unable to process the request. Try again later."});
+    });
+};
+
+const validateConsentFields = (fields) => {
+  const fieldsToValidate = { ...fields };
+  delete fieldsToValidate.scopes;
+
+  for (const key in fieldsToValidate) {
+    if (!fields[key]) {
+      return false;
     }
-  }).catch(() => {
-    return buildErrorResponse({message: "Unable to process the request. Try again later."});
-  });
+  }
+
+  return true;
+};
+
+const consent = (fields) => {
+  if (!validateConsentFields(fields)) {
+    return Promise.resolve(
+      buildErrorResponse({ message: "Unable to process the request. Try again later." })
+    );
+  }
+
+  const { clientId, state, scopes } = fields;
+  const requestData = new URLSearchParams();
+  requestData.append("client_id", clientId);
+  requestData.append("state", state);
+  for (const scope of scopes) {
+    requestData.append("scope", scope);
+  }
+
+  return axiosInstance
+    .post(
+      // TODO get url from config
+      "/oauth2/authorize",
+      requestData,
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      }
+    ).then(response => {
+      switch (response.status) {
+        case 200: {
+          const body = response.data;
+          return buildSuccessResponse({
+            redirectUrl: body.redirectUrl ?? ""
+          });
+        }
+
+        default: {
+          return buildErrorResponse({ message: "Unable to process the request. Try again later." });
+        }
+      }
+    }).catch(() => {
+      return buildErrorResponse({ message: "Unable to process the request. Try again later." });
+    });
 };
 
 const userService = {
   signIn,
   authorize,
+  consent,
 };
 
 export { userService };

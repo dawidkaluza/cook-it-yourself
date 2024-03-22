@@ -1,31 +1,18 @@
-import {Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Typography} from "@mui/material";
+import {Alert, Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Typography} from "@mui/material";
 import React, {useState} from "react";
 import SendIcon from "@mui/icons-material/Send";
 import CancelIcon from "@mui/icons-material/Cancel";
 import {useSearchParams} from "react-router-dom";
-
-/*
-client_id - the client identifier
-scope - a space-delimited list of scopes present in the authorization request
-state - a CSRF protection token
-
- */
-
+import {useConsent} from "../../services/user/useConsent";
 
 const Form = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const clientId = searchParams.get('client_id');
-
-  const state = searchParams.get("state");
+  const [searchParams] = useSearchParams();
 
   const scope = searchParams.get("scope");
-  const [scopes, setScopes] = useState(scope ? scope.split(" ") : []);
+  const scopes = scope ? scope.split(" ") : [];
   const [checkedScopes, setCheckedScopes] = useState(new Set(scopes));
 
-  const isScopeChecked = (scope) => {
-    return checkedScopes.has(scope);
-  };
+  const { consent, loading, success, error } = useConsent();
 
   const handleScopeChange = (event) => {
     const target = event.target;
@@ -39,9 +26,11 @@ const Form = () => {
     setCheckedScopes(newCheckedScopes);
   };
 
+  const clientId = searchParams.get('client_id');
+  const state = searchParams.get("state");
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("submit");
+    consent({ clientId, state, scopes: checkedScopes });
   };
 
   return (
@@ -70,7 +59,7 @@ const Form = () => {
         {clientId} wants to get access to your account.
       </Typography>
 
-      {scopes ?
+      {scopes.length ?
         <Typography>
           Check which access you want to consent and approve or decline the request.
         </Typography>
@@ -84,7 +73,7 @@ const Form = () => {
         {scopes.map(scope =>
           <FormControlLabel
             key={scope}
-            control={<Checkbox name={"scope"} value={scope} checked={isScopeChecked(scope)} onChange={handleScopeChange} />}
+            control={<Checkbox name={"scope"} value={scope} checked={checkedScopes.has(scope)} onChange={handleScopeChange} />}
             label={scope}
           />
         )}
@@ -96,9 +85,29 @@ const Form = () => {
         flexDirection: "row",
         justifyContent: "center"
       }}>
-        <ApproveButton loading={false} sx={{ m: 1 }} />
+        <ApproveButton loading={loading} sx={{ m: 1 }} />
         <DeclineButton loading={false} sx={{ m: 1 }} />
       </Box>
+
+      {error &&
+        <Alert
+          severity={"error"}
+          sx={{ width: 1 }}
+        >
+          {error}
+        </Alert>
+      }
+
+      {success &&
+        <Alert
+          severity={"success"}
+          sx={{ width: 1 }}
+        >
+          <Typography>
+            {success}
+          </Typography>
+        </Alert>
+      }
     </Box>
   );
 };
@@ -120,6 +129,7 @@ const ApproveButton = ({
   );
 };
 
+// TODO What to do when User decides to decline the request?
 const DeclineButton = ({
   loading, ...props
 }) => {

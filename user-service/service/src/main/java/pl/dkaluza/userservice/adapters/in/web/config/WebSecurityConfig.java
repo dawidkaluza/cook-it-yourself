@@ -202,7 +202,7 @@ class WebSecurityConfig {
             .clientSettings(
                 ClientSettings.builder()
                     .requireProofKey(true)
-                    .requireAuthorizationConsent(true)
+                    .requireAuthorizationConsent(false)
                     .build()
             )
             .build();

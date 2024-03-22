@@ -21,14 +21,14 @@ const useSignIn = () => {
       // TODO what if cookie does not exist?
       const csrfToken = cookies['XSRF-TOKEN'];
 
-      return userService
+      userService
         .signIn({ username, password, csrfToken })
         .then(result => {
           if (!result.success) {
             const response = result.response;
             setError(response.message ?? "");
             setFieldsErrors(response.fields ?? {});
-            return result;
+            return;
           }
 
           setSuccess("Signing in proceeded successfully.");
