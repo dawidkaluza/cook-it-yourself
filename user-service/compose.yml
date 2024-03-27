@@ -24,12 +24,17 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=developer
       - RABBITMQ_PASSWORD=developer
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=developer
     ports:
       - "8080:8080"
     depends_on:
       database:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   web:
@@ -81,6 +86,19 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  redis:
+    image: redis:7.2.4-alpine
+    healthcheck:
+      test: redis-cli ping
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    networks:
+      - main
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass developer
 
 volumes:
   database: {}
