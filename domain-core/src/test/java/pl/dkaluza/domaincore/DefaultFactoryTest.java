@@ -1,20 +1,18 @@
 package pl.dkaluza.domaincore;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultFactoryTest {
-
     @ParameterizedTest
-    @MethodSource("validateDataProvider")
-    void validate_differentComponents_returnExpectedErrors(String name, List<String> expectedErrors) {
+    @CsvSource(value = {
+        "NULL, true",
+        "'   ', true",
+        "Dawid, false",
+    }, nullValues = { "NULL" })
+    void validate_differentComponents_returnExpectedErrors(String name, boolean hasErrors) {
         // Given
         var factory = new DefaultFactory<>(
             ValidationExecutor.builder()
@@ -27,14 +25,13 @@ class DefaultFactoryTest {
         var errors = factory.validate();
 
         // Then
-        assertThat(errors)
-            .extracting(FieldError::getName)
-            .containsExactlyElementsOf(expectedErrors);
-    }
-
-    private static Stream<Arguments> validateDataProvider() {
-        return Stream.of(
-            Arguments.of(null, List.of("name"))
-        );
+        if (hasErrors) {
+            assertThat(errors)
+                .extracting(FieldError::getName)
+                .containsExactly("name");
+        } else {
+            assertThat(errors)
+                .isEmpty();
+        }
     }
 }
