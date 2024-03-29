@@ -3,7 +3,7 @@ package pl.dkaluza.domaincore;
 public abstract class Index<T> {
     private final T id;
 
-    Index(T id) {
+    protected Index(T id) {
         this.id = id;
     }
 

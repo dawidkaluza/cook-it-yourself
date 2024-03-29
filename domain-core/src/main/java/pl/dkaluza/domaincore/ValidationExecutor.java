@@ -1,30 +1,31 @@
 package pl.dkaluza.domaincore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class ValidationExecutor {
     private final List<Validator> validators;
 
-    private ValidationExecutor() {
-        this.validators = new ArrayList<>();
+    private ValidationExecutor(List<Validator> validators) {
+        this.validators = validators;
     }
 
-    public static ValidationExecutor create() {
-        return new ValidationExecutor();
+    public static ValidationExecutor empty() {
+        return new ValidationExecutor(Collections.emptyList());
     }
 
-    public ValidationExecutor withValidation(boolean condition, String name, String message) {
-        Validator validator = () -> condition ? null : new FieldError(name, message);
-        validators.add(validator);
-        return this;
+    public static ValidationExecutor of(List<Validator> validators) {
+        return new ValidationExecutor(validators);
     }
 
-    public ValidationExecutor withValidation(BooleanSupplier conditionSupplier, String name, String message) {
-        Validator validator = () -> conditionSupplier.getAsBoolean() ? null : new FieldError(name, message);
-        validators.add(validator);
-        return this;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    List<Validator> getValidators() {
+        return new ArrayList<>(validators);
     }
 
     public List<FieldError> validate() {
@@ -37,5 +38,29 @@ public class ValidationExecutor {
         }
 
         return errors;
+    }
+
+    public static class Builder {
+        private final List<Validator> validators;
+
+        private Builder() {
+            validators = new ArrayList<>();
+        }
+
+        public Builder withValidation(boolean condition, String name, String message) {
+            Validator validator = () -> condition ? null : new FieldError(name, message);
+            validators.add(validator);
+            return this;
+        }
+
+        public Builder withValidation(BooleanSupplier conditionSupplier, String name, String message) {
+            Validator validator = () -> conditionSupplier.getAsBoolean() ? null : new FieldError(name, message);
+            validators.add(validator);
+            return this;
+        }
+
+        public ValidationExecutor build() {
+            return new ValidationExecutor(validators);
+        }
     }
 }

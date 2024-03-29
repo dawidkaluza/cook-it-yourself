@@ -6,31 +6,38 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class Builder<T> {
-    private final ValidationExecutor validationExecutor;
-    private List<FieldError> errors;
-    private boolean isValidated;
+abstract class AbstractFactory<T> implements Factory<T> {
     private final Supplier<T> objectSupplier;
 
-    protected Builder(ValidationExecutor validationExecutor, Supplier<T> objectSupplier) {
-        this.validationExecutor = validationExecutor;
+    private List<FieldError> errors;
+    private boolean isValidated;
+
+    public AbstractFactory(Supplier<T> objectSupplier) {
         this.objectSupplier = objectSupplier;
 
-        this.errors = Collections.emptyList();
+        errors = Collections.emptyList();
         isValidated = false;
     }
 
+    abstract List<FieldError> collectErrors();
+
+    protected Supplier<T> getObjectSupplier() {
+        return objectSupplier;
+    }
+
+    @Override
     public List<FieldError> validate() {
         if (isValidated) {
             return errors;
         }
 
-        this.errors = validationExecutor.validate();
+        this.errors = collectErrors();
         isValidated = true;
         return Collections.unmodifiableList(errors);
     }
 
-    public T build() throws ValidationException {
+    @Override
+    public T create() throws ValidationException {
         if (!isValidated) {
             validate();
         }
