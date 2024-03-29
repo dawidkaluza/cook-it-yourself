@@ -67,8 +67,8 @@ public class UserName {
         }
 
         @Override
-        protected Supplier<UserName> getObjectSupplier() {
-            return super.getObjectSupplier();
+        protected UserName assemble() {
+            return super.assemble();
         }
     }
 }

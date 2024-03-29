@@ -54,8 +54,8 @@ public class EmailAddress {
         }
 
         @Override
-        protected Supplier<EmailAddress> getObjectSupplier() {
-            return super.getObjectSupplier();
+        protected EmailAddress assemble() {
+            return super.assemble();
         }
 
         private static boolean isEmailValid(String email) {

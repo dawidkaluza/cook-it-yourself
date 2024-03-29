@@ -1,9 +1,6 @@
 package pl.dkaluza.userservice.domain;
 
-import pl.dkaluza.domaincore.Assertions;
-import pl.dkaluza.domaincore.DefaultFactory;
-import pl.dkaluza.domaincore.Factory;
-import pl.dkaluza.domaincore.ValidationExecutor;
+import pl.dkaluza.domaincore.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -46,8 +43,8 @@ public class Password {
     static class PasswordFactory extends DefaultFactory<Password> {
         private static final Pattern PASSWORD_PATTERN = Pattern.compile("^\\S+$");
 
-        private PasswordFactory(ValidationExecutor validationExecutor, Supplier<Password> objectSupplier) {
-            super(validationExecutor, objectSupplier);
+        private PasswordFactory(ValidationExecutor validationExecutor, Assembler<Password> assembler) {
+            super(validationExecutor, assembler);
         }
 
         private static boolean isPasswordValid(char[] password) {
@@ -87,8 +84,8 @@ public class Password {
         }
 
         @Override
-        protected Supplier<Password> getObjectSupplier() {
-            return super.getObjectSupplier();
+        protected Password assemble() {
+            return super.assemble();
         }
     }
 }

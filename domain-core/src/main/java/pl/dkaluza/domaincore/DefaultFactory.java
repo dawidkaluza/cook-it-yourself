@@ -1,18 +1,20 @@
 package pl.dkaluza.domaincore;
 
 import java.util.List;
-import java.util.function.Supplier;
 
-public class DefaultFactory<T> extends AbstractFactory<T> {
+/**
+ * Factory where validation is dependent on provided ValidationExecutor.
+ */
+public class DefaultFactory<T> extends Factory<T> {
     private final ValidationExecutor validationExecutor;
 
-    protected DefaultFactory(ValidationExecutor validationExecutor, Supplier<T> objectSupplier) {
-        super(objectSupplier);
+    protected DefaultFactory(ValidationExecutor validationExecutor, Assembler<T> assembler) {
+        super(assembler);
         this.validationExecutor = validationExecutor;
     }
 
     @Override
-    List<FieldError> collectErrors() {
+    protected List<FieldError> validate() {
         return validationExecutor.validate();
     }
 }

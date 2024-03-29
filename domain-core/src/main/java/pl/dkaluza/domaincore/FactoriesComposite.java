@@ -1,21 +1,22 @@
 package pl.dkaluza.domaincore;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class FactoriesComposite<T> extends AbstractFactory<T> {
+/**
+ * Factory that can be a composite of other factories.
+ */
+public class FactoriesComposite<T> extends Factory<T> {
     private final List<Factory<?>> factories;
 
-    public FactoriesComposite(Supplier<T> objectSupplier, Factory<?>... factories) {
-        super(objectSupplier);
+    public FactoriesComposite(Assembler<T> assembler, Factory<?>... factories) {
+        super(assembler);
         this.factories = List.of(factories);
     }
 
     @Override
-    List<FieldError> collectErrors() {
-        var errors = new ArrayList<FieldError>();
+    protected List<FieldError> validate() {
+        List<FieldError> errors = new ArrayList<>();
         for (Factory<?> factory : factories) {
             errors.addAll(factory.validate());
         }

@@ -1,7 +1,6 @@
 package pl.dkaluza.userservice.domain;
 
 import pl.dkaluza.domaincore.AbstractPersistable;
-import pl.dkaluza.domaincore.DefaultFactory;
 import pl.dkaluza.domaincore.FactoriesComposite;
 import pl.dkaluza.domaincore.Factory;
 import pl.dkaluza.userservice.domain.EmailAddress.EmailAddressFactory;
@@ -85,8 +84,8 @@ public class User extends AbstractPersistable<UserId> {
             var nameFactory = new UserNameFactory(name);
             return new FactoriesComposite<>(
                 () -> new User(
-                    null, emailFactory.getObjectSupplier().get(),
-                    passwordFactory.getObjectSupplier().get(), nameFactory.getObjectSupplier().get()
+                    null, emailFactory.assemble(),
+                    passwordFactory.assemble(), nameFactory.assemble()
                 ),
                 emailFactory, passwordFactory, nameFactory
             );
@@ -99,8 +98,8 @@ public class User extends AbstractPersistable<UserId> {
             var nameFactory = new UserNameFactory(name);
             return new FactoriesComposite<>(
                 () -> new User(
-                    idFactory.getObjectSupplier().get(), emailFactory.getObjectSupplier().get(),
-                    passwordFactory.getObjectSupplier().get(), nameFactory.getObjectSupplier().get()
+                    idFactory.assemble(), emailFactory.assemble(),
+                    passwordFactory.assemble(), nameFactory.assemble()
                 ),
                 idFactory, emailFactory, passwordFactory, nameFactory
             );
