@@ -12,10 +12,6 @@ public class ValidationExecutor {
         this.validators = validators;
     }
 
-    public static ValidationExecutor empty() {
-        return new ValidationExecutor(Collections.emptyList());
-    }
-
     public static ValidationExecutor of(List<Validator> validators) {
         return new ValidationExecutor(validators);
     }
