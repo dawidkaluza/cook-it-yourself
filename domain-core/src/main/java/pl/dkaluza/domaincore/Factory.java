@@ -14,7 +14,8 @@ import java.util.List;
  * Internal processes - accessible only within factories.
  * <ul>
  *     <li>validate - check components of which given domain object is to be created..Return errors if any occurred.</li>
- *     <li>assemble - create domain object and return it.</li>
+ *     <li>assemble - create domain object and return it, even when validation returned errors!
+ *     Using this method it's your responsibility to make sure, that created object is valid.</li>
  * </ul>
  * Public processes - accessible internally and externally (by factories' users).
  * <ul>
