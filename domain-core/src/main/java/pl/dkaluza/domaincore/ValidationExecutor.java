@@ -24,10 +24,6 @@ public class ValidationExecutor {
         return new Builder();
     }
 
-    List<Validator> getValidators() {
-        return new ArrayList<>(validators);
-    }
-
     public List<FieldError> validate() {
         var errors = new ArrayList<FieldError>();
         for (Validator validator : validators) {
