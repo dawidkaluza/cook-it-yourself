@@ -14,12 +14,12 @@ public class Password {
         this.encodedPassword = encodedPassword;
     }
 
-    public static Factory<Password> of(char[] encodedPassword) {
-        return PasswordFactory.of(encodedPassword);
-    }
-
     public static Factory<Password> of(char[] password, Function<char[], char[]> passwordEncoder) {
         return PasswordFactory.of(password, passwordEncoder);
+    }
+
+    public static Factory<Password> of(char[] encodedPassword) {
+        return PasswordFactory.of(encodedPassword);
     }
 
     public char[] getValue() {
