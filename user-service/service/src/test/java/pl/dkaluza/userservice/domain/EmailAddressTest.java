@@ -15,9 +15,12 @@ class EmailAddressTest {
     @ParameterizedTest
     @MethodSource("invalidEmailParamsProvider")
     void of_invalidParams_throwException(String email) {
-        // Given, when
+        // Given
+        var factory = EmailAddress.of(email);
+
+        // When
         var e = catchThrowableOfType(
-            () -> EmailAddress.of(email).produce(),
+            factory::produce,
             ValidationException.class
         );
 
@@ -43,8 +46,11 @@ class EmailAddressTest {
     @ParameterizedTest
     @MethodSource("validEmailParamsProvider")
     void of_validParams_returnObject(String email) {
-        // Given, when
-        var emailObject = EmailAddress.of(email).produce();
+        // Given
+        var factory = EmailAddress.of(email);
+
+        // When
+        var emailObject = factory.produce();
 
         // Then
         assertThat(emailObject)

@@ -18,9 +18,12 @@ class PasswordTest {
     @ParameterizedTest
     @MethodSource("rawPasswordInvalidParamsProvider")
     void ofRawPassword_variousParams_throwException(char[] password, Function<char[], char[]> passwordEncoder, String[] expectedErrorsNames) {
-        // Given, when
+        // Given
+        var factory = Password.of(password, passwordEncoder);
+
+        // When
         ValidationException e = catchThrowableOfType(
-            () -> Password.of(password, passwordEncoder).produce(),
+            factory::produce,
             ValidationException.class
         );
 
@@ -50,9 +53,10 @@ class PasswordTest {
     void ofRawPassword_variousParams_returnObject(char[] password) {
         // Given
         Function<char[], char[]> passwordEncoder = (pwd) -> ("***" + String.valueOf(pwd) + "***").toCharArray();
+        var factory = Password.of(password, passwordEncoder);
 
         // When
-        var passwordObject = Password.of(password, passwordEncoder).produce();
+        var passwordObject = factory.produce();
 
         // Then
         assertThat(passwordObject)
@@ -73,9 +77,12 @@ class PasswordTest {
 
     @Test
     void ofEncodedPassword_variousParams_throwException() {
-        // Given, when
+        // Given
+        var factory = Password.of(null);
+
+        // When
         var e = catchThrowableOfType(
-            () -> Password.of(null).produce(),
+            factory::produce,
             ValidationException.class
         );
 
@@ -92,9 +99,10 @@ class PasswordTest {
     void ofEncodedPassword_variousParams_returnObject(String encodedPasswordAsString) {
         // Given
         var encodedPassword = encodedPasswordAsString.toCharArray();
+        var factory = Password.of(encodedPassword);
 
-        // Given, when
-        var password = Password.of(encodedPassword).produce();
+        // When
+        var password = factory.produce();
 
         // Then
         assertThat(password)

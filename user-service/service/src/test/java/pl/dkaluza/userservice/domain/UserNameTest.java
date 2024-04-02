@@ -15,9 +15,12 @@ class UserNameTest {
     @ParameterizedTest
     @MethodSource("invalidNameParamsProvider")
     void of_invalidParams_throwException(String name) {
-        // Given, when
+        // Given
+        var factory = UserName.of(name);
+
+        // When
         var e = catchThrowableOfType(
-            () -> UserName.of(name).produce(),
+            factory::produce,
             ValidationException.class
         );
 
@@ -42,8 +45,11 @@ class UserNameTest {
     @ParameterizedTest
     @MethodSource("validNameParamsProvider")
     void of_validParams_returnObject(String name) {
-        // Given, when
-        var nameObject = UserName.of(name).produce();
+        // Given
+        var factory = UserName.of(name);
+
+        // When
+        var nameObject = factory.produce();
 
         // Then
         assertThat(nameObject)
