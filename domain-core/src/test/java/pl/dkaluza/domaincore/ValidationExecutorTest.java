@@ -21,7 +21,7 @@ class ValidationExecutorTest {
                 return null;
             }
 
-            return new FieldError("length", "Number must be positive");
+            return new FieldError("length", "Length must be a positive number");
         };
 
         var validationExecutor = ValidationExecutor.of(List.of(validator));
@@ -32,7 +32,8 @@ class ValidationExecutorTest {
         // Then
         if (hasErrors) {
             assertThat(errors)
-                .extracting(FieldError::getName)
+                .isNotNull()
+                .extracting(FieldError::name)
                 .containsExactly("length");
         } else {
             assertThat(errors)
@@ -42,6 +43,7 @@ class ValidationExecutorTest {
 
     @ParameterizedTest
     @CsvSource({
+        "-1, '  ', 'number name'",
         "1, '', 'name'",
         "0, 'Dawid', 'number'",
         "1, 'Dawid', ''",
@@ -62,7 +64,7 @@ class ValidationExecutorTest {
 
         // Then
         assertThat(errors)
-            .extracting(FieldError::getName)
+            .extracting(FieldError::name)
             .containsExactly(expectedErrorsNames);
     }
 }

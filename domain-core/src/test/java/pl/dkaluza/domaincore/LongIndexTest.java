@@ -27,7 +27,7 @@ class LongIndexTest {
             .isNotNull();
 
         assertThat(e.getErrors())
-            .extracting(FieldError::getName)
+            .extracting(FieldError::name)
             .containsExactly("id");
     }
 

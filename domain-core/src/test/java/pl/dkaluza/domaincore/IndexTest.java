@@ -16,11 +16,13 @@ class IndexTest {
     }
 
     private static Stream<Arguments> equalArgumentsProvider() {
+        var userId1 = new UserId(1L);
         return Stream.of(
-            Arguments.of(new UserId(1L), null, false),
-            Arguments.of(new UserId(1L), new Object(), false),
-            Arguments.of(new UserId(1L), new UserId(2L), false),
-            Arguments.of(new UserId(1L), new UserId(1L), true)
+            Arguments.of(userId1, null, false),
+            Arguments.of(userId1, new Object(), false),
+            Arguments.of(userId1, new UserId(2L), false),
+            Arguments.of(userId1, userId1, true),
+            Arguments.of(userId1, new UserId(1L), true)
         );
     }
 }

@@ -28,7 +28,7 @@ class FactoriesCompositeTest {
 
         // Then
         assertThat(errors)
-            .extracting(FieldError::getName)
+            .extracting(FieldError::name)
             .containsExactly(expectedFieldsErrors);
     }
 
@@ -48,7 +48,7 @@ class FactoriesCompositeTest {
             .isNotNull();
 
         assertThat(e.getErrors())
-            .extracting(FieldError::getName)
+            .extracting(FieldError::name)
             .containsExactly("sender", "message");
     }
 

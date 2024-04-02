@@ -28,7 +28,7 @@ class DefaultFactoryTest {
         // Then
         if (hasErrors) {
             assertThat(errors)
-                .extracting(FieldError::getName)
+                .extracting(FieldError::name)
                 .containsExactly("name");
         } else {
             assertThat(errors)
@@ -85,7 +85,7 @@ class DefaultFactoryTest {
         // Then
         if (hasErrors) {
             assertThat(errors)
-                .extracting(FieldError::getName)
+                .extracting(FieldError::name)
                 .containsExactly("name");
         } else {
             assertThat(errors)
@@ -121,7 +121,7 @@ class DefaultFactoryTest {
         }
 
         assertThat(e.getErrors())
-            .extracting(FieldError::getName)
+            .extracting(FieldError::name)
             .containsExactly("name");
     }
 

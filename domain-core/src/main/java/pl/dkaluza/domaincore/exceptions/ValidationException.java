@@ -18,9 +18,9 @@ public class ValidationException extends DomainException {
 
         for (FieldError error : errors) {
             stringBuilder
-                .append(error.getName())
+                .append(error.name())
                 .append("=")
-                .append(error.getMessage())
+                .append(error.name())
                 .append("; ");
         }
 
