@@ -20,7 +20,7 @@ public class ValidationException extends DomainException {
             stringBuilder
                 .append(error.name())
                 .append("=")
-                .append(error.name())
+                .append(error.message())
                 .append("; ");
         }
 
