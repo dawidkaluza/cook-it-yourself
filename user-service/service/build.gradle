@@ -15,6 +15,17 @@ repositories {
     mavenCentral()
 }
 
+
+compileJava {
+    options.compilerArgs += [
+        '-Amapstruct.defaultComponentModel=spring'
+    ]
+}
+
+ext {
+    mapstructVersion = "1.5.5.Final"
+}
+
 dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -27,6 +38,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation project(':domain-core')
     runtimeOnly 'org.postgresql:postgresql'
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
