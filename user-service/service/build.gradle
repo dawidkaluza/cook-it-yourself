@@ -14,18 +14,9 @@ java {
 repositories {
     mavenCentral()
 
+    // Repo for common internal libraries
     maven {
-        def githubProps = new Properties()
-        File propsFile = file(rootDir.absolutePath + "/../github.properties")
-        if (propsFile.isFile()) {
-            propsFile.withInputStream { githubProps.load(it) }
-        }
-
-        url = uri("https://maven.pkg.github.com/dawidkaluza/cook-it-yourself")
-        credentials {
-            username = githubProps.get("username", System.getenv("USERNAME"))
-            password = githubProps.get("token", System.getenv("TOKEN"))
-        }
+        url = 'https://repsy.io/mvn/dawidkaluza/cook-it-yourself/'
     }
 }
 
