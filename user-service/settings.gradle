@@ -1,6 +1,4 @@
 rootProject.name = 'user-service'
 include ':web'
 include ':service'
-include ':domain-core'
-project(':domain-core').projectDir = file("../domain-core")
 

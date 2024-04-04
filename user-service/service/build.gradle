@@ -13,6 +13,20 @@ java {
 
 repositories {
     mavenCentral()
+
+    maven {
+        def githubProps = new Properties()
+        File propsFile = file(rootDir.absolutePath + "/../github.properties")
+        if (propsFile.isFile()) {
+            propsFile.withInputStream { githubProps.load(it) }
+        }
+
+        url = uri("https://maven.pkg.github.com/dawidkaluza/cook-it-yourself")
+        credentials {
+            username = githubProps.get("username", System.getenv("USERNAME"))
+            password = githubProps.get("token", System.getenv("TOKEN"))
+        }
+    }
 }
 
 
@@ -36,7 +50,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation project(':domain-core')
+    implementation 'pl.dkaluza:domain-core:0.0.1'
     runtimeOnly 'org.postgresql:postgresql'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

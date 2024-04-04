@@ -1,12 +1,18 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
 }
 
 group = 'pl.dkaluza'
-version = '1.0-SNAPSHOT'
+version = '0.0.1'
 
 repositories {
     mavenCentral()
+}
+
+java {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
 dependencies {
@@ -17,4 +23,29 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            def githubProps = new Properties()
+            File propsFile = file(rootDir.absolutePath + "/../github.properties")
+            if (propsFile.isFile()) {
+                propsFile.withInputStream { githubProps.load(it) }
+            }
+
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/dawidkaluza/cook-it-yourself")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
