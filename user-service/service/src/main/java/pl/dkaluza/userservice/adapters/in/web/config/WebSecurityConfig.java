@@ -82,7 +82,6 @@ class WebSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain userAuthSecurityFilterChain(HttpSecurity http, WebAppSettings webAppSettings, CookieCsrfTokenRepository tokenRepository, CsrfTokenRequestAttributeHandler tokenReqAttrHandler, CsrfGenerateCookieFilter generateCookieFilter, RestfulRedirectStrategy redirectStrategy) throws Exception {
-        // TODO configure session to be stored in redis
         http
             .securityMatcher("/sign-in", "/sign-out")
             .cors(Customizer.withDefaults())
