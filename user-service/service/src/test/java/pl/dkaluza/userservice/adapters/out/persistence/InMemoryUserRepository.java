@@ -12,6 +12,7 @@ import java.util.Set;
 
 import static pl.dkaluza.domaincore.Assertions.*;
 
+//FIXME it's just for a POC for now, to be extended later
 public class InMemoryUserRepository implements UserRepository {
     private final Set<User> users;
     private long idSeq;

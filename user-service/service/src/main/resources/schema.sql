@@ -4,3 +4,10 @@ CREATE TABLE IF NOT EXISTS users (
     encoded_password VARCHAR(32) NOT NULL,
     name VARCHAR(128) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    exchange VARCHAR(256) NOT NULL,
+    routing_key VARCHAR(256) NOT NULL,
+    message TEXT NOT NULL
+);

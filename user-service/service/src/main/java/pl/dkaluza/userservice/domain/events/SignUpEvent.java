@@ -1,6 +1,6 @@
 package pl.dkaluza.userservice.domain.events;
 
-import pl.dkaluza.userservice.domain.User;
+import pl.dkaluza.userservice.domain.UserId;
 
-public record SignUpEvent(User user) {
+public record SignUpEvent(UserId id) {
 }

@@ -105,8 +105,8 @@ class DefaultUserServiceTest {
         SignUpEvent event = userEventPublisher.dequeue();
         assertThat(event)
             .isNotNull()
-            .extracting(SignUpEvent::user)
-            .isEqualTo(user);
+            .extracting(SignUpEvent::id)
+            .isEqualTo(user.getId());
     }
 
     private User newUser(String email, String password, String name) throws ValidationException {

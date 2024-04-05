@@ -28,7 +28,7 @@ class DefaultUserService implements UserService {
         }
 
         var insertedUser = userRepository.insertUser(user);
-        userEventPublisher.publish(new SignUpEvent(insertedUser));
+        userEventPublisher.publish(new SignUpEvent(insertedUser.getId()));
         return insertedUser;
     }
 }
