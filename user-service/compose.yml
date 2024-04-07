@@ -11,7 +11,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./service/src/:/app/service/src/
+      - ./service/src/:/home/developer/app/service/src/
     networks:
       - main
     environment:

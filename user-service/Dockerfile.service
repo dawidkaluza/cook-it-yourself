@@ -1,11 +1,13 @@
 FROM eclipse-temurin:17-jdk@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e
-WORKDIR /app
-COPY gradle ./gradle
-COPY settings.gradle gradlew ./
 
-COPY service/build.gradle ./service/
+RUN groupadd -r developer && useradd -l -r -m -g developer developer
+USER developer
+WORKDIR /home/developer/app
+
+COPY --chown=developer gradle ./gradle
+COPY --chown=developer settings.gradle gradlew ./
+RUN ./gradlew --version # to pre-download specified Gradle version
+COPY --chown=developer service/build.gradle ./service/
 RUN ./gradlew :service:resolveDependencies
 
-VOLUME [ "/root/.gradle" ]
-RUN ./gradlew :service:compileJava # without this you might not get the most recent version of your app
 CMD ./gradlew :service:compileJava --continuous & ./gradlew :service:bootRun
