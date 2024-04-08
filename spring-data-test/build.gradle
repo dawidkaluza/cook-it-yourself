@@ -1,0 +1,51 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'pl.dkaluza'
+version = '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
+dependencies {
+    implementation 'org.springframework.data:spring-data-commons:3.2.4'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            def repsyProps = new Properties()
+            File propsFile = file(rootDir.absolutePath + "/repsy.properties")
+            if (propsFile.isFile()) {
+                propsFile.withInputStream { repsyProps.load(it) }
+            }
+
+            name = "Repsy"
+            url = 'https://repsy.io/mvn/dawidkaluza/cook-it-yourself/'
+            credentials {
+                username = repsyProps.get("username", System.getenv("USERNAME"))
+                password = repsyProps.get("password", System.getenv("PASSWORD"))
+            }
+        }
+    }
+
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
