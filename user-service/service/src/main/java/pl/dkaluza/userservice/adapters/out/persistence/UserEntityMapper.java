@@ -17,7 +17,7 @@ interface UserEntityMapper {
         return User.builder()
             .id(entity.id())
             .email(entity.email())
-            .password(entity.encodedPassword())
+            .encodedPassword(entity.encodedPassword())
             .name(entity.name())
             .fromPersistenceFactory()
             .produce();

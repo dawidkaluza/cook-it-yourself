@@ -7,20 +7,20 @@ import org.junit.jupiter.params.provider.NullSource;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.userservice.adapters.out.eventpublisher.InMemoryUserEventPublisher;
-import pl.dkaluza.userservice.adapters.out.persistence.InMemoryUserRepository;
+import pl.dkaluza.userservice.adapters.out.persistence.InMemoryUserPersistenceAdapter;
 import pl.dkaluza.userservice.domain.events.SignUpEvent;
 import pl.dkaluza.userservice.domain.exceptions.EmailAlreadyExistsException;
 
 import static org.assertj.core.api.Assertions.*;
 
 class DefaultUserServiceTest {
-    private InMemoryUserRepository userRepository;
+    private InMemoryUserPersistenceAdapter userRepository;
     private InMemoryUserEventPublisher userEventPublisher;
     private DefaultUserService userService;
 
     @BeforeEach
     void beforeEach() {
-        userRepository = new InMemoryUserRepository();
+        userRepository = new InMemoryUserPersistenceAdapter();
         userEventPublisher = new InMemoryUserEventPublisher();
         userService = new DefaultUserService(userRepository, userEventPublisher);
     }
@@ -98,7 +98,7 @@ class DefaultUserServiceTest {
             .extracting(UserName::getValue)
             .isEqualTo(name);
 
-        var existsInRepo = userRepository.userExistsById(user.getId());
+        var existsInRepo = userRepository.userExistsByEmail(user.getEmail());
         assertThat(existsInRepo)
             .isTrue();
 

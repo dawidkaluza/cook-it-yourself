@@ -48,6 +48,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'pl.dkaluza:spring-data-test:0.0.1'
 }
 
 def currentEnv() {
