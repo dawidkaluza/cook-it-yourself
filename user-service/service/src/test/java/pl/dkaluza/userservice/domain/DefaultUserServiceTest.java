@@ -6,7 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
-import pl.dkaluza.userservice.adapters.out.eventpublisher.InMemoryUserEventPublisher;
+import pl.dkaluza.userservice.adapters.out.eventpublisher.InMemoryUserEventPublisherAdapter;
 import pl.dkaluza.userservice.adapters.out.persistence.InMemoryUserPersistenceAdapter;
 import pl.dkaluza.userservice.domain.events.SignUpEvent;
 import pl.dkaluza.userservice.domain.exceptions.EmailAlreadyExistsException;
@@ -15,13 +15,13 @@ import static org.assertj.core.api.Assertions.*;
 
 class DefaultUserServiceTest {
     private InMemoryUserPersistenceAdapter userRepository;
-    private InMemoryUserEventPublisher userEventPublisher;
+    private InMemoryUserEventPublisherAdapter userEventPublisher;
     private DefaultUserService userService;
 
     @BeforeEach
     void beforeEach() {
         userRepository = new InMemoryUserPersistenceAdapter();
-        userEventPublisher = new InMemoryUserEventPublisher();
+        userEventPublisher = new InMemoryUserEventPublisherAdapter();
         userService = new DefaultUserService(userRepository, userEventPublisher);
     }
 

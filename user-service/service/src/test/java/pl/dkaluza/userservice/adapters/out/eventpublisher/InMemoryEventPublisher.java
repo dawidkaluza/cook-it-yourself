@@ -1,6 +1,5 @@
 package pl.dkaluza.userservice.adapters.out.eventpublisher;
 
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.LinkedList;

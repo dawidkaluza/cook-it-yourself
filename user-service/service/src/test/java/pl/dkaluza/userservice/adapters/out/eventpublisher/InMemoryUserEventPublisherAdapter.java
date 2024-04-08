@@ -6,10 +6,10 @@ import pl.dkaluza.userservice.ports.out.UserEventPublisher;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class InMemoryUserEventPublisher implements UserEventPublisher {
+public class InMemoryUserEventPublisherAdapter implements UserEventPublisher {
     private final Queue<Object> events;
 
-    public InMemoryUserEventPublisher() {
+    public InMemoryUserEventPublisherAdapter() {
         this.events = new LinkedList<>();
     }
 

@@ -20,7 +20,14 @@ class UserEventPublisherAdapterTest {
     void beforeEach() {
         messageRepository = new InMemoryMessageRepository();
         eventPublisher = new InMemoryEventPublisher();
-        userEventPublisherAdapter = new UserEventPublisherAdapter(messageRepository, eventPublisher, new ObjectMapper());
+        userEventPublisherAdapter = new UserEventPublisherAdapter(
+            new SignUpEventMapper(
+                new ObjectMapper(),
+                new UserServiceExchange()
+            ),
+            messageRepository,
+            eventPublisher
+        );
     }
 
     @ParameterizedTest

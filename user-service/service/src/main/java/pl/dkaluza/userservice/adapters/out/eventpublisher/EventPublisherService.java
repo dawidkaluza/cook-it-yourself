@@ -19,11 +19,10 @@ class EventPublisherService {
 
     @Transactional
     public void sendById(Long id) {
-        var messageEntity = messageRepository
+        // Could have been removed by scheduler, so message not being there is not a bug
+        messageRepository
             .findById(id)
-            .orElseThrow(() -> new IllegalStateException("Service couldn't find event with id=" + id));
-
-        sendAndRemove(messageEntity);
+            .ifPresent(this::sendAndRemove);
     }
 
     @Transactional
