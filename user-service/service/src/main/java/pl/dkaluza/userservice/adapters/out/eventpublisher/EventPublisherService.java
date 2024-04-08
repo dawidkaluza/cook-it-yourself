@@ -6,6 +6,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.dkaluza.domaincore.Assertions;
+
+import static pl.dkaluza.domaincore.Assertions.*;
 
 @Service
 class EventPublisherService {
@@ -19,6 +22,8 @@ class EventPublisherService {
 
     @Transactional
     public void sendById(Long id) {
+        assertArgument(id != null, "Id is null");
+
         // Could have been removed by scheduler, so message not being there is not a bug
         messageRepository
             .findById(id)
@@ -27,6 +32,8 @@ class EventPublisherService {
 
     @Transactional
     public void sendRemainingMessages(int amount) {
+        assertArgument(amount > 0, "Amount must be a positive number");
+
         var messages = messageRepository.findAll(
             PageRequest.of(0, amount, Sort.by(Sort.Direction.ASC, "id"))
         );
