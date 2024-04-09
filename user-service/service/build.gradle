@@ -42,14 +42,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'pl.dkaluza:domain-core:0.0.1'
+    implementation 'pl.dkaluza:domain-core:0.0.1-SNAPSHOT'
     runtimeOnly 'org.postgresql:postgresql'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'pl.dkaluza:spring-data-test:0.0.1'
+    testImplementation 'pl.dkaluza:spring-data-test:0.0.1-SNAPSHOT'
 }
 
 def currentEnv() {
