@@ -13,11 +13,15 @@ interface UserEntityMapper {
     @Mapping(source = "name.value", target = "name")
     UserEntity toEntity(User user);
 
+    default String toString(char[] charArray) {
+        return new String(charArray);
+    }
+
     default User toDomain(UserEntity entity) throws ValidationException {
         return User.builder()
             .id(entity.id())
             .email(entity.email())
-            .encodedPassword(entity.encodedPassword())
+            .encodedPassword(entity.encodedPassword().toCharArray())
             .name(entity.name())
             .fromPersistenceFactory()
             .produce();

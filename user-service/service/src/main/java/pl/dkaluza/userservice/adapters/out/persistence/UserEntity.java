@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.Objects;
 
 @Table("users")
-record UserEntity(@Id Long id, String email, char[] encodedPassword, String name) {
+record UserEntity(@Id Long id, String email, String encodedPassword, String name) {
     @Override
     public boolean equals(Object o) {
         if (this == o){
