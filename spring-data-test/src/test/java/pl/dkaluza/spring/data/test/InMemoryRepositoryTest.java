@@ -2,6 +2,8 @@ package pl.dkaluza.spring.data.test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -91,6 +93,41 @@ class InMemoryRepositoryTest {
             .isNotNull()
             .extracting(User::id, User::name)
             .containsExactly(3L, "Nicolas");
+    }
+
+    @Test
+    void findAll_pageRequest_returnExpectedUsers() {
+        // Given
+        userRepository.saveAll(
+            List.of(
+                new User(null, "Dawid"),
+                new User(null, "Gabriel"),
+                new User(null, "Nico"),
+                new User(null, "Don"),
+                new User(null, "David")
+            )
+        );
+
+        // When
+        var users = userRepository.findAll(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "id")));
+
+        // Then
+        assertThat(users)
+            .isNotNull();
+
+        assertThat(users.getTotalPages())
+            .isEqualTo(3);
+
+        assertThat(users.getTotalElements())
+            .isEqualTo(5);
+
+        var content = users.getContent();
+
+        assertThat(content)
+            .hasSize(2)
+            .extracting(User::name)
+            .containsExactly("Nico", "Don");
+
     }
 
     // TODO write the rest of the tests

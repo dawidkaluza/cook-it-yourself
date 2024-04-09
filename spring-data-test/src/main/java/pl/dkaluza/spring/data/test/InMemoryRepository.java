@@ -23,7 +23,7 @@ public abstract class InMemoryRepository<T, ID> implements ListCrudRepository<T,
 
     private static Object getFieldValue(Object object, String fieldName) {
         try {
-            Field field = object.getClass().getField(fieldName);
+            Field field = object.getClass().getDeclaredField(fieldName);
             return performAction(object, field, () -> field.get(object));
         } catch (Exception e) {
             throw new InMemoryRepositoryException("Reflection API thrown exception", e);
