@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -35,6 +36,7 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import pl.dkaluza.userservice.ports.in.UserService;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
@@ -165,13 +167,8 @@ class WebSecurityConfig {
     }
 
     @Bean
-    InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        return new InMemoryUserDetailsManager(
-            User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("admin"))
-                .build()
-        );
+    UserDetailsService userDetailsService(UserDetailsMapper userDetailsMapper, UserService userService) {
+        return new DefaultUserDetailsService(userDetailsMapper, userService);
     }
 
     @Bean
