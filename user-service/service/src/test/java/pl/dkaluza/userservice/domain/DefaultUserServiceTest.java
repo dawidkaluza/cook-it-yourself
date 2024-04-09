@@ -10,6 +10,7 @@ import pl.dkaluza.userservice.adapters.out.eventpublisher.InMemoryUserEventPubli
 import pl.dkaluza.userservice.adapters.out.persistence.InMemoryUserPersistenceAdapter;
 import pl.dkaluza.userservice.domain.events.SignUpEvent;
 import pl.dkaluza.userservice.domain.exceptions.EmailAlreadyExistsException;
+import pl.dkaluza.userservice.domain.exceptions.UserNotFoundException;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -107,6 +108,43 @@ class DefaultUserServiceTest {
             .isNotNull()
             .extracting(SignUpEvent::id)
             .isEqualTo(user.getId());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    void loadUserByEmail_invalidParams_throwException(EmailAddress email) {
+        assertThatThrownBy(() -> userService.loadUserByEmail(email))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void loadUserByEmail_nonExistingEmail_throwException() {
+        // Given
+        var newUser = newUser("dawid@d.c", "123xyz", "Dawid");
+        userRepository.insertUser(newUser);
+
+        // When, then
+        assertThatThrownBy(() -> userService.loadUserByEmail(
+            EmailAddress.of("gabriel@d.c").produce()
+        )).isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void loadUserByEmail_existingEmail_returnUser() {
+        // Given
+        var newUser = newUser("dawid@d.c", "123xyz", "Dawid");
+        userRepository.insertUser(newUser);
+
+        // When
+        var foundUser = userService.loadUserByEmail(
+            EmailAddress.of("dawid@d.c").produce()
+        );
+
+        // Then
+        assertThat(foundUser)
+            .isNotNull()
+            .extracting(User::getEmail, User::getName)
+            .containsExactly(newUser.getEmail(), newUser.getName());
     }
 
     private User newUser(String email, String password, String name) throws ValidationException {

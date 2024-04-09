@@ -1,9 +1,8 @@
 package pl.dkaluza.userservice.domain.exceptions;
 
-import pl.dkaluza.domaincore.exceptions.DomainException;
 import pl.dkaluza.userservice.domain.EmailAddress;
 
-public class EmailAlreadyExistsException extends DomainException {
+public class EmailAlreadyExistsException extends UserException {
     public EmailAlreadyExistsException(EmailAddress email) {
         super("E-mail " + email + " already exists");
     }

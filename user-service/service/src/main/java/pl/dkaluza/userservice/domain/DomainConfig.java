@@ -24,7 +24,11 @@ class DomainConfig {
     DefaultUserService defaultUserService(UserRepository userRepository, UserEventPublisher userEventPublisher) {
         var userService = new DefaultUserService(userRepository, userEventPublisher);
         var attrSource = new NameMatchTransactionAttributeSource();
+        var readOnlyTxAttr = new DefaultTransactionAttribute();
+        readOnlyTxAttr.setReadOnly(true);
+
         attrSource.addTransactionalMethod("signUp", new DefaultTransactionAttribute());
+        attrSource.addTransactionalMethod("loadUserByEmail", new DefaultTransactionAttribute(readOnlyTxAttr));
         return transactional(userService, attrSource);
     }
 

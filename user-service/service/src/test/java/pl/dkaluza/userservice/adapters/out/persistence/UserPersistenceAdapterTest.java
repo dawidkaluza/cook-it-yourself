@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.userservice.domain.EmailAddress;
 import pl.dkaluza.userservice.domain.User;
+import pl.dkaluza.userservice.domain.UserName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -76,6 +77,48 @@ class UserPersistenceAdapterTest {
 
         assertThat(savedUser.getName())
             .isEqualTo(newUser.getName());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    void findUserByEmail_invalidParams_throwException(EmailAddress email) {
+        assertThatThrownBy(() -> userPersistenceAdapter.findUserByEmail(email))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "dawid@d.c, true",
+        "gabriel@d.c, false"
+    })
+    void findUserByEmail_validEmail_returnOptionalUser(String email, boolean exists) {
+        // Given
+        var user = User.builder()
+            .email("dawid@d.c")
+            .password("123xyz".toCharArray())
+            .passwordEncoder((pwd) -> pwd)
+            .name("Dawid")
+            .newUserFactory()
+            .produce();
+
+        userPersistenceAdapter.insertUser(user);
+
+        // When
+        var optionallyFoundUser = userPersistenceAdapter.findUserByEmail(
+            EmailAddress.of(email).produce()
+        );
+
+        // Then
+        if (exists) {
+            assertThat(optionallyFoundUser)
+                .isPresent()
+                .get()
+                .extracting(User::getEmail, User::getName)
+                .containsExactly(EmailAddress.of("dawid@d.c").produce(), UserName.of("Dawid").produce());
+        } else {
+            assertThat(optionallyFoundUser)
+                .isEmpty();
+        }
     }
 
     @ParameterizedTest

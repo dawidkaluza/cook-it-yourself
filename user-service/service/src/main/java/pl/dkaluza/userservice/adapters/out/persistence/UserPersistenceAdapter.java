@@ -6,6 +6,8 @@ import pl.dkaluza.userservice.domain.EmailAddress;
 import pl.dkaluza.userservice.domain.User;
 import pl.dkaluza.userservice.ports.out.UserRepository;
 
+import java.util.Optional;
+
 import static pl.dkaluza.domaincore.Assertions.*;
 
 @Component
@@ -25,6 +27,15 @@ class UserPersistenceAdapter implements UserRepository {
 
         var newUser = userRepository.save(userMapper.toEntity(user));
         return userMapper.toDomain(newUser);
+    }
+
+    @Override
+    public Optional<User> findUserByEmail(EmailAddress email) {
+        assertArgument(email != null, "Email is null");
+
+        return userRepository
+            .findByEmail(email.getValue())
+            .map(userMapper::toDomain);
     }
 
     @Override
