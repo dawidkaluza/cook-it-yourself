@@ -1,12 +1,14 @@
-import React, {useState} from "react";
-import { Link as RouterLink } from "react-router-dom";
 import {Alert, Box, Button, CircularProgress, Link, TextField, Typography} from "@mui/material";
-import LoginIcon from '@mui/icons-material/Login';
-import {useSignIn} from "../../services/user/useSignIn";
+import {Link as RouterLink} from "react-router-dom";
+import React, {useState} from "react";
+import LoginIcon from "@mui/icons-material/Login";
 
 const Form = () => {
+  const error = false;
+  const success = false;
+  const loading = false;
+  const fieldsErrors = {}
   const [fields, setFields] = useState({});
-  const { signIn, loading, success, error, fieldsErrors } = useSignIn();
 
   const handleFieldChange = (event) => {
     const target = event.target;
@@ -18,9 +20,7 @@ const Form = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    // noinspection JSIgnoredPromiseFromCall
-    signIn(fields);
+    console.log("Submit!");
   };
 
   return (
@@ -42,11 +42,11 @@ const Form = () => {
         variant={"h5"}
         align={"center"}
       >
-        Sign in
+        Sign up
       </Typography>
 
       <FormTextField
-        name={"username"}
+        name={"email"}
         label={"E-mail"}
         onChange={handleFieldChange}
         fields={fields}
@@ -61,6 +61,15 @@ const Form = () => {
         fields={fields}
         errors={fieldsErrors}
       />
+
+      <FormTextField
+        name={"name"}
+        label={"Name"}
+        onChange={handleFieldChange}
+        fields={fields}
+        errors={fieldsErrors}
+      />
+
       <SubmitButton
         loading={loading}
         sx={{
@@ -69,7 +78,7 @@ const Form = () => {
         }}
       />
       <Typography>
-        Don't have an account? <Link component={RouterLink} to={"/sign-up"}>Sign up.</Link>
+        Already signed up? <Link component={RouterLink} to={"/sign-in"}>Sign in.</Link>
       </Typography>
       {error &&
         <Alert
@@ -95,8 +104,9 @@ const Form = () => {
 };
 
 
+
 const FormTextField = ({
- name, type = "text", label = "", placeholder = "", fields, errors, onChange, ...props
+  name, type = "text", label = "", placeholder = "", fields, errors, onChange, ...props
 }) => {
   return (
     <TextField
@@ -127,9 +137,9 @@ const SubmitButton = ({
       disabled={loading}
       {...props}
     >
-      Sign in
+      Sign up
     </Button>
   );
 };
 
-export { Form };
+export { Form }

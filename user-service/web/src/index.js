@@ -4,11 +4,16 @@ import {SignIn} from "./pages/signIn/SignIn";
 import {CookiesProvider} from "react-cookie";
 import {Consent} from "./pages/consent/Consent";
 import {createRoot} from "react-dom/client";
+import {SignUp} from "./pages/signUp/SignUp";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to={"/sign-in"} />
+  },
+  {
+    path: "/sign-up",
+    element: <SignUp />
   },
   {
     path: "/sign-in",
