@@ -10,4 +10,4 @@ RUN ./gradlew --version # to pre-download specified Gradle version
 COPY --chown=developer service/build.gradle ./service/
 RUN ./gradlew :service:resolveDependencies
 
-CMD ./gradlew :service:compileJava --continuous & ./gradlew :service:bootRun
+CMD ./gradlew :service:compileJava --continuous --no-daemon & ./gradlew :service:bootRun --no-daemon
