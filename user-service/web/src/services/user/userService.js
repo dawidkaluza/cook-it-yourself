@@ -22,19 +22,6 @@ const buildErrorResponse = ({ message = "", fields = {} }) => {
   };
 };
 
-const validateSignInFields = (fields, errors) => {
-  let result = true;
-
-  for (const key in fields) {
-    if (!fields[key]) {
-      errors[key] = errors[key] ?? "Field must not be empty.";
-      result = false;
-    }
-  }
-
-  return result;
-};
-
 const handleRedirect = (redirectUrlAsString) => {
   if (!redirectUrlAsString) {
     return buildSuccessResponse({
@@ -73,6 +60,82 @@ const handleRedirect = (redirectUrlAsString) => {
     }
   }
 }
+
+const validateSignUpFields = (fields, errors) => {
+  let result = true;
+
+  for (const key in fields) {
+    if (!fields[key]) {
+      errors[key] = errors[key] ?? "Field must not be empty.";
+      result = false;
+    }
+  }
+
+  return result;
+}
+
+const signUp = (fields) => {
+  const errors = {};
+  const validationResult = validateSignUpFields(fields, errors);
+  if (!validationResult) {
+    return Promise.resolve(
+      buildErrorResponse({ fields: errors })
+    );
+  }
+
+  const { email, password, name } = fields;
+  return axiosInstance.post(
+    "/user/sign-up",
+    { email, password, name }
+  ).then(response => {
+    if (response.status === 201) {
+      const body = response.data;
+      return buildSuccessResponse({
+        id: body.id,
+        email: body.email,
+        name: body.name
+      });
+    }
+  }).catch(error => {
+    if (error.response) {
+      const response = error.response;
+      switch (response.status) {
+        case 409: {
+          return buildErrorResponse({
+            fields: {
+              email: "Email already exists"
+            }
+          });
+        }
+
+        case 422: {
+          const errorFields = {};
+          const respErrorFields = response.data.fields;
+          for (const respErrorField of respErrorFields) {
+            errorFields[respErrorField.name] = respErrorField.message;
+          }
+
+          return buildErrorResponse({ fields: errorFields });
+        }
+      }
+    }
+
+    return buildErrorResponse({ message: "Unable to process the request. Try again later." });
+  });
+}
+
+const validateSignInFields = (fields, errors) => {
+  let result = true;
+
+  for (const key in fields) {
+    if (!fields[key]) {
+      errors[key] = errors[key] ?? "Field must not be empty.";
+      result = false;
+    }
+  }
+
+  return result;
+};
 
 const signIn = (fields) => {
   const errors = {};
@@ -213,6 +276,7 @@ const consent = (fields) => {
 };
 
 const userService = {
+  signUp,
   signIn,
   authorize,
   consent,

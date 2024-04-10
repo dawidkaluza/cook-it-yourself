@@ -2,12 +2,10 @@ import {Alert, Box, Button, CircularProgress, Link, TextField, Typography} from 
 import {Link as RouterLink} from "react-router-dom";
 import React, {useState} from "react";
 import LoginIcon from "@mui/icons-material/Login";
+import {useSignUp} from "../../services/user/useSignUp";
 
 const Form = () => {
-  const error = false;
-  const success = false;
-  const loading = false;
-  const fieldsErrors = {}
+  const { signUp, loading, success, error, fieldsErrors } = useSignUp();
   const [fields, setFields] = useState({});
 
   const handleFieldChange = (event) => {
@@ -20,7 +18,7 @@ const Form = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Submit!");
+    signUp(fields);
   };
 
   return (
