@@ -1,13 +1,19 @@
 FROM eclipse-temurin:17-jdk@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e
 
-RUN groupadd -r developer && useradd -l -r -m -g developer developer
-USER developer
-WORKDIR /home/developer/app
+ARG UNAME=developer
+ARG UID=1000
+ARG GNAME=developer
+ARG GID=1000
 
-COPY --chown=developer gradle ./gradle
-COPY --chown=developer settings.gradle gradlew ./
-RUN ./gradlew --version # to pre-download specified Gradle version
-COPY --chown=developer service/build.gradle ./service/
-RUN ./gradlew :service:resolveDependencies
+RUN groupadd -r -g ${GID} ${GNAME} &&  \
+    useradd -l -r -m -u ${UID} -g ${GNAME} ${UNAME}
+USER developer
+WORKDIR /home/${UNAME}/app
+
+COPY --chown=${UNAME} gradle ./gradle
+COPY --chown=${UNAME} settings.gradle gradlew ./
+COPY --chown=${UNAME} service/build.gradle ./service/
+RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID}  \
+    ./gradlew :service:resolveDependencies --no-daemon
 
 CMD ./gradlew :service:compileJava --continuous --no-daemon & ./gradlew :service:bootRun --no-daemon
