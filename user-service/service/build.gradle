@@ -47,9 +47,39 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'pl.dkaluza:spring-data-test:0.0.1-SNAPSHOT'
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testImplementation 'org.springframework.security:spring-security-test'
+//    testImplementation 'pl.dkaluza:spring-data-test:0.0.1-SNAPSHOT'
+}
+
+testing {
+    //noinspection GroovyAssignabilityCheck
+    suites {
+        test {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation 'pl.dkaluza:spring-data-test:0.0.1-SNAPSHOT'
+            }
+        }
+
+        integrationTest(JvmTestSuite) {
+            dependencies {
+                implementation project()
+
+                implementation 'org.springframework.boot:spring-boot-starter-test'
+                implementation 'org.springframework.security:spring-security-test'
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
 }
 
 def currentEnv() {
@@ -83,6 +113,6 @@ tasks.named('processResources') {
     }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+//tasks.named('test') {
+//    useJUnitPlatform()
+//}
