@@ -1,5 +1,7 @@
 include:
-  - compose.common.yml
+  - path:
+      - compose.common.yml
+      - compose.infra.yml
 
 services:
   service:
@@ -18,7 +20,7 @@ services:
     networks:
       - main
     environment:
-      - DATABASE_HOST=database
+      - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
       - DATABASE_NAME=user
       - DATABASE_USER=developer
@@ -33,7 +35,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      database:
+      postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy

@@ -30,6 +30,7 @@ compileJava {
 
 ext {
     mapstructVersion = "1.5.5.Final"
+    testcontainersVersion = "1.19.7"
 }
 
 dependencies {
@@ -73,6 +74,9 @@ testing {
 
                 implementation 'org.springframework.boot:spring-boot-starter-test'
                 implementation 'org.springframework.security:spring-security-test'
+                implementation "org.testcontainers:testcontainers:${testcontainersVersion}"
+                implementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+                implementation 'io.rest-assured:rest-assured:5.4.0'
             }
 
             targets {
@@ -119,7 +123,7 @@ tasks.named('processResources') {
 
 tasks.register('copyComposeCommon', Copy) {
     from "$rootDir/compose.common.yml"
-    into "$buildDir/resources/integrationTest/resources/"
+    into "$buildDir/resources/integrationTest/"
 }
 
 tasks.named('processIntegrationTestResources') {

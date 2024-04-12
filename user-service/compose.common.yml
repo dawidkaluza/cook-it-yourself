@@ -1,21 +1,15 @@
 services:
-  database:
+  postgres:
     image: postgres:15.2-alpine
     healthcheck:
       test: pg_isready -d user -U developer
       interval: 2s
       timeout: 5s
       retries: 10
-    networks:
-      - main
-    volumes:
-      - database:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=developer
       - POSTGRES_PASSWORD=developer
       - POSTGRES_DB=user
-    ports:
-      - "5432:5432"
 
   rabbitmq:
     image: rabbitmq:3.11.11-management-alpine
@@ -24,14 +18,9 @@ services:
       interval: 2s
       timeout: 5s
       retries: 15
-    networks:
-      - main
     environment:
       - RABBITMQ_DEFAULT_USER=developer
       - RABBITMQ_DEFAULT_PASS=developer
-    ports:
-      - "5672:5672"
-      - "15672:15672"
 
   redis:
     image: redis:7.2.4-alpine
@@ -40,14 +29,4 @@ services:
       interval: 2s
       timeout: 5s
       retries: 15
-    networks:
-      - main
-    ports:
-      - "6379:6379"
     command: redis-server --requirepass developer
-
-volumes:
-  database: {}
-
-networks:
-  main: {}

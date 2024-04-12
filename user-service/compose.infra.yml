@@ -1,0 +1,25 @@
+services:
+  postgres:
+    networks:
+      - main
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    networks:
+      - main
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  redis:
+    networks:
+      - main
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres-data: {}
+
+networks:
+  main: {}
