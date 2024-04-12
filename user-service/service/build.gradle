@@ -46,18 +46,22 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    testImplementation 'org.springframework.security:spring-security-test'
-//    testImplementation 'pl.dkaluza:spring-data-test:0.0.1-SNAPSHOT'
 }
 
 testing {
     //noinspection GroovyAssignabilityCheck
     suites {
-        test {
+        configureEach {
             useJUnitJupiter()
 
+            dependencies {
+                implementation 'org.assertj:assertj-core:3.25.1'
+                implementation 'org.mockito:mockito-core:5.11.0'
+                implementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+            }
+        }
+
+        test {
             dependencies {
                 implementation 'pl.dkaluza:spring-data-test:0.0.1-SNAPSHOT'
             }
