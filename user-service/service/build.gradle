@@ -116,3 +116,12 @@ tasks.named('processResources') {
         dependsOn('copyWebApp')
     }
 }
+
+tasks.register('copyComposeCommon', Copy) {
+    from "$rootDir/compose.common.yml"
+    into "$buildDir/resources/integrationTest/resources/"
+}
+
+tasks.named('processIntegrationTestResources') {
+    dependsOn('copyComposeCommon')
+}
