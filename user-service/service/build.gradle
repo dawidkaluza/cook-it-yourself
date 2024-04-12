@@ -116,7 +116,3 @@ tasks.named('processResources') {
         dependsOn('copyWebApp')
     }
 }
-
-//tasks.named('test') {
-//    useJUnitPlatform()
-//}
