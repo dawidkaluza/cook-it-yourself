@@ -13,7 +13,9 @@ WORKDIR /home/${UNAME}/app
 COPY --chown=${UNAME} gradle ./gradle
 COPY --chown=${UNAME} settings.gradle gradlew ./
 COPY --chown=${UNAME} service/build.gradle ./service/
-RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID}  \
-    ./gradlew :service:resolveDependencies --no-daemon
+
+RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
+    ./gradlew :service:resolveDependencies --no-daemon && cp -R ~/.gradle ~/.gradle_temp
+RUN mv ~/.gradle_temp ~/.gradle
 
 CMD ./gradlew :service:compileJava --continuous --no-daemon & ./gradlew :service:bootRun --no-daemon
