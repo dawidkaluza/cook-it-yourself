@@ -103,7 +103,6 @@ class UserRestApiTest {
         .when()
             .post("/user/sign-up")
         .then()
-            .log().all()
             .statusCode(201)
             .contentType(ContentType.JSON)
             .body("id", notNullValue())
