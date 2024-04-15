@@ -72,8 +72,10 @@ testing {
             dependencies {
                 implementation project()
 
+                implementation 'pl.dkaluza:domain-core:0.0.1-SNAPSHOT'
                 implementation 'org.springframework.boot:spring-boot-starter-test'
                 implementation 'org.springframework.security:spring-security-test'
+                implementation 'org.springframework.boot:spring-boot-starter-jdbc'
                 implementation "org.testcontainers:testcontainers:${testcontainersVersion}"
                 implementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
                 implementation 'io.rest-assured:rest-assured:5.4.0'
