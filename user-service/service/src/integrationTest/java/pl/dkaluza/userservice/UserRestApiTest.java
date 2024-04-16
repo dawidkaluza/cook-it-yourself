@@ -1,35 +1,55 @@
 package pl.dkaluza.userservice;
 
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
 import pl.dkaluza.userservice.config.EnableTestcontainers;
+import pl.dkaluza.userservice.config.JdbiFacade;
+import pl.dkaluza.userservice.config.RabbitFacade;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 
 
 @EnableTestcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserRestApiTest {
+    private RabbitFacade rabbitFacade;
+    private JdbiFacade jdbiFacade;
+
     @LocalServerPort
     private Integer port;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws IOException, TimeoutException {
+        rabbitFacade = new RabbitFacade();
+        rabbitFacade.start();
+
+        jdbiFacade = new JdbiFacade();
+        jdbiFacade.start();
+        var handle = jdbiFacade.getHandle();
+        handle.execute("DELETE from users");
+
         baseURI = "http://localhost:" + port;
-        //noinspection SqlWithoutWhere
-        jdbcTemplate.execute("DELETE FROM users");
+    }
+
+    @AfterEach
+    void afterEach() throws IOException, TimeoutException {
+        rabbitFacade.stop();
+        jdbiFacade.stop();
     }
 
     @Test
@@ -71,7 +91,8 @@ class UserRestApiTest {
 
     @Test
     void signUp_emailAlreadyExists_returnConflict() {
-        jdbcTemplate.update("INSERT INTO users (email, encoded_password, name) VALUES (?, ?, ?)", "dawid@d.c", "123456", "Dawid");
+        var handle = jdbiFacade.getHandle();
+        handle.execute("INSERT INTO users (email, encoded_password, name) VALUES (?, ?, ?)", "dawid@d.c", "*(&@#*(@!BJCJAS123", "Dawid");
 
         var requestBody = new HashMap<String, Object>();
         requestBody.put("email", "dawid@d.c");
@@ -91,22 +112,40 @@ class UserRestApiTest {
     }
 
     @Test
-    void signUp_validRequest_returnCreatedUser() {
+    void signUp_validRequest_returnCreatedUser() throws IOException {
+        var messageIdRef = new AtomicReference<Integer>();
+        rabbitFacade.subscribe(
+            "userExchange",
+            "user.signUp",
+            (tag, delivery) -> {
+                var messageAsString = new String(delivery.getBody(), StandardCharsets.UTF_8);
+                messageIdRef.set(new JsonPath(messageAsString).getInt("id"));
+            },
+            (tag) -> {}
+        );
+
         var requestBody = new HashMap<String, Object>();
         requestBody.put("email", "dawid@d.c");
         requestBody.put("password", "123456");
         requestBody.put("name", "Dawid");
 
-        given()
+        var request = given()
             .contentType(ContentType.JSON)
-            .body(requestBody)
-        .when()
-            .post("/user/sign-up")
-        .then()
+            .body(requestBody);
+
+        var response = request.when()
+            .post("/user/sign-up");
+
+        response.then()
             .statusCode(201)
             .contentType(ContentType.JSON)
             .body("id", notNullValue())
             .body("email", equalTo("dawid@d.c"))
             .body("name", equalTo("Dawid"));
+
+        var id = new JsonPath(response.getBody().asString()).getInt("id");
+        await()
+            .atMost(Duration.ofSeconds(15))
+            .untilAtomic(messageIdRef, equalTo(id));
     }
 }

@@ -25,6 +25,10 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
         compose.start();
     }
 
+    static ComposeContainer getComposeContainer() {
+        return compose;
+    }
+
     @Override
     public void initialize(ConfigurableApplicationContext ctx) {
         var postgresHost = compose.getServiceHost("postgres", 5432);
