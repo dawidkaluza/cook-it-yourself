@@ -2,6 +2,7 @@ package pl.dkaluza.userservice;
 
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +16,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 
@@ -113,6 +116,7 @@ class UserRestApiTest {
 
     @Test
     void signUp_validRequest_returnCreatedUser() throws IOException {
+        // Given
         var messageIdRef = new AtomicReference<Integer>();
         rabbitFacade.subscribe(
             "userExchange",
@@ -133,9 +137,11 @@ class UserRestApiTest {
             .contentType(ContentType.JSON)
             .body(requestBody);
 
+        // When
         var response = request.when()
             .post("/user/sign-up");
 
+        // Then
         response.then()
             .statusCode(201)
             .contentType(ContentType.JSON)
@@ -144,6 +150,14 @@ class UserRestApiTest {
             .body("name", equalTo("Dawid"));
 
         var id = new JsonPath(response.getBody().asString()).getInt("id");
+
+        var handle = jdbiFacade.getHandle();
+        var users = handle.select("SELECT id, email, name FROM users WHERE id = ?", id).mapToMap().list();
+        assertThat(users)
+            .containsExactly(
+                Map.of("id", id, "email", "dawid@d.c", "name", "Dawid")
+            );
+
         await()
             .atMost(Duration.ofSeconds(15))
             .untilAtomic(messageIdRef, equalTo(id));
