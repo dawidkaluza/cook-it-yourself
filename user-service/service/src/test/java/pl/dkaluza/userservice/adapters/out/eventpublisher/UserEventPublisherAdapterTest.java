@@ -55,7 +55,7 @@ class UserEventPublisherAdapterTest {
         var message = messages.get(0);
         assertThat(message)
             .extracting(MessageEntity::exchange, MessageEntity::routingKey)
-            .containsExactly("userExchange", "user.signUp");
+            .containsExactly("userService", "user.signUp");
 
         OnMessagePublishedEvent onMsgPublishedEvent = eventPublisher.dequeue();
         assertThat(onMsgPublishedEvent)

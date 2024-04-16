@@ -119,7 +119,7 @@ class UserRestApiTest {
         // Given
         var messageIdRef = new AtomicReference<Integer>();
         rabbitFacade.subscribe(
-            "userExchange",
+            "userService",
             "user.signUp",
             (tag, delivery) -> {
                 var messageAsString = new String(delivery.getBody(), StandardCharsets.UTF_8);
