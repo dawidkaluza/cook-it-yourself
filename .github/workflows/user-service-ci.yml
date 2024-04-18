@@ -30,19 +30,18 @@ jobs:
         working-directory: ./user-service
         run: ./gradlew integrationTest build
 
-      - name: Store test results
-        if: ${{ success() || failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: |
-            user-service/service/build/test-results/
+#      - name: Store test results
+#        if: ${{ success() || failure() }}
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: test-results
+#          path: |
+#            user-service/service/build/test-results/
 
       - name: Report test results
         if: ${{ success() || failure() }}
         uses: dorny/test-reporter@v1
         with:
-          artifact: test-results
           name: User-service tests
-          path: '*.xml'
+          path: 'user-service/service/build/test-results/**/*.xml'
           reporter: java-junit
