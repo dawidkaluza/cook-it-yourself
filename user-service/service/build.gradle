@@ -132,3 +132,11 @@ tasks.register('copyComposeCommon', Copy) {
 tasks.named('processIntegrationTestResources') {
     dependsOn('copyComposeCommon')
 }
+
+tasks.named("bootJar") {
+    archiveClassifier = 'boot'
+}
+
+tasks.named("jar") {
+    archiveClassifier = ''
+}
