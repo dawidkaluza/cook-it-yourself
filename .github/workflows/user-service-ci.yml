@@ -44,5 +44,5 @@ jobs:
         with:
           artifact: test-results
           name: User-service tests
-          path: '*.xml''
+          path: '*.xml'
           reporter: java-junit
