@@ -93,10 +93,7 @@ testing {
     }
 }
 
-def currentEnv() {
-    return properties.get('appEnv', 'dev')
-}
-
+// todo cant --refresh-dependencies be used?
 tasks.register('resolveDependencies') {
     doLast {
         rootProject.allprojects { project ->
@@ -107,21 +104,15 @@ tasks.register('resolveDependencies') {
     }
 }
 
-tasks.register('copyWebApp', Copy) {
+tasks.register('embedWebApp', Copy) {
     from "$rootDir/web/dist"
     into "$buildDir/resources/main/static/web/."
-}
 
-tasks.named('compileJava') {
-    if (currentEnv() == 'prod') {
-        dependsOn(':web:npmBuild')
-    }
+    dependsOn(':web:npmBuild')
 }
 
 tasks.named('processResources') {
-    if (currentEnv() == 'prod') {
-        dependsOn('copyWebApp')
-    }
+    mustRunAfter('embedWebApp')
 }
 
 tasks.register('copyComposeCommon', Copy) {
@@ -135,8 +126,10 @@ tasks.named('processIntegrationTestResources') {
 
 tasks.named("bootJar") {
     archiveClassifier = 'boot'
+    dependsOn('embedWebApp')
 }
 
 tasks.named("jar") {
     archiveClassifier = ''
+    dependsOn('embedWebApp')
 }
