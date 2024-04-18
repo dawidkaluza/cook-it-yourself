@@ -27,3 +27,12 @@ jobs:
       - name: Build and test
         working-directory: ./user-service
         run: ./gradlew integrationTest build
+
+      - name: Store reports
+        if: ${{ success() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            user-service/service/build/reports
+            user-service/service/build/test-results
