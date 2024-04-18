@@ -66,7 +66,7 @@ class UserRestApiTest {
         .when()
             .post("/user/sign-up")
         .then()
-            .statusCode(404)
+            .statusCode(422)
             .contentType(ContentType.JSON)
             .body("message", not(empty()))
             .body("timestamp", not(empty()))
