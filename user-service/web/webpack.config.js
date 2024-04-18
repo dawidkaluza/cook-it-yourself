@@ -1,5 +1,6 @@
-const env = process.env.ENV ?? 'dev';
-require("dotenv").config({ path: `./.env.${env}` });
+const env = process.env.USER_SERVICE_ENV ?? (process.env.WEBPACK_SERVE ? 'dev' : 'prod');
+process.env.USER_SERVICE_ENV = env;
+require("dotenv").config({ path: [ `./.env.${env}.local`, `./.env.${env}`, `./.env.local`, `./.env` ] });
 
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -8,13 +9,13 @@ const webpack = require("webpack");
 module.exports = {
   mode: "development",
   devServer: {
-    port: process.env.PORT,
+    port: process.env.PORT ?? 9090,
     historyApiFallback: true,
   },
   entry: "/src/index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
-    publicPath: process.env.PUBLIC_PATH,
+    publicPath: process.env.PUBLIC_PATH ?? "/",
   },
   module: {
     rules: [
