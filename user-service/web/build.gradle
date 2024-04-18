@@ -13,8 +13,10 @@ tasks.register('npmCi', NpmTask) {
 
 tasks.register('npmStart', NpmTask) {
     args = [ 'start' ]
+    dependsOn('npmCi')
 }
 
 tasks.register('npmBuild', NpmTask) {
     args = [ 'run', 'build' ]
+    dependsOn('npmCi')
 }
