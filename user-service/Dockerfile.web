@@ -1,13 +1,29 @@
 FROM eclipse-temurin:17-jdk@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e
-WORKDIR /app
-#RUN addgroup --system javauser && adduser --system --ingroup javauser javauser
-#RUN chown -R javauser:javauser ./
-#USER javauser
-COPY gradle ./gradle
-COPY settings.gradle gradlew ./
 
-COPY web/build.gradle web/package.json web/package-lock.json web/.env.dev web/webpack.config.js ./web/
-RUN ./gradlew :web:npmCi
+ARG UNAME=developer
+ARG UID=1000
+ARG GNAME=developer
+ARG GID=1000
 
-VOLUME [ "/root/.gradle", "/app/web/.gradle", "/app/web/node_modules" ]
-CMD ["./gradlew", ":web:npmStart"]
+RUN groupadd -r -g ${GID} ${GNAME} &&  \
+    useradd -l -r -m -u ${UID} -g ${GNAME} ${UNAME}
+USER ${UNAME}
+WORKDIR /home/${UNAME}/app
+
+COPY --chown=${UNAME} gradle ./gradle
+COPY --chown=${UNAME} settings.gradle gradlew ./
+COPY --chown=${UNAME} web/build.gradle web/package.json web/package-lock.json web/.env.dev web/webpack.config.js ./web/
+
+RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
+    --mount=type=cache,target=/home/${UNAME}/app/web/.gradle,uid=${UID},gid=${GID} \
+    --mount=type=cache,target=/home/${UNAME}/app/web/node_modules,uid=${UID},gid=${GID} \
+    ./gradlew :web:npmCi --no-daemon && \
+    cp -R ~/.gradle ~/.gradle_temp && \
+    cp -R ~/app/web/.gradle ~/app/web/.gradle_temp && \
+    cp -R ~/app/web/node_modules ~/app/web/node_modules_temp
+
+RUN mv ~/.gradle_temp ~/.gradle
+RUN mv ~/app/web/.gradle_temp ~/app/web/.gradle
+RUN mv ~/app/web/node_modules_temp ~/app/web/node_modules
+
+CMD ./gradlew :web:npmStart --no-daemon

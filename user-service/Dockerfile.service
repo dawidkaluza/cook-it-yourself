@@ -7,7 +7,7 @@ ARG GID=1000
 
 RUN groupadd -r -g ${GID} ${GNAME} &&  \
     useradd -l -r -m -u ${UID} -g ${GNAME} ${UNAME}
-USER developer
+USER ${UNAME}
 WORKDIR /home/${UNAME}/app
 
 COPY --chown=${UNAME} gradle ./gradle

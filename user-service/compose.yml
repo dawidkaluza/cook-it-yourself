@@ -49,7 +49,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./web/src/:/app/web/src/
+      - ./web/src/:/home/developer/app/web/src/
     networks:
       - main
     ports:
