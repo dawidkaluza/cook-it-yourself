@@ -51,7 +51,7 @@ jobs:
           path: 'user-service/service/build/test-results/**/*.xml'
           reporter: java-junit
 
-      - name: Login into GitHub Container Registry
+      - name: Log into GitHub Container Registry
         if: ${{ github.ref == 'refs/heads/master' }}
         uses: docker/login-action@v3
         with:
@@ -65,4 +65,4 @@ jobs:
         with:
           context: ./user-service
           push: true
-          tags: ghcr.io/dawidkaluza/cook-it-yourself:latest
+          tags: ghcr.io/dawidkaluza/cook-it-yourself/user-service:latest
