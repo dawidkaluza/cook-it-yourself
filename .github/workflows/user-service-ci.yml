@@ -65,4 +65,4 @@ jobs:
         with:
           context: ./user-service
           push: true
-          tags: cook-it-yourself/user-service:latest
+          tags: dawidkaluza/user-service:latest
