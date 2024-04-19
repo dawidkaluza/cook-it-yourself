@@ -9,12 +9,21 @@ node {
 
 tasks.register('npmCi', NpmTask) {
     args = [ 'ci' ]
+
+    inputs.files('package.json', 'package-lock.json')
+    outputs.dir('node_modules')
 }
 
 tasks.register('npmStart', NpmTask) {
     args = [ 'start' ]
+    mustRunAfter('npmCi')
 }
 
 tasks.register('npmBuild', NpmTask) {
     args = [ 'run', 'build' ]
+
+    inputs.dir(fileTree('./').exclude('.gradle', 'build', 'build.gradle', '.gitignore'))
+    outputs.dir('dist')
+
+    mustRunAfter('npmCi')
 }

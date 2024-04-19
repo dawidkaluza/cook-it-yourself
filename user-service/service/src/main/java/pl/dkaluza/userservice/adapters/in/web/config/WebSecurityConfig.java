@@ -126,7 +126,7 @@ class WebSecurityConfig {
 
     @Bean
     @Order(3)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, SignInUrlAuthenticationEntryPoint signInUrlAuthEntryPoint) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, SignInUrlAuthenticationEntryPoint signInUrlAuthEntryPoint, WebAppSettings webAppSettings) throws Exception {
         //noinspection Convert2MethodRef
         http
             .cors(Customizer.withDefaults())
@@ -142,12 +142,18 @@ class WebSecurityConfig {
                     new MediaTypeRequestMatcher(MediaType.ALL)
                 )
             )
-            .authorizeHttpRequests(authorize ->
+            .authorizeHttpRequests(authorize -> {
                 authorize
                     .requestMatchers("/actuator/health").permitAll()
-                    .requestMatchers("/user/sign-up").permitAll()
-                    .anyRequest().authenticated()
-            )
+                    .requestMatchers("/user/sign-up").permitAll();
+
+                if (webAppSettings.isWebAppEmbedded()) {
+                    var publicPath = webAppSettings.getPublicPath();
+                    authorize.requestMatchers(publicPath + "/**").permitAll();
+                }
+
+                authorize.anyRequest().authenticated();
+            })
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();

@@ -7,6 +7,7 @@ import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.io.File;
+import java.time.Duration;
 
 class TestcontainersInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     private static final ComposeContainer compose;
@@ -18,9 +19,9 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
         }
 
         compose = new ComposeContainer(new File(resource.getFile()))
-            .withExposedService("postgres", 5432, Wait.forHealthcheck())
-            .withExposedService("rabbitmq", 5672, Wait.forHealthcheck())
-            .withExposedService("redis", 6379, Wait.forHealthcheck())
+            .withExposedService("postgres", 5432, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(90)))
+            .withExposedService("rabbitmq", 5672, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(90)))
+            .withExposedService("redis", 6379, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(90)))
             .withLocalCompose(true);
         compose.start();
     }

@@ -13,6 +13,7 @@ class WebAppSettings {
 
     /**
      * Base URI of the web app.
+     * Note that this is not concatenated with public path.
      */
     private final String baseUri;
 

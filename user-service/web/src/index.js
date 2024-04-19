@@ -6,7 +6,8 @@ import {Consent} from "./pages/consent/Consent";
 import {createRoot} from "react-dom/client";
 import {SignUp} from "./pages/signUp/SignUp";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
   {
     path: "/",
     element: <Navigate to={"/sign-in"} />
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
     path: "/consent",
     element: <Consent />
   }
-]);
+], { basename: process.env.PUBLIC_PATH });
 
 const rootElement = document.getElementById("app");
 const root = createRoot(rootElement);
