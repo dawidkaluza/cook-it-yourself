@@ -20,11 +20,11 @@ services:
     networks:
       - main
     environment:
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=user
-      - DATABASE_USER=developer
-      - DATABASE_PASSWORD=developer
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=user
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=developer
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=developer

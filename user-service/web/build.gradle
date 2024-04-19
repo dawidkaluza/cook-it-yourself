@@ -13,7 +13,7 @@ tasks.register('npmCi', NpmTask) {
 
 tasks.register('npmStart', NpmTask) {
     args = [ 'start' ]
-    dependsOn('npmCi')
+    dependsOn('npmCi') // this dependency needs to be removed I guess, since Gradle might run npmCi even when its not needed
 }
 
 tasks.register('npmBuild', NpmTask) {
