@@ -16,7 +16,7 @@ jobs:
       contents: read
       actions: read
       checks: write
-#      packages: write
+      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
