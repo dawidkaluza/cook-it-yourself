@@ -148,6 +148,7 @@ class UserAuthenticationTest {
         var sessionId = signInPage.getCookie("SESSION");
         var xsrfToken = signInPage.getCookie("XSRF-TOKEN");
         var request = given()
+            .cookies(signInPage.getCookies())
             .header("X-XSRF-TOKEN", xsrfToken)
             .formParam("username", "dawid@d.c")
             .formParam("password", "password");
@@ -162,7 +163,7 @@ class UserAuthenticationTest {
 
         var newSessionId = response.getCookie("SESSION");
         assertThat(newSessionId)
-            .isNotNull()
+            .isNotBlank()
             .isNotEqualTo(sessionId);
 
         var jedis = jedisFacade.getJedis();
@@ -170,6 +171,10 @@ class UserAuthenticationTest {
             .hasSize(0);
         assertThat(jedis.keys("*" + newSessionId))
             .hasSize(1);
+
+        // TODO fix:
+        //  last assertion fails - cant find keys with new session id
+        //  in all previous tests, csrf token was not in cookies when sending sign in request, which is a mistake and should be fixed
     }
 
     @Test
