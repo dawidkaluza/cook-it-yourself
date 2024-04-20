@@ -125,6 +125,10 @@ tasks.named('processIntegrationTestResources') {
     dependsOn('copyComposeCommon')
 }
 
+tasks.named('integrationTest') {
+    environment 'USER_SERVICE_ENV', 'prod'
+}
+
 tasks.named("bootJar") {
     archiveClassifier = 'boot'
     dependsOn('embedWebApp')
