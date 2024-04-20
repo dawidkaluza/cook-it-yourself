@@ -1,5 +1,6 @@
 package pl.dkaluza.userservice;
 
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
 import io.restassured.filter.FilterContext;
@@ -7,7 +8,9 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
+import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +21,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import pl.dkaluza.userservice.config.EnableTestcontainers;
 import pl.dkaluza.userservice.config.JdbiFacade;
+import pl.dkaluza.userservice.config.JedisFacade;
 
 import java.time.Duration;
 import java.util.Map;
 
 import static io.restassured.RestAssured.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
 
 
 /*
@@ -67,6 +73,7 @@ Rest Assured can try to simulate opening a page and sending a request, but it do
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserAuthenticationTest {
     private JdbiFacade jdbiFacade;
+    private JedisFacade jedisFacade;
 
     @LocalServerPort
     private Integer port;
@@ -75,6 +82,9 @@ class UserAuthenticationTest {
     void beforeEach() {
         jdbiFacade = new JdbiFacade();
         jdbiFacade.start();
+
+        jedisFacade = new JedisFacade();
+        jedisFacade.start();
 
         baseURI = "http://localhost:" + port;
 
@@ -98,25 +108,27 @@ class UserAuthenticationTest {
     @AfterEach
     void afterAll() {
         jdbiFacade.stop();
+        jedisFacade.stop();
     }
 
+    // TODO doesnt make sense when user is unauthorized I guess
     @ParameterizedTest
     @ValueSource(strings = { "123", "" })
-    void signIn_invalidCsrfToken_returnForbidden(String csrfToken) {
+    void signIn_invalidCsrfToken_returnUnauthorized(String csrfToken) {
         given()
             .header("X-XSRF-TOKEN", csrfToken)
             .formParam("username", "dawid@d.c")
             .formParam("password", "password")
-        .when()
+            .when()
             .post("/sign-in")
-        .then()
+            .then()
             .statusCode(403);
     }
 
     @ParameterizedTest
     @CsvSource({
         "gabriel@d.c, 12345",
-//        "dawid@d.c, passwd",
+        "dawid@d.c, passwd",
     })
     void signIn_invalidEmailOrPassword_returnUnauthorized(String email, String password) {
         given()
@@ -131,7 +143,33 @@ class UserAuthenticationTest {
 
     @Test
     void signIn_unauthenticated_authenticate() {
+        // Given
+        var signInPage = given().get("/web/sign-in");
+        var sessionId = signInPage.getCookie("SESSION");
+        var xsrfToken = signInPage.getCookie("XSRF-TOKEN");
+        var request = given()
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .formParam("username", "dawid@d.c")
+            .formParam("password", "password");
 
+        // When
+        var response = request.post("/sign-in");
+
+        // Then
+        response.then()
+            .statusCode(200)
+            .body("redirectUrl", notNullValue());
+
+        var newSessionId = response.getCookie("SESSION");
+        assertThat(newSessionId)
+            .isNotNull()
+            .isNotEqualTo(sessionId);
+
+        var jedis = jedisFacade.getJedis();
+        assertThat(jedis.keys("*" + sessionId))
+            .hasSize(0);
+        assertThat(jedis.keys("*" + newSessionId))
+            .hasSize(1);
     }
 
     @Test
