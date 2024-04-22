@@ -1,6 +1,5 @@
 package pl.dkaluza.userservice;
 
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
 import io.restassured.filter.FilterContext;
@@ -10,68 +9,25 @@ import io.restassured.http.Cookies;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
-import org.assertj.core.api.Assertions;
-import org.awaitility.Awaitility;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import pl.dkaluza.userservice.config.EnableTestcontainers;
 import pl.dkaluza.userservice.config.JdbiFacade;
 import pl.dkaluza.userservice.config.JedisFacade;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Map;
 
-import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.*;
+import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-
-
-/*
-oauth2 auth code tests:
-- given unauthorized user, when user requests for auth code, then redirect user to sign in page (RA)
-- given authorized user, when user requests for auth code with invalid params, then redirect to web app with error code (RA)
-- given authorized user, when user requests for auth code, then redirect to web app with auth code (RA)
-
-sign in tests:
-given user on sign in page, when user sends invalid sign in request, show errors
-given user on sign in page, when user sends valid sign in request, return success and redirect to last visited page
-
-sign in tests (RA):
-given user on sign in page with CSRF token in a cookie, when user sends invalid sign in request, return errors
-given user on sign in page with CSRF token in a cookie, when user sends valid sign in request, return success and redirect to last visiteg page
-
-sign up tests:
-- given user on sign up page, when user sends invalid sign up request, show errors
-- given user on sign up page, when user sends valid sign up request, return success and redirect to sign in page
-
-sign up tests (RA):
-given user on sign up page with CSRF token in a cookie, when user sends invalid sign up request, return errors
-given user on sign up page with CSRF token in a cookie, when user sends valid sign up request, return success and redirect to last visiteg page
-
-requirements:
-- go thru redirections
-- submit forms
--
-
-solutions:
-rest assured:
-form authentication - submit authentication via form before performing a request (https://github.com/rest-assured/rest-assured/wiki/Usage#form-authentication)
-csrf token - send get request, get csrf token, send POST request with CSRF token (https://github.com/rest-assured/rest-assured/wiki/Usage#csrf-form-token P.S. does not support csrf token being stored in cookies, but same can be accomplished via Filters: https://github.com/rest-assured/rest-assured/wiki/Usage#filters)
-issue - CORS policy, can be overriden
-
-Summary:
-Rest Assured can try to simulate opening a page and sending a request, but it does not really do that so what is being tested is only service endpoints, not web UI - which is not bad since UI automated tests are not that straightforward, hence it might be better to have UI tests in e2e tests
-
- */
 
 @EnableTestcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -97,6 +53,7 @@ class UserAuthenticationTest {
 
         var req = new RequestSpecBuilder()
             .setContentType(ContentType.JSON)
+            .setAccept(ContentType.JSON)
             .setBody(Map.of(
                 "email", "dawid@d.c",
                 "password", "password",
@@ -116,15 +73,20 @@ class UserAuthenticationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "123", "" })
-    void signIn_invalidCsrfToken_returnUnauthorized(String csrfToken) {
+    @CsvSource({
+        "/sign-in, 123",
+        "/sign-in, ''",
+        "/sign-out, 123",
+    })
+    void anyAuthenticationRequest_invalidCsrfToken_returnUnauthorized(String endpoint, String csrfToken) {
         given()
-            .filter(csrfCookieFilter("/web/sign-in"))
+            .filter(csrfCookieFilter("/web" + endpoint))
             .header("X-XSRF-TOKEN", csrfToken)
+            .accept(ContentType.JSON)
             .formParam("username", "dawid@d.c")
             .formParam("password", "password")
         .when()
-            .post("/sign-in")
+            .post(endpoint)
         .then()
             .statusCode(403);
     }
@@ -137,6 +99,7 @@ class UserAuthenticationTest {
     void signIn_invalidEmailOrPassword_returnUnauthorized(String email, String password) {
         given()
             .filter(csrfCookieFilter("/web/sign-in"))
+            .accept(ContentType.JSON)
             .formParam("username", email)
             .formParam("password", password)
         .when()
@@ -150,6 +113,7 @@ class UserAuthenticationTest {
         // Given
         var request = given()
             .filter(csrfCookieFilter("/web/sign-in"))
+            .accept(ContentType.JSON)
             .formParam("username", "dawid@d.c")
             .formParam("password", "password");
 
@@ -177,11 +141,11 @@ class UserAuthenticationTest {
         var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=ciy-web&state=1234xyz&code_challenge=MMRGwBwWyq4DLBuYbwPHRF6HGyVnN_UAUDnQ8GVGjn8&code_challenge_method=S256";
         var oauthAuthorizeResponse = given()
             .redirects().follow(false)
-            .contentType(ContentType.JSON)
             .get(oauthAuthorizeUrl);
 
         var request = given()
             .filter(csrfCookieFilter("/web/sign-in", oauthAuthorizeResponse.detailedCookies()))
+            .accept(ContentType.JSON)
             .formParam("username", "dawid@d.c")
             .formParam("password", "password");
 
@@ -197,26 +161,35 @@ class UserAuthenticationTest {
 
     @Test
     void signIn_alreadyAuthenticated_reauthenticate() {
+        // Given
+        var firstSessionId = given()
+            .filter(csrfCookieFilter("/web/sign-in"))
+            .accept(ContentType.JSON)
+            .formParam("username", "dawid@d.c")
+            .formParam("password", "password")
+            .post("/sign-in")
+            .getCookie("SESSION");
 
-    }
+        var request = given()
+            .filter(csrfCookieFilter("/web/sign-in"))
+            .accept(ContentType.JSON)
+            .formParam("username", "dawid@d.c")
+            .formParam("password", "password");
 
-    @Test
-    void signOut_invalidCsrfToken_returnForbidden() {
+        // When
+        var response = request.post("/sign-in");
 
-    }
+        // Then
+        response.then()
+            .statusCode(200)
+            .body("redirectUrl", notNullValue())
+            .cookie("SESSION", not(blankOrNullString()));
 
-    @Test
-    void signOut_unauthenticated_accept() {
+        var secondSessionId = response.getCookie("SESSION");
 
-    }
-
-    @Test
-    void signOut_authenticated_invalidateAuthentication() {
-
-    }
-
-    private String base64Decode(String input) {
-        return new String(Base64.getDecoder().decode(input));
+        assertThat(secondSessionId)
+            .isNotBlank()
+            .isNotEqualTo(firstSessionId);
     }
 
     private Filter csrfCookieFilter(String path) {
