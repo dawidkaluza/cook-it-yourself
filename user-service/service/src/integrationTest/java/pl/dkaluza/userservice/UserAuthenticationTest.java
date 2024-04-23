@@ -143,6 +143,10 @@ class UserAuthenticationTest {
             .redirects().follow(false)
             .get(oauthAuthorizeUrl);
 
+        if (oauthAuthorizeResponse.statusCode() != 302 || !oauthAuthorizeResponse.getHeader("Location").endsWith("/web/sign-in")) {
+            throw new IllegalStateException("Response from authorize request is not a redirection to sign in page (status code=302 and Location=*/web/sign-in conditions not met)");
+        }
+
         var request = given()
             .filter(csrfCookieFilter("/web/sign-in", oauthAuthorizeResponse.detailedCookies()))
             .accept(ContentType.JSON)
@@ -214,11 +218,17 @@ class UserAuthenticationTest {
             var res = given().cookies(cookies).get(path);
 
             var cookiesList = new ArrayList<Cookie>();
-            cookiesList.addAll(cookies.asList());
             cookiesList.addAll(res.getDetailedCookies().asList());
-            requestSpec.cookies(new Cookies(cookiesList));
+            cookiesList.addAll(
+                cookies.asList().stream().filter(
+                    cookie -> !res.getCookies().containsKey(cookie.getName())
+                ).toList()
+            );
 
-            var token = res.getCookie("XSRF-TOKEN");
+            var reqCookies = new Cookies(cookiesList);
+            requestSpec.cookies(reqCookies);
+
+            var token = reqCookies.getValue("XSRF-TOKEN");
             requestSpec.header("X-XSRF-TOKEN", token);
             return ctx.next(requestSpec, responseSpec);
         }
