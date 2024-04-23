@@ -1,14 +1,6 @@
 package pl.dkaluza.userservice;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.Filter;
-import io.restassured.filter.FilterContext;
 import io.restassured.http.ContentType;
-import io.restassured.http.Cookie;
-import io.restassured.http.Cookies;
-import io.restassured.response.Response;
-import io.restassured.specification.FilterableRequestSpecification;
-import io.restassured.specification.FilterableResponseSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,14 +12,13 @@ import pl.dkaluza.userservice.config.EnableTestcontainers;
 import pl.dkaluza.userservice.config.JdbiFacade;
 import pl.dkaluza.userservice.config.JedisFacade;
 
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Map;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+import static pl.dkaluza.userservice.RestAssuredUtils.*;
 
 @EnableTestcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,20 +41,7 @@ class UserAuthenticationTest {
 
         var handle = jdbiFacade.getHandle();
         handle.execute("DELETE FROM users");
-
-        var req = new RequestSpecBuilder()
-            .setContentType(ContentType.JSON)
-            .setAccept(ContentType.JSON)
-            .setBody(Map.of(
-                "email", "dawid@d.c",
-                "password", "password",
-                "name", "Dawid"
-            ))
-            .build();
-        var res = given().spec(req).post("/user/sign-up");
-        if (res.statusCode() != 201) {
-            throw new IllegalStateException("Sign up failed.\n > Status code: " + res.statusCode() + "\n > Body: " + res.body().asPrettyString());
-        }
+        signUp("dawid@d.c", "password", "Dawid");
     }
 
     @AfterEach
@@ -97,28 +75,15 @@ class UserAuthenticationTest {
         "dawid@d.c, passwd",
     })
     void signIn_invalidEmailOrPassword_returnUnauthorized(String email, String password) {
-        given()
-            .filter(csrfCookieFilter("/web/sign-in"))
-            .accept(ContentType.JSON)
-            .formParam("username", email)
-            .formParam("password", password)
-        .when()
-            .post("/sign-in")
-        .then()
+        signIn(email, password, false)
+            .then()
             .statusCode(403);
     }
 
     @Test
     void signIn_unauthenticated_authenticate() {
-        // Given
-        var request = given()
-            .filter(csrfCookieFilter("/web/sign-in"))
-            .accept(ContentType.JSON)
-            .formParam("username", "dawid@d.c")
-            .formParam("password", "password");
-
-        // When
-        var response = request.post("/sign-in");
+        // Given, when
+        var response = signIn("dawid@d.c", "password");
 
         // Then
         response.then()
@@ -147,14 +112,8 @@ class UserAuthenticationTest {
             throw new IllegalStateException("Response from authorize request is not a redirection to sign in page (status code=302 and Location=*/web/sign-in conditions not met)");
         }
 
-        var request = given()
-            .filter(csrfCookieFilter("/web/sign-in", oauthAuthorizeResponse.detailedCookies()))
-            .accept(ContentType.JSON)
-            .formParam("username", "dawid@d.c")
-            .formParam("password", "password");
-
         // When
-        var response = request.post("/sign-in");
+        var response = signIn("dawid@d.c", "password", oauthAuthorizeResponse.detailedCookies());
 
         // Then
         response.then()
@@ -166,22 +125,10 @@ class UserAuthenticationTest {
     @Test
     void signIn_alreadyAuthenticated_reauthenticate() {
         // Given
-        var firstSessionId = given()
-            .filter(csrfCookieFilter("/web/sign-in"))
-            .accept(ContentType.JSON)
-            .formParam("username", "dawid@d.c")
-            .formParam("password", "password")
-            .post("/sign-in")
-            .getCookie("SESSION");
-
-        var request = given()
-            .filter(csrfCookieFilter("/web/sign-in"))
-            .accept(ContentType.JSON)
-            .formParam("username", "dawid@d.c")
-            .formParam("password", "password");
+        var firstSessionId = signIn("dawid@d.c", "password").getCookie("SESSION");
 
         // When
-        var response = request.post("/sign-in");
+        var response = signIn("dawid@d.c", "password");
 
         // Then
         response.then()
@@ -194,44 +141,6 @@ class UserAuthenticationTest {
         assertThat(secondSessionId)
             .isNotBlank()
             .isNotEqualTo(firstSessionId);
-    }
-
-    private Filter csrfCookieFilter(String path) {
-        return new CsrfCookieFilter(path, new Cookies());
-    }
-
-    private Filter csrfCookieFilter(String path, Cookies cookies) {
-        return new CsrfCookieFilter(path, cookies);
-    }
-
-    private static class CsrfCookieFilter implements Filter {
-        private final String path;
-        private final Cookies cookies;
-
-        private CsrfCookieFilter(String path, Cookies cookies) {
-            this.path = path;
-            this.cookies = cookies;
-        }
-
-        @Override
-        public Response filter(FilterableRequestSpecification requestSpec, FilterableResponseSpecification responseSpec, FilterContext ctx) {
-            var res = given().cookies(cookies).get(path);
-
-            var cookiesList = new ArrayList<Cookie>();
-            cookiesList.addAll(res.getDetailedCookies().asList());
-            cookiesList.addAll(
-                cookies.asList().stream().filter(
-                    cookie -> !res.getCookies().containsKey(cookie.getName())
-                ).toList()
-            );
-
-            var reqCookies = new Cookies(cookiesList);
-            requestSpec.cookies(reqCookies);
-
-            var token = reqCookies.getValue("XSRF-TOKEN");
-            requestSpec.header("X-XSRF-TOKEN", token);
-            return ctx.next(requestSpec, responseSpec);
-        }
     }
 }
 
