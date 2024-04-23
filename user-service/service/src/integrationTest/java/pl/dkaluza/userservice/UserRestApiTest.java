@@ -24,6 +24,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
+import static pl.dkaluza.userservice.RestAssuredUtils.*;
 
 
 @EnableTestcontainers
@@ -75,17 +76,8 @@ class UserRestApiTest {
 
     @Test
     void signUp_invalidRequestBodyData_returnUnprocessableEntity() {
-        var requestBody = new HashMap<String, Object>();
-        requestBody.put("email", "dawid");
-        requestBody.put("password", "124");
-        requestBody.put("name", "Dawid");
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(requestBody)
-        .when()
-            .post("/user/sign-up")
-        .then()
+        signUp("dawid", "124", "name", false)
+            .then()
             .statusCode(422)
             .contentType(ContentType.JSON)
             .body("fields.name", hasItems("email", "password"));
@@ -93,20 +85,12 @@ class UserRestApiTest {
 
     @Test
     void signUp_emailAlreadyExists_returnConflict() {
-        var handle = jdbiFacade.getHandle();
-        handle.execute("INSERT INTO users (email, encoded_password, name) VALUES (?, ?, ?)", "dawid@d.c", "*(&@#*(@!BJCJAS123", "Dawid");
+        // Given
+        signUp("dawid@d.c", "123456", "Dawid");
 
-        var requestBody = new HashMap<String, Object>();
-        requestBody.put("email", "dawid@d.c");
-        requestBody.put("password", "123456");
-        requestBody.put("name", "Dawid");
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(requestBody)
-        .when()
-            .post("/user/sign-up")
-        .then()
+        // When, then
+        signUp("dawid@d.c", "123456", "Dawid", false)
+            .then()
             .statusCode(409)
             .contentType(ContentType.JSON)
             .body("message", not(empty()))
@@ -127,18 +111,8 @@ class UserRestApiTest {
             (tag) -> {}
         );
 
-        var requestBody = new HashMap<String, Object>();
-        requestBody.put("email", "dawid@d.c");
-        requestBody.put("password", "123456");
-        requestBody.put("name", "Dawid");
-
-        var request = given()
-            .contentType(ContentType.JSON)
-            .body(requestBody);
-
         // When
-        var response = request.when()
-            .post("/user/sign-up");
+        var response = signUp("dawid@d.c", "123456", "Dawid");
 
         // Then
         response.then()

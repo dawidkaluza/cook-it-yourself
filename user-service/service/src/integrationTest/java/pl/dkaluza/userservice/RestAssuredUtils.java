@@ -18,11 +18,11 @@ public final class RestAssuredUtils {
     private RestAssuredUtils() {
     }
 
-    public static void signUp(String email, String password, String name) {
-        signUp(email, password, name, true);
+    public static Response signUp(String email, String password, String name) {
+        return signUp(email, password, name, true);
     }
 
-    public static void signUp(String email, String password, String name, boolean validate) {
+    public static Response signUp(String email, String password, String name, boolean validate) {
         var response = given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
@@ -36,6 +36,8 @@ public final class RestAssuredUtils {
         if (validate && response.statusCode() != 201) {
             throw new IllegalStateException("Sign up failed.\n > Status code: " + response.statusCode() + "\n > Body: " + response.body().asPrettyString());
         }
+
+        return response;
     }
 
     public static Response signIn(String email, String password) {
