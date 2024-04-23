@@ -85,7 +85,19 @@ class WebSecurityConfig {
     public SecurityFilterChain userAuthSecurityFilterChain(HttpSecurity http, WebAppSettings webAppSettings, CookieCsrfTokenRepository tokenRepository, CsrfTokenRequestAttributeHandler tokenReqAttrHandler, CsrfGenerateCookieFilter generateCookieFilter, RestfulRedirectStrategy redirectStrategy) throws Exception {
         http
             .securityMatcher("/sign-in", "/sign-out")
-            .cors(Customizer.withDefaults())
+            .cors(cors -> {
+                var source = new UrlBasedCorsConfigurationSource();
+                CorsConfiguration config = new CorsConfiguration();
+                config.addAllowedHeader("*");
+                config.addAllowedMethod("*");
+                for (var origin : webAppSettings.getOrigins()) {
+                    config.addAllowedOrigin(origin);
+                }
+                config.setAllowCredentials(true);
+                source.registerCorsConfiguration("/**", config);
+
+                cors.configurationSource(source);
+            })
             .csrf((csrf) -> csrf
                 .csrfTokenRepository(tokenRepository)
                 .csrfTokenRequestHandler(tokenReqAttrHandler)
@@ -160,16 +172,22 @@ class WebSecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(WebAppSettings webAppSettings) {
+    public CorsConfigurationSource corsConfigurationSource(WebAppSettings webAppSettings, Oauth2Settings oauth2Settings) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.addAllowedOrigin(webAppSettings.getBaseUri());
+        for (var origin : webAppSettings.getOrigins()) {
+            config.addAllowedOrigin(origin);
+        }
+        for (var origin : oauth2Settings.getClientsOrigins()) {
+            config.addAllowedOrigin(origin);
+        }
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+
 
     @Bean
     UserDetailsService userDetailsService(UserDetailsMapper userDetailsMapper, UserService userService) {
