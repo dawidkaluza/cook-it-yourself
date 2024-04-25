@@ -5,9 +5,9 @@ metadata:
   labels:
     app: user-service-postgres
 spec:
+  selector:
+    app: user-service-postgres
   ports:
   - port: 5432
     targetPort: 5432
-  selector:
-    app: user-service-postgres
   clusterIP: None

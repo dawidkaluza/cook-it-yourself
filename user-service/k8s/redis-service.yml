@@ -5,9 +5,9 @@ metadata:
   labels:
     app: user-service-redis
 spec:
+  selector:
+    app: user-service-redis
   ports:
     - port: 6379
       targetPort: 6379
-  selector:
-    app: user-service-redis
   clusterIP: None
