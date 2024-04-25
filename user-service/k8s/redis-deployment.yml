@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-redis
+  labels:
+    app: user-service-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: user-service-redis
+    spec:
+      containers:
+        - image: redis:7.2.4-alpine
+          name: redis
+          command: [ "redis-server", "--requirepass ${REDIS_PASSWORD}" ]
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-secrets
+                  key: REDIS_PASSWORD
+          ports:
+            - containerPort: 6379

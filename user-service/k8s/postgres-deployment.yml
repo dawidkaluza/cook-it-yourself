@@ -22,21 +22,19 @@ spec:
         env:
         - name: POSTGRES_USER
           valueFrom:
-            configMapKeyRef:
-              name: user-service-config
+            secretKeyRef:
+              name: user-service-secrets
               key: POSTGRES_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              name: user-service-config
+            secretKeyRef:
+              name: user-service-secrets
               key: POSTGRES_PASSWORD
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
               name: user-service-config
               key: POSTGRES_DB
-              # TODO I know it can be written longer (map config keys directly to env keys)
-              # TODO credentials should be stored as secrets
         ports:
         - containerPort: 5432
         volumeMounts:

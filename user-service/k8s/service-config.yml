@@ -3,8 +3,10 @@ kind: ConfigMap
 metadata:
   name: user-service-config
 data:
-  POSTGRES_HOST: "postgres"
+  POSTGRES_HOST: "user-service-postgres"
   POSTGRES_PORT: "5432"
   POSTGRES_DB: "user"
-  POSTGRES_USER: "developer"
-  POSTGRES_PASSWORD: "developer"
+  RABBITMQ_HOST: "user-service-rabbitmq"
+  RABBITMQ_PORT: "5672"
+  REDIS_HOST: "user-service-redis"
+  REDIS_PORT: "6379"

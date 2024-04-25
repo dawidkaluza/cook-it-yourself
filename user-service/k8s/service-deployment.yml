@@ -17,31 +17,10 @@ spec:
       containers:
       - image: ghcr.io/dawidkaluza/cook-it-yourself/user-service:latest
         name: user-service
-        env:
-          - name: POSTGRES_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: user-service-config
-                key: POSTGRES_HOST
-          - name: POSTGRES_PORT
-            valueFrom:
-              configMapKeyRef:
-                name: user-service-config
-                key: POSTGRES_PORT
-          - name: POSTGRES_USER
-            valueFrom:
-              configMapKeyRef:
-                name: user-service-config
-                key: POSTGRES_USER
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              configMapKeyRef:
-                name: user-service-config
-                key: POSTGRES_PASSWORD
-          - name: POSTGRES_DB
-            valueFrom:
-              configMapKeyRef:
-                name: user-service-config
-                key: POSTGRES_DB
+        envFrom:
+          - configMapRef:
+              name: user-service-config
+          - secretRef:
+              name: user-service-secrets
         ports:
           - containerPort: 8080

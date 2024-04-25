@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-rabbitmq
+  labels:
+    app: user-service-rabbitmq
+spec:
+  ports:
+    - port: 5672
+      targetPort: 5672
+    - port: 15672
+      targetPort: 15672
+  selector:
+    app: user-service-rabbitmq
+  clusterIP: None

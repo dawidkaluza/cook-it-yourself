@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-rabbitmq
+  labels:
+    app: user-service-rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-rabbitmq
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: user-service-rabbitmq
+    spec:
+      containers:
+        - image: rabbitmq:3.11.11-management-alpine
+          name: rabbitmq
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-secrets
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-secrets
+                  key: RABBITMQ_PASSWORD
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
