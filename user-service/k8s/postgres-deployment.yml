@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-postgres
+  labels:
+    app: user-service-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: user-service-postgres
+    spec:
+      containers:
+      - image: postgres:15.2-alpine
+        name: postgres
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: user-service-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: user-service-config
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: user-service-config
+              key: POSTGRES_DB
+              # TODO I know it can be written longer (map config keys directly to env keys)
+              # TODO credentials should be stored as secrets
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: user-service-postgres-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: user-service-postgres-data
+        persistentVolumeClaim:
+          claimName: user-service-postgres-pv-claim
