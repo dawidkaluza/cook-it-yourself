@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: user-service
+spec:
+  parentRefs:
+    - name: gateway
+      sectionName: http
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      # TODO eventually user service should accessible from /auth paths or sth like that
+      backendRefs:
+        - name: user-service
+          port: 8080
