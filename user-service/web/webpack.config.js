@@ -1,6 +1,6 @@
 const env = process.env.USER_SERVICE_ENV ?? (process.env.WEBPACK_SERVE ? 'dev' : 'prod');
 process.env.USER_SERVICE_ENV = env;
-require("dotenv").config({ path: [ `./.env.${env}.local`, `./.env.${env}`, `./.env.local`, `./.env` ] });
+require("dotenv").config({ path: [ `.env`, `.env.local`, `.env.${env}`, `.env.${env}.local` ], override: true });
 
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
