@@ -12,7 +12,7 @@ WORKDIR /home/${UNAME}/app
 
 COPY --chown=${UNAME} gradle ./gradle
 COPY --chown=${UNAME} settings.gradle gradlew ./
-COPY --chown=${UNAME} web/build.gradle web/package.json web/package-lock.json web/.env.dev web/.env web/webpack.config.js ./web/
+COPY --chown=${UNAME} web/build.gradle web/package.json web/package-lock.json ./web/
 
 RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
     --mount=type=cache,target=/home/${UNAME}/app/web/.gradle,uid=${UID},gid=${GID} \
@@ -25,5 +25,6 @@ RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
 RUN mv ~/.gradle_temp ~/.gradle
 RUN mv ~/app/web/.gradle_temp ~/app/web/.gradle
 RUN mv ~/app/web/node_modules_temp ~/app/web/node_modules
+COPY --chown=${UNAME} web/.env.dev web/.env web/webpack.config.js ./web/
 
 CMD ./gradlew :web:npmStart --no-daemon
