@@ -15,7 +15,7 @@ spec:
         app: user-service
     spec:
       containers:
-      - image: ghcr.io/dawidkaluza/cook-it-yourself/user-service:latest
+      - image: ghcr.io/dawidkaluza/cook-it-yourself/user-service:latest@sha256:e5d410ef2f29a9b06e47e0d72af04d95f9f455cb3bfcebfbd0f6538be756d9b0
         name: user-service
         envFrom:
           - configMapRef:
