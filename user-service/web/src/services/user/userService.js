@@ -39,7 +39,7 @@ const handleRedirect = (redirectUrlAsString) => {
     });
   }
 
-  const userServiceBaseUrl = new URL(process.env.USER_SERVICE_BASEURL ?? window.location.origin);
+  const userServiceBaseUrl = new URL(process.env.USER_SERVICE_BASEURL || window.location.origin);
   if (redirectUrl.href.startsWith(userServiceBaseUrl.href)) {
     return authorize(redirectUrl.href)
       .then(result => {
