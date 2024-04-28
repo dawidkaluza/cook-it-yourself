@@ -31,34 +31,31 @@ const handleRedirect = (redirectUrlAsString) => {
   }
 
   const redirectUrl = new URL(redirectUrlAsString);
-  const userServiceBaseUrl = new URL(process.env.USER_SERVICE_BASEURL);
-
-  switch (redirectUrl.host) {
-    case window.location.host: {
-      return buildSuccessResponse({
-        redirectUrl: redirectUrl.pathname + redirectUrl.search,
-        external: false
-      });
-    }
-
-    case userServiceBaseUrl.host: {
-      return authorize(redirectUrl.href)
-        .then(result => {
-          if (!result.success) {
-            return result;
-          }
-
-          return handleRedirect(result.response.redirectUrl);
-        });
-    }
-
-    default: {
-      return buildSuccessResponse({
-        redirectUrl: redirectUrl.href,
-        external: true
-      });
-    }
+  const webAppBaseUrl = new URL(window.location.origin + process.env.PUBLIC_PATH);
+  if (redirectUrl.href.startsWith(webAppBaseUrl.href)) {
+    return buildSuccessResponse({
+      redirectUrl: redirectUrl.pathname + redirectUrl.search,
+      external: false
+    });
   }
+
+  const userServiceBaseUrl = new URL(process.env.USER_SERVICE_BASEURL ?? window.location.origin);
+  if (redirectUrl.href.startsWith(userServiceBaseUrl.href)) {
+    return authorize(redirectUrl.href)
+      .then(result => {
+        if (!result.success) {
+          return result;
+        }
+
+        return handleRedirect(result.response.redirectUrl);
+      });
+  }
+
+
+  return buildSuccessResponse({
+    redirectUrl: redirectUrl.href,
+    external: true
+  });
 }
 
 const validateSignUpFields = (fields, errors) => {
