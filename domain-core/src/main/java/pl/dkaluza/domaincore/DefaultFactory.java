@@ -13,6 +13,14 @@ public class DefaultFactory<T> extends Factory<T> {
         this.validationExecutor = validationExecutor;
     }
 
+    public static <T> DefaultFactory<T> newWithAssembler(ValidationExecutor validationExecutor, Assembler<T> assembler) {
+        return new DefaultFactory<>(validationExecutor, assembler);
+    }
+
+    public static <T> DefaultFactory<T> newWithObject(ValidationExecutor validationExecutor, T object) {
+        return new DefaultFactory<>(validationExecutor, () -> object);
+    }
+
     @Override
     protected List<FieldError> validate() {
         return validationExecutor.validate();

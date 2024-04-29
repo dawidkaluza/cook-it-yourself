@@ -1,7 +1,7 @@
 package pl.dkaluza.domaincore;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
@@ -14,6 +14,10 @@ public class ValidationExecutor {
 
     public static ValidationExecutor of(List<Validator> validators) {
         return new ValidationExecutor(validators);
+    }
+
+    public static ValidationExecutor of(Validator... validators) {
+        return new ValidationExecutor(Arrays.asList(validators));
     }
 
     public static Builder builder() {
