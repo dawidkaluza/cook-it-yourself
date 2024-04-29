@@ -13,7 +13,6 @@ const useSignUp = () => {
 
   const signUp = useCallback(
     ({ email, password, name }) => {
-      console.log()
       setLoading(true);
       setSuccess("");
       setError("");
