@@ -43,14 +43,21 @@ public class ValidationExecutor {
             validators = new ArrayList<>();
         }
 
+        @Deprecated
         public Builder withValidation(boolean condition, String name, String message) {
             Validator validator = () -> condition ? null : new FieldError(name, message);
             validators.add(validator);
             return this;
         }
 
+        @Deprecated
         public Builder withValidation(BooleanSupplier conditionSupplier, String name, String message) {
             Validator validator = () -> conditionSupplier.getAsBoolean() ? null : new FieldError(name, message);
+            validators.add(validator);
+            return this;
+        }
+
+        public Builder withValidator(Validator validator) {
             validators.add(validator);
             return this;
         }

@@ -40,13 +40,26 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             return !(length < 3 || length > 256);
         }
 
-        static IngredientFactory newIngredient(Long id, String name, BigDecimal value, String measure) {
-            var idFactory = new IngredientIdFactory(id);
-
-            var nameFactory = DefaultFactory.newWithObject(
+        private static Factory<String> nameFactory(String name) {
+            return DefaultFactory.newWithObject(
                 ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
                 name
             );
+        }
+
+        static IngredientFactory newIngredient(String name, BigDecimal value, String measure) {
+            var nameFactory = nameFactory(name);
+            var amountFactory = new AmountFactory(value, measure);
+
+            return new IngredientFactory(
+                () -> new Ingredient(null, name, amountFactory.assemble()),
+                nameFactory, amountFactory
+            );
+        }
+
+        static IngredientFactory fromPersistence(Long id, String name, BigDecimal value, String measure) {
+            var idFactory = new IngredientIdFactory(id);
+            var nameFactory = nameFactory(name);
             var amountFactory = new AmountFactory(value, measure);
 
             return new IngredientFactory(

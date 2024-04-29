@@ -3,8 +3,11 @@ package pl.dkaluza.kitchenservice.domain;
 import pl.dkaluza.domaincore.DefaultFactory;
 import pl.dkaluza.domaincore.Factory;
 import pl.dkaluza.domaincore.ValidationExecutor;
+import pl.dkaluza.domaincore.Validator;
 
 import java.math.BigDecimal;
+
+import static pl.dkaluza.domaincore.Validator.*;
 
 public class Amount {
     private static final Amount ZERO = new Amount(BigDecimal.ZERO, "");
@@ -53,13 +56,13 @@ public class Amount {
 
     static class AmountFactory extends DefaultFactory<Amount> {
         AmountFactory(BigDecimal value, String measure) {
+            this(value, measure, new Validator[0]);
+        }
+
+        AmountFactory(BigDecimal value, String measure, Validator... validators) {
             super(
-                ValidationExecutor.builder()
-                    .withValidation(!(value == null || value.signum() < 0), "value", "Value must not be a negative number")
-                    .withValidation(!(measure == null || measure.trim().length() > 32), "measure", "Measure must have from 0 to 32 chars")
-                    .build(),
+                getExecutor(value, measure, validators),
                 () -> {
-                    //noinspection DataFlowIssue
                     if (value.signum() == 0) {
                         return ZERO;
                     }
@@ -67,6 +70,18 @@ public class Amount {
                     return new Amount(value, measure);
                 }
             );
+        }
+
+        private static ValidationExecutor getExecutor(BigDecimal value, String measure, Validator... validators) {
+            var builder = ValidationExecutor.builder()
+                .withValidation(validator(!(value == null || value.signum() < 0), "value", "Value must not be a negative number"))
+                .withValidation(validator(!(measure == null || measure.trim().length() > 32), "measure", "Measure must have from 0 to 32 chars"));
+
+            for (Validator validator : validators) {
+                builder.withValidation(validator);
+            }
+
+            return builder.build();
         }
 
         @Override
