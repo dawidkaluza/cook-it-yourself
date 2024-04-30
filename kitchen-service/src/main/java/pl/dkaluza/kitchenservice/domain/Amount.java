@@ -74,11 +74,11 @@ public class Amount {
 
         private static ValidationExecutor getExecutor(BigDecimal value, String measure, Validator... validators) {
             var builder = ValidationExecutor.builder()
-                .withValidation(validator(!(value == null || value.signum() < 0), "value", "Value must not be a negative number"))
-                .withValidation(validator(!(measure == null || measure.trim().length() > 32), "measure", "Measure must have from 0 to 32 chars"));
+                .withValidator(validator(!(value == null || value.signum() < 0), "value", "Value must not be a negative number"))
+                .withValidator(validator(!(measure == null || measure.trim().length() > 32), "measure", "Measure must have from 0 to 32 chars"));
 
             for (Validator validator : validators) {
-                builder.withValidation(validator);
+                builder.withValidator(validator);
             }
 
             return builder.build();

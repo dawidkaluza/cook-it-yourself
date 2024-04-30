@@ -1,6 +1,7 @@
 package pl.dkaluza.domaincore;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -10,8 +11,12 @@ public class FactoriesComposite<T> extends Factory<T> {
     private final List<Factory<?>> factories;
 
     public FactoriesComposite(Assembler<T> assembler, Factory<?>... factories) {
+        this(assembler, List.of(factories));
+    }
+
+    public FactoriesComposite(Assembler<T> assembler, List<Factory<?>> factories) {
         super(assembler);
-        this.factories = List.of(factories);
+        this.factories = new ArrayList<>(factories);
     }
 
     @Override
