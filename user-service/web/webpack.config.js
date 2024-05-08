@@ -12,7 +12,7 @@ module.exports = {
     port: process.env.PORT ?? 9090,
     historyApiFallback: true,
   },
-  entry: "/src/index.js",
+  entry: "/src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     publicPath: process.env.PUBLIC_PATH ?? "/",
@@ -20,12 +20,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.?js$/,
+        test: /\.(js|ts)x?$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
+            presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
           },
         },
       },
