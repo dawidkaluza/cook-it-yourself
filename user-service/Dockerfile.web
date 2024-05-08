@@ -25,6 +25,6 @@ RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
 RUN mv ~/.gradle_temp ~/.gradle
 RUN mv ~/app/web/.gradle_temp ~/app/web/.gradle
 RUN mv ~/app/web/node_modules_temp ~/app/web/node_modules
-COPY --chown=${UNAME} web/.env.dev web/.env web/webpack.config.js ./web/
+COPY --chown=${UNAME} web/.env.dev web/.env web/webpack.config.js web/tsconfig.json ./web/
 
 CMD ./gradlew :web:npmStart --no-daemon
