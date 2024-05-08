@@ -12,6 +12,9 @@ module.exports = {
     port: process.env.PORT ?? 9090,
     historyApiFallback: true,
   },
+  resolve: {
+    extensions: [ '.ts', '.tsx', '.js', '.jsx' ]
+  },
   entry: "/src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
