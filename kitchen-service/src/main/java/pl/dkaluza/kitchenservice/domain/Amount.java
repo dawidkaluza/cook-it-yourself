@@ -75,7 +75,7 @@ public class Amount {
                         return ZERO;
                     }
 
-                    return new Amount(value, measure);
+                    return new Amount(value, measure.trim());
                 }
             );
         }
