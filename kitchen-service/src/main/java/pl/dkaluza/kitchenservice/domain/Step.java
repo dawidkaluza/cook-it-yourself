@@ -39,10 +39,14 @@ public class Step extends AbstractPersistable<StepId> {
             return !(length < 3 || length > 16384);
         }
 
+        private static Assembler<String> textAssembler(String text) {
+            return text == null ? () -> null : text::trim;
+        }
+
         private static Factory<String> newTextFactory(String text, String prefix) {
-            return DefaultFactory.newWithObject(
+            return DefaultFactory.newWithAssembler(
                 ValidationExecutor.of(validator(isTextValid(text), prefix + "text", "Text must be non-blank, must have from 3 to 16384 chars")),
-                text
+                textAssembler(text)
             );
         }
 
@@ -52,7 +56,7 @@ public class Step extends AbstractPersistable<StepId> {
 
         static StepFactory newStep(String text, String prefix) {
             return new StepFactory(
-                () -> new Step(null, text),
+                () -> new Step(null, textAssembler(text).assemble()),
                 newTextFactory(text, prefix)
             );
         }
@@ -63,11 +67,10 @@ public class Step extends AbstractPersistable<StepId> {
 
         static StepFactory fromPersistence(Long id, String text, String prefix) {
             var idFactory = new StepIdFactory(id, prefix);
-            var textFactory = newTextFactory(text, prefix);
 
             return new StepFactory(
-                () -> new Step(idFactory.assemble(), text),
-                idFactory, textFactory
+                () -> new Step(idFactory.assemble(), textAssembler(text).assemble()),
+                idFactory, newTextFactory(text, prefix)
             );
         }
 
