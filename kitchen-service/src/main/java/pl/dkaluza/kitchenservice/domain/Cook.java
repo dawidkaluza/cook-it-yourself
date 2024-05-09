@@ -11,11 +11,11 @@ public class Cook extends AbstractPersistable<CookId> {
         super(id);
     }
 
-    public Factory<Cook> of(CookId id) {
+    public static Factory<Cook> of(CookId id) {
         return of(id.getId());
     }
 
-    public Factory<Cook> of(Long id) {
+    public static Factory<Cook> of(Long id) {
         var cookIdFactory = new CookIdFactory(id);
         return new FactoriesComposite<>(
             () -> new Cook(cookIdFactory.assemble()),
