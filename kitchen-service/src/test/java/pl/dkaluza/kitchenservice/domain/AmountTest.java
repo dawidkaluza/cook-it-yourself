@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 class AmountTest {
     @ParameterizedTest
     @MethodSource("newAmountInvalidParamsProvider")
-    void of_invalidParams_returnExpectedErrors(BigDecimal value, String measure, String[] expectedErrorFields) {
+    void of_invalidParams_throwException(BigDecimal value, String measure, String[] expectedErrorFields) {
         // Given
         var factory = Amount.of(value, measure);
 

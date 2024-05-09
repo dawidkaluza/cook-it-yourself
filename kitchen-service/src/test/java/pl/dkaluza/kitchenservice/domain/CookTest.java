@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.*;
 class CookTest {
 
     @Test
-    void newCook_invalidId_returnExpectedFieldErrors() {
+    void newCook_invalidId_throwException() {
         // Given, when
         var e = catchThrowableOfType(
             () -> Cook.of(0L).produce(),
