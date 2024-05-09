@@ -14,7 +14,11 @@ public class IngredientId extends LongIndex {
 
     static class IngredientIdFactory extends LongIndexFactory<IngredientId> {
         IngredientIdFactory(Long id) {
-            super(id, () -> new IngredientId(id));
+            this(id, "");
+        }
+
+        IngredientIdFactory(Long id, String prefix) {
+            super(id, () -> new IngredientId(id), prefix);
         }
 
         @Override

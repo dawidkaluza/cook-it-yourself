@@ -56,12 +56,20 @@ public class Amount {
 
     static class AmountFactory extends DefaultFactory<Amount> {
         AmountFactory(BigDecimal value, String measure) {
-            this(value, measure, new Validator[0]);
+            this(value, measure, "", new Validator[0]);
+        }
+
+        AmountFactory(BigDecimal value, String measure, String prefix) {
+            this(value, measure, prefix, new Validator[0]);
         }
 
         AmountFactory(BigDecimal value, String measure, Validator... validators) {
+            this(value, measure, "", validators);
+        }
+
+        AmountFactory(BigDecimal value, String measure, String prefix, Validator... validators) {
             super(
-                getValidationExecutor(value, measure, validators),
+                getValidationExecutor(value, measure, prefix, validators),
                 () -> {
                     if (value.signum() == 0) {
                         return ZERO;
@@ -72,10 +80,10 @@ public class Amount {
             );
         }
 
-        private static ValidationExecutor getValidationExecutor(BigDecimal value, String measure, Validator... validators) {
+        private static ValidationExecutor getValidationExecutor(BigDecimal value, String measure, String prefix, Validator... validators) {
             var builder = ValidationExecutor.builder()
-                .withValidator(validator(!(value == null || value.signum() < 0), "value", "Value must not be a negative number"))
-                .withValidator(validator(!(measure == null || measure.trim().length() > 32), "measure", "Measure must have from 0 to 32 chars"));
+                .withValidator(validator(!(value == null || value.signum() < 0), prefix + "value", "Value must not be a negative number"))
+                .withValidator(validator(!(measure == null || measure.trim().length() > 32), prefix + "measure", "Measure must have from 0 to 32 chars"));
 
             for (Validator validator : validators) {
                 builder.withValidator(validator);

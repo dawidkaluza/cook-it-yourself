@@ -161,9 +161,11 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
 
         static AmountFactory newPortionSizeFactory(BigDecimal value, String measure) {
+            final var prefix = "portionSize.";
             return new AmountFactory(
                 value, measure,
-                Validator.validator(value.signum() > 0, "value", "Value must be a positive number")
+                prefix,
+                Validator.validator(value.signum() > 0, prefix + "value", "Value must be a positive number")
             );
         }
     }
@@ -196,10 +198,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         public Factory<Recipe> build() {
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
             var ingredientFactories = ingredients.stream()
-                .map(dto -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure()))
+                .map(dto -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure(), "ingredients[]."))
                 .toList();
             var methodStepFactories = methodSteps.stream()
-                .map(dto -> StepFactory.newStep(dto.text()))
+                .map(dto -> StepFactory.newStep(dto.text(), "methodSteps[]."))
                 .toList();
 
             var factories = new ArrayList<Factory<?>>();
@@ -258,10 +260,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             var idFactory = new RecipeIdFactory(id);
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
             var ingredientFactories = ingredients.stream()
-                .map(dto -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure()))
+                .map(dto -> IngredientFactory.fromPersistence(dto.id(), dto.name(), dto.value(), dto.measure(), "ingredients[]."))
                 .toList();
             var methodStepFactories = methodSteps.stream()
-                .map(dto -> StepFactory.newStep(dto.text()))
+                .map(dto -> StepFactory.fromPersistence(dto.id(), dto.text(), "methodSteps[]."))
                 .toList();
 
             var factories = new ArrayList<Factory<?>>();

@@ -18,6 +18,14 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
         this.amount = amount;
     }
 
+    public Factory<Ingredient> newIngredient(String name, BigDecimal value, String measure) {
+        return IngredientFactory.newIngredient(name, value, measure);
+    }
+
+    public Factory<Ingredient> fromPersistence(Long id, String name, BigDecimal value, String measure) {
+        return IngredientFactory.fromPersistence(id, name, value, measure);
+    }
+
     public String getName() {
         return name;
     }
@@ -40,16 +48,20 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             return !(length < 3 || length > 256);
         }
 
-        private static Factory<String> nameFactory(String name) {
+        private static Factory<String> nameFactory(String name, String prefix) {
             return DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
+                ValidationExecutor.of(validator(isNameValid(name), prefix + "name", "Name must have from 3 to 256 chars")),
                 name
             );
         }
 
         static IngredientFactory newIngredient(String name, BigDecimal value, String measure) {
-            var nameFactory = nameFactory(name);
-            var amountFactory = new AmountFactory(value, measure);
+            return newIngredient(name, value, measure, "");
+        }
+
+        static IngredientFactory newIngredient(String name, BigDecimal value, String measure, String prefix) {
+            var nameFactory = nameFactory(name, prefix);
+            var amountFactory = new AmountFactory(value, measure, prefix);
 
             return new IngredientFactory(
                 () -> new Ingredient(null, name, amountFactory.assemble()),
@@ -58,9 +70,13 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
         }
 
         static IngredientFactory fromPersistence(Long id, String name, BigDecimal value, String measure) {
-            var idFactory = new IngredientIdFactory(id);
-            var nameFactory = nameFactory(name);
-            var amountFactory = new AmountFactory(value, measure);
+            return fromPersistence(id, name, value, measure, "");
+        }
+
+        static IngredientFactory fromPersistence(Long id, String name, BigDecimal value, String measure, String prefix) {
+            var idFactory = new IngredientIdFactory(id, prefix);
+            var nameFactory = nameFactory(name, prefix);
+            var amountFactory = new AmountFactory(value, measure, prefix);
 
             return new IngredientFactory(
                 () -> new Ingredient(idFactory.assemble(), name, amountFactory.assemble()),

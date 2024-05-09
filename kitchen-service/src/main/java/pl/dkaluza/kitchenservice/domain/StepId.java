@@ -14,7 +14,11 @@ public class StepId extends LongIndex {
 
     static class StepIdFactory extends LongIndexFactory<StepId> {
         StepIdFactory(Long id) {
-            super(id, () -> new StepId(id));
+            this(id, "");
+        }
+
+        StepIdFactory(Long id, String prefix) {
+            super(id, () -> new StepId(id), prefix);
         }
 
         @Override

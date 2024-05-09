@@ -39,23 +39,31 @@ public class Step extends AbstractPersistable<StepId> {
             return !(length < 3 || length > 16384);
         }
 
-        private static Factory<String> newTextFactory(String text) {
+        private static Factory<String> newTextFactory(String text, String prefix) {
             return DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(isTextValid(text), "text", "Text must be non-blank, must have from 3 to 16384 chars")),
+                ValidationExecutor.of(validator(isTextValid(text), prefix + "text", "Text must be non-blank, must have from 3 to 16384 chars")),
                 text
             );
         }
 
         static StepFactory newStep(String text) {
+            return newStep(text, "");
+        }
+
+        static StepFactory newStep(String text, String prefix) {
             return new StepFactory(
                 () -> new Step(null, text),
-                newTextFactory(text)
+                newTextFactory(text, prefix)
             );
         }
 
         static StepFactory fromPersistence(Long id, String text) {
-            var idFactory = new StepIdFactory(id);
-            var textFactory = newTextFactory(text);
+            return fromPersistence(id, text, "");
+        }
+
+        static StepFactory fromPersistence(Long id, String text, String prefix) {
+            var idFactory = new StepIdFactory(id, prefix);
+            var textFactory = newTextFactory(text, prefix);
 
             return new StepFactory(
                 () -> new Step(idFactory.assemble(), text),
