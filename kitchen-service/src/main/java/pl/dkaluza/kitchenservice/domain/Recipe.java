@@ -165,7 +165,7 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return new AmountFactory(
                 value, measure,
                 prefix,
-                Validator.validator(value.signum() > 0, prefix + "value", "Value must be a positive number")
+                Validator.validator(value != null && value.signum() > 0, prefix + "value", "Value must be a positive number")
             );
         }
     }

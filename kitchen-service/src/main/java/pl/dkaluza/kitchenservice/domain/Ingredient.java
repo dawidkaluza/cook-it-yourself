@@ -18,11 +18,11 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
         this.amount = amount;
     }
 
-    public Factory<Ingredient> newIngredient(String name, BigDecimal value, String measure) {
+    public static Factory<Ingredient> newIngredient(String name, BigDecimal value, String measure) {
         return IngredientFactory.newIngredient(name, value, measure);
     }
 
-    public Factory<Ingredient> fromPersistence(Long id, String name, BigDecimal value, String measure) {
+    public static Factory<Ingredient> fromPersistence(Long id, String name, BigDecimal value, String measure) {
         return IngredientFactory.fromPersistence(id, name, value, measure);
     }
 
@@ -55,13 +55,21 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             );
         }
 
+        private static AmountFactory amountFactory(BigDecimal value, String measure, String prefix) {
+            return new AmountFactory(
+                value, measure,
+                prefix,
+                Validator.validator(value != null && value.signum() > 0, prefix + "value", "Value must be a positive number")
+            );
+        }
+
         static IngredientFactory newIngredient(String name, BigDecimal value, String measure) {
             return newIngredient(name, value, measure, "");
         }
 
         static IngredientFactory newIngredient(String name, BigDecimal value, String measure, String prefix) {
             var nameFactory = nameFactory(name, prefix);
-            var amountFactory = new AmountFactory(value, measure, prefix);
+            var amountFactory = amountFactory(value, measure, prefix);
 
             return new IngredientFactory(
                 () -> new Ingredient(null, name, amountFactory.assemble()),
@@ -76,7 +84,7 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
         static IngredientFactory fromPersistence(Long id, String name, BigDecimal value, String measure, String prefix) {
             var idFactory = new IngredientIdFactory(id, prefix);
             var nameFactory = nameFactory(name, prefix);
-            var amountFactory = new AmountFactory(value, measure, prefix);
+            var amountFactory = amountFactory(value, measure, prefix);
 
             return new IngredientFactory(
                 () -> new Ingredient(idFactory.assemble(), name, amountFactory.assemble()),
