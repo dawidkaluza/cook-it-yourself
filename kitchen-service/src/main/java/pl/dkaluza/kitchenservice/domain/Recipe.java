@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static pl.dkaluza.domaincore.Validator.validator;
 import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
@@ -197,30 +198,22 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         @Override
         public Factory<Recipe> build() {
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
-            var ingredientFactories = ingredients.stream()
-                .map(dto -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure(), "ingredients[]."))
-                .toList();
-            var methodStepFactories = methodSteps.stream()
-                .map(dto -> StepFactory.newStep(dto.text(), "methodSteps[]."))
-                .toList();
+            var ingredientsFactory = IngredientsFactory.newIngredients(ingredients);
+            var methodStepsFactory = StepsFactory.newSteps(methodSteps);
 
-            var factories = new ArrayList<Factory<?>>();
-            factories.add(newNameFactory(name()));
-            factories.add(newDescriptionFactory(description()));
-            factories.addAll(ingredientFactories);
-            factories.addAll(methodStepFactories);
-            factories.add(newCookingTimeFactory(cookingTime()));
-            factories.add(portionSizeFactory);
             return new FactoriesComposite<>(
                 () -> new Recipe(
                     null,
                     name(), description(),
-                    ingredientFactories.stream().map(IngredientFactory::assemble).toList(),
-                    methodStepFactories.stream().map(StepFactory::assemble).toList(),
+                    ingredientsFactory.assemble(),
+                    methodStepsFactory.assemble(),
                     cookingTime(),
                     portionSizeFactory.assemble()
                 ),
-                factories
+                newNameFactory(name()), newDescriptionFactory(description()),
+                ingredientsFactory, methodStepsFactory,
+                newCookingTimeFactory(cookingTime()),
+                portionSizeFactory
             );
         }
     }
@@ -259,36 +252,122 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         public Factory<Recipe> build() {
             var idFactory = new RecipeIdFactory(id);
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
-            var ingredientFactories = ingredients.stream()
-                .map(dto -> IngredientFactory.fromPersistence(dto.id(), dto.name(), dto.value(), dto.measure(), "ingredients[]."))
-                .toList();
-            var methodStepFactories = methodSteps.stream()
-                .map(dto -> StepFactory.fromPersistence(dto.id(), dto.text(), "methodSteps[]."))
-                .toList();
+            var ingredientsFactory = IngredientsFactory.fromPersistence(ingredients);
+            var methodStepsFactory = StepsFactory.fromPersistence(methodSteps);
 
-            var factories = new ArrayList<Factory<?>>();
-            factories.add(idFactory);
-            factories.add(newNameFactory(name()));
-            factories.add(newDescriptionFactory(description()));
-            factories.addAll(ingredientFactories);
-            factories.addAll(methodStepFactories);
-            factories.add(newCookingTimeFactory(cookingTime()));
-            factories.add(portionSizeFactory);
             return new FactoriesComposite<>(
                 () -> new Recipe(
                     idFactory.assemble(),
                     name(), description(),
-                    ingredientFactories.stream().map(IngredientFactory::assemble).toList(),
-                    methodStepFactories.stream().map(StepFactory::assemble).toList(),
+                    ingredientsFactory.assemble(),
+                    methodStepsFactory.assemble(),
                     cookingTime(),
                     portionSizeFactory.assemble()
                 ),
-                factories
+                idFactory, newNameFactory(name()), newDescriptionFactory(description()),
+                ingredientsFactory, methodStepsFactory,
+                newCookingTimeFactory(cookingTime()),
+                portionSizeFactory
             );
         }
     }
 
+
     private record IngredientBuilderDto(Long id, String name, BigDecimal value, String measure) {}
 
+    private static class IngredientsFactory extends FactoriesComposite<List<Ingredient>> {
+        private IngredientsFactory(Assembler<List<Ingredient>> assembler, List<Factory<?>> allFactories) {
+            super(assembler, allFactories);
+        }
+
+        private static List<Ingredient> assemble(List<IngredientFactory> ingredients) {
+            return ingredients.stream()
+                .map(IngredientFactory::assemble)
+                .toList();
+        }
+
+        private static IngredientsFactory of(List<IngredientBuilderDto> ingredients, Function<IngredientBuilderDto, IngredientFactory> mapper) {
+            var factories = ingredients.stream()
+                .map(mapper)
+                .toList();
+
+            var listFactory = DefaultFactory.newWithObject(
+                ValidationExecutor.of(validator(!ingredients.isEmpty(), "ingredients", "Ingredients must not be empty.")),
+                ingredients
+            );
+
+            var factoriesMerged = new ArrayList<Factory<?>>(factories);
+            factoriesMerged.add(listFactory);
+
+            return new IngredientsFactory(() -> assemble(factories), factoriesMerged);
+        }
+
+        public static IngredientsFactory newIngredients(List<IngredientBuilderDto> ingredients) {
+            return of(
+                ingredients,
+                ingredient -> IngredientFactory.newIngredient(ingredient.name(), ingredient.value(), ingredient.measure(), "ingredients.")
+            );
+        }
+
+        public static IngredientsFactory fromPersistence(List<IngredientBuilderDto> ingredients) {
+            return of(
+                ingredients,
+                ingredient -> IngredientFactory.fromPersistence(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure(), "ingredients.")
+            );
+        }
+
+        @Override
+        protected List<Ingredient> assemble() {
+            return super.assemble();
+        }
+    }
+
     private record MethodStepBuilderDto(Long id, String text) {}
+
+    private static class StepsFactory extends FactoriesComposite<List<Step>> {
+        public StepsFactory(Assembler<List<Step>> assembler, List<? extends Factory<?>> factories) {
+            super(assembler, factories);
+        }
+
+        private static List<Step> assemble(List<StepFactory> ingredients) {
+            return ingredients.stream()
+                .map(StepFactory::assemble)
+                .toList();
+        }
+
+        private static StepsFactory of(List<MethodStepBuilderDto> steps, Function<MethodStepBuilderDto, StepFactory> mapper) {
+            var factories = steps.stream()
+                .map(mapper)
+                .toList();
+
+            var listFactory = DefaultFactory.newWithObject(
+                ValidationExecutor.of(validator(!steps.isEmpty(), "methodSteps", "Steps must not be empty.")),
+                steps
+            );
+
+            var factoriesMerged = new ArrayList<Factory<?>>(factories);
+            factoriesMerged.add(listFactory);
+
+            return new StepsFactory(() -> assemble(factories), factoriesMerged);
+        }
+
+        public static StepsFactory newSteps(List<MethodStepBuilderDto> steps) {
+            return of(
+                steps,
+                step -> StepFactory.newStep(step.text(), "methodSteps.")
+            );
+        }
+
+        public static StepsFactory fromPersistence(List<MethodStepBuilderDto> steps) {
+            return of(
+                steps,
+                step -> StepFactory.fromPersistence(step.id(), step.text(), "methodSteps.")
+            );
+        }
+
+        @Override
+        protected List<Step> assemble() {
+            return super.assemble();
+        }
+    }
 }
