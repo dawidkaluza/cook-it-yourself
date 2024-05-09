@@ -7,11 +7,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static pl.dkaluza.domaincore.Validator.*;
-import static pl.dkaluza.kitchenservice.domain.Amount.*;
-import static pl.dkaluza.kitchenservice.domain.Ingredient.*;
-import static pl.dkaluza.kitchenservice.domain.RecipeId.*;
-import static pl.dkaluza.kitchenservice.domain.Step.*;
+import static pl.dkaluza.domaincore.Validator.validator;
+import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
+import static pl.dkaluza.kitchenservice.domain.Ingredient.IngredientFactory;
+import static pl.dkaluza.kitchenservice.domain.RecipeId.RecipeIdFactory;
+import static pl.dkaluza.kitchenservice.domain.Step.StepFactory;
 
 public class Recipe extends AbstractPersistable<RecipeId> {
     private final String name;
@@ -64,37 +64,17 @@ public class Recipe extends AbstractPersistable<RecipeId> {
     }
 
     private static abstract class RecipeBuilder<T extends RecipeBuilder<T>> {
-        private final boolean withId;
-        private RecipeIdFactory idFactory;
-        private List<IngredientFactory> ingredientsFactories;
-        private List<StepFactory> methodStepsFactories;
         private String name;
         private String description;
         private Duration cookingTime;
         private BigDecimal portionSizeValue;
         private String portionSizeMeasure;
 
-        private RecipeBuilder(boolean withId) {
-            this.withId = withId;
-            ingredientsFactories = new ArrayList<>();
-            methodStepsFactories = new ArrayList<>();
-        }
+        private RecipeBuilder() { }
 
         abstract T getThis();
 
         public abstract Factory<Recipe> build();
-
-        void idFactory(RecipeIdFactory idFactory) {
-            this.idFactory = idFactory;
-        }
-
-        void ingredientFactory(IngredientFactory factory) {
-            ingredientsFactories.add(factory);
-        }
-
-        void methodStepFactory(StepFactory factory) {
-            methodStepsFactories.add(factory);
-        }
 
         public T name(String name) {
             this.name = name;
@@ -137,7 +117,7 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return portionSizeMeasure;
         }
 
-        static boolean isNameValid(String name) {
+        private static boolean isNameValid(String name) {
             if (name == null || name.isBlank()) {
                 return false;
             }
@@ -146,19 +126,19 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return !(length < 3 || length > 256);
         }
 
-        static DefaultFactory<String> newNameFactory(String name) {
-            return DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
-                name
-            );
-        }
-
-        static boolean isDescriptionValid(String description) {
+        private static boolean isDescriptionValid(String description) {
             if (description == null) {
                 return false;
             }
 
             return description.trim().length() <= 16384;
+        }
+
+        static DefaultFactory<String> newNameFactory(String name) {
+            return DefaultFactory.newWithObject(
+                ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
+                name
+            );
         }
 
         static DefaultFactory<String> newDescriptionFactory(String description) {
@@ -189,11 +169,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
     }
 
     public final static class NewRecipeBuilder extends RecipeBuilder<NewRecipeBuilder> {
-        private List<IngredientBuilderDto> ingredients;
-        private List<MethodStepBuilderDto> methodSteps;
+        private final List<IngredientBuilderDto> ingredients;
+        private final List<MethodStepBuilderDto> methodSteps;
 
         private NewRecipeBuilder() {
-            super(false);
             ingredients = new ArrayList<>();
             methodSteps = new ArrayList<>();
         }
@@ -215,7 +194,6 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
         @Override
         public Factory<Recipe> build() {
-
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
             var ingredientFactories = ingredients.stream()
                 .map(dto -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure()))
@@ -246,8 +224,13 @@ public class Recipe extends AbstractPersistable<RecipeId> {
     }
 
     public final static class FromPersistenceRecipeBuilder extends RecipeBuilder<FromPersistenceRecipeBuilder> {
+        private Long id;
+        private final List<IngredientBuilderDto> ingredients;
+        private final List<MethodStepBuilderDto> methodSteps;
+
         private FromPersistenceRecipeBuilder() {
-            super(true);
+            ingredients = new ArrayList<>();
+            methodSteps = new ArrayList<>();
         }
 
         @Override
@@ -256,25 +239,51 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
 
         public FromPersistenceRecipeBuilder id(Long id) {
-            idFactory(new RecipeIdFactory(id));
+            this.id = id;
             return this;
         }
 
         public FromPersistenceRecipeBuilder ingredient(Long id, String name, BigDecimal value, String measure) {
-            ingredientFactory(
-                IngredientFactory.fromPersistence(id, name, value, measure)
-            );
+            ingredients.add(new IngredientBuilderDto(id, name, value, measure));
             return this;
         }
 
         public FromPersistenceRecipeBuilder methodStep(Long id, String text) {
-            methodStepFactory(
-                StepFactory.fromPersistence(id, text)
-            );
+            methodSteps.add(new MethodStepBuilderDto(id, text));
             return this;
         }
 
+        @Override
+        public Factory<Recipe> build() {
+            var idFactory = new RecipeIdFactory(id);
+            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
+            var ingredientFactories = ingredients.stream()
+                .map(dto -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure()))
+                .toList();
+            var methodStepFactories = methodSteps.stream()
+                .map(dto -> StepFactory.newStep(dto.text()))
+                .toList();
 
+            var factories = new ArrayList<Factory<?>>();
+            factories.add(idFactory);
+            factories.add(newNameFactory(name()));
+            factories.add(newDescriptionFactory(description()));
+            factories.addAll(ingredientFactories);
+            factories.addAll(methodStepFactories);
+            factories.add(newCookingTimeFactory(cookingTime()));
+            factories.add(portionSizeFactory);
+            return new FactoriesComposite<>(
+                () -> new Recipe(
+                    idFactory.assemble(),
+                    name(), description(),
+                    ingredientFactories.stream().map(IngredientFactory::assemble).toList(),
+                    methodStepFactories.stream().map(StepFactory::assemble).toList(),
+                    cookingTime(),
+                    portionSizeFactory.assemble()
+                ),
+                factories
+            );
+        }
     }
 
     private record IngredientBuilderDto(Long id, String name, BigDecimal value, String measure) {}

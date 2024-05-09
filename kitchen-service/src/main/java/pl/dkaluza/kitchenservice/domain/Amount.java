@@ -7,7 +7,7 @@ import pl.dkaluza.domaincore.Validator;
 
 import java.math.BigDecimal;
 
-import static pl.dkaluza.domaincore.Validator.*;
+import static pl.dkaluza.domaincore.Validator.validator;
 
 public class Amount {
     private static final Amount ZERO = new Amount(BigDecimal.ZERO, "");
@@ -61,7 +61,7 @@ public class Amount {
 
         AmountFactory(BigDecimal value, String measure, Validator... validators) {
             super(
-                getExecutor(value, measure, validators),
+                getValidationExecutor(value, measure, validators),
                 () -> {
                     if (value.signum() == 0) {
                         return ZERO;
@@ -72,7 +72,7 @@ public class Amount {
             );
         }
 
-        private static ValidationExecutor getExecutor(BigDecimal value, String measure, Validator... validators) {
+        private static ValidationExecutor getValidationExecutor(BigDecimal value, String measure, Validator... validators) {
             var builder = ValidationExecutor.builder()
                 .withValidator(validator(!(value == null || value.signum() < 0), "value", "Value must not be a negative number"))
                 .withValidator(validator(!(measure == null || measure.trim().length() > 32), "measure", "Measure must have from 0 to 32 chars"));

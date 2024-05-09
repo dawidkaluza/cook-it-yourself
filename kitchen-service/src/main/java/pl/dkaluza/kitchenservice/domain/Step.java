@@ -2,8 +2,8 @@ package pl.dkaluza.kitchenservice.domain;
 
 import pl.dkaluza.domaincore.*;
 
-import static pl.dkaluza.domaincore.Validator.*;
-import static pl.dkaluza.kitchenservice.domain.StepId.*;
+import static pl.dkaluza.domaincore.Validator.validator;
+import static pl.dkaluza.kitchenservice.domain.StepId.StepIdFactory;
 
 public class Step extends AbstractPersistable<StepId> {
     private final String text;

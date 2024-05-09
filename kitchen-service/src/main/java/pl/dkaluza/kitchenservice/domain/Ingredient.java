@@ -4,7 +4,7 @@ import pl.dkaluza.domaincore.*;
 
 import java.math.BigDecimal;
 
-import static pl.dkaluza.domaincore.Validator.*;
+import static pl.dkaluza.domaincore.Validator.validator;
 import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
 import static pl.dkaluza.kitchenservice.domain.IngredientId.IngredientIdFactory;
 

@@ -4,7 +4,7 @@ import pl.dkaluza.domaincore.AbstractPersistable;
 import pl.dkaluza.domaincore.FactoriesComposite;
 import pl.dkaluza.domaincore.Factory;
 
-import static pl.dkaluza.kitchenservice.domain.CookId.*;
+import static pl.dkaluza.kitchenservice.domain.CookId.CookIdFactory;
 
 public class Cook extends AbstractPersistable<CookId> {
     private Cook(CookId id) {
