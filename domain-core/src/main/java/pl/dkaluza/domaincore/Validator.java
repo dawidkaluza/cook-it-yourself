@@ -6,10 +6,10 @@ public interface Validator {
     FieldError validate();
 
     static Validator validator(boolean condition, String name, String description) {
-        return () -> condition ? new FieldError(name, description) : null;
+        return () -> condition ? null : new FieldError(name, description);
     }
 
     static Validator validator(BooleanSupplier condition, String name, String description) {
-        return () -> condition.getAsBoolean() ? new FieldError(name, description) : null;
+        return () -> condition.getAsBoolean() ? null : new FieldError(name, description);
     }
 }
