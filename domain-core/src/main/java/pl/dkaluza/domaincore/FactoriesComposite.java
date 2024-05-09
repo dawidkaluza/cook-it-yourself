@@ -14,7 +14,7 @@ public class FactoriesComposite<T> extends Factory<T> {
         this(assembler, List.of(factories));
     }
 
-    public FactoriesComposite(Assembler<T> assembler, List<Factory<?>> factories) {
+    public FactoriesComposite(Assembler<T> assembler, List<? extends Factory<?>> factories) {
         super(assembler);
         this.factories = new ArrayList<>(factories);
     }
