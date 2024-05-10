@@ -134,37 +134,6 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return cookId;
         }
 
-        private static boolean isNameValid(String name) {
-            if (name == null || name.isBlank()) {
-                return false;
-            }
-
-            int length = name.trim().length();
-            return !(length < 3 || length > 256);
-        }
-
-        private static boolean isDescriptionValid(String description) {
-            if (description == null) {
-                return false;
-            }
-
-            return description.trim().length() <= 16384;
-        }
-
-        static DefaultFactory<String> newNameFactory(String name) {
-            return DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
-                name
-            );
-        }
-
-        static DefaultFactory<String> newDescriptionFactory(String description) {
-            return DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(isDescriptionValid(description), "description", "Description must have 16384 chars at most")),
-                description
-            );
-        }
-
         static DefaultFactory<Duration> newCookingTimeFactory(Duration cookingTime) {
             return DefaultFactory.newWithObject(
                 ValidationExecutor.of(
@@ -217,6 +186,8 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
         @Override
         public Factory<Recipe> build() {
+            var nameFactory = new NameFactory(name());
+            var descriptionFactory = new DescriptionFactory(description());
             var ingredientsFactory = IngredientsFactory.newIngredients(ingredients);
             var methodStepsFactory = StepsFactory.newSteps(methodSteps);
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
@@ -225,14 +196,14 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return new FactoriesComposite<>(
                 () -> new Recipe(
                     null,
-                    name(), description(),
+                    nameFactory.assemble(), descriptionFactory.assemble(),
                     ingredientsFactory.assemble(),
                     methodStepsFactory.assemble(),
                     cookingTime(),
                     portionSizeFactory.assemble(),
                     cookIdFactory.assemble()
                 ),
-                newNameFactory(name()), newDescriptionFactory(description()),
+                nameFactory, descriptionFactory,
                 ingredientsFactory, methodStepsFactory,
                 newCookingTimeFactory(cookingTime()),
                 portionSizeFactory,
@@ -274,6 +245,8 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         @Override
         public Factory<Recipe> build() {
             var idFactory = new RecipeIdFactory(id);
+            var nameFactory = new NameFactory(name());
+            var descriptionFactory = new DescriptionFactory(description());
             var ingredientsFactory = IngredientsFactory.fromPersistence(ingredients);
             var methodStepsFactory = StepsFactory.fromPersistence(methodSteps);
             var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
@@ -282,19 +255,64 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return new FactoriesComposite<>(
                 () -> new Recipe(
                     idFactory.assemble(),
-                    name(), description(),
+                    nameFactory.assemble(), descriptionFactory.assemble(),
                     ingredientsFactory.assemble(),
                     methodStepsFactory.assemble(),
                     cookingTime(),
                     portionSizeFactory.assemble(),
                     cookIdFactory.assemble()
                 ),
-                idFactory, newNameFactory(name()), newDescriptionFactory(description()),
+                idFactory, nameFactory, descriptionFactory,
                 ingredientsFactory, methodStepsFactory,
                 newCookingTimeFactory(cookingTime()),
                 portionSizeFactory,
                 cookIdFactory
             );
+        }
+    }
+
+    private static class NameFactory extends DefaultFactory<String> {
+        NameFactory(String name) {
+            super(
+                ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
+                () -> name.trim()
+            );
+        }
+
+        private static boolean isNameValid(String name) {
+            if (name == null || name.isBlank()) {
+                return false;
+            }
+
+            int length = name.trim().length();
+            return !(length < 3 || length > 256);
+        }
+
+        @Override
+        protected String assemble() {
+            return super.assemble();
+        }
+    }
+
+    private static class DescriptionFactory extends DefaultFactory<String> {
+        protected DescriptionFactory(String description) {
+            super(
+                ValidationExecutor.of(validator(isDescriptionValid(description), "description", "Description must have 16384 chars at most")),
+                () -> description.trim()
+            );
+        }
+
+        private static boolean isDescriptionValid(String description) {
+            if (description == null) {
+                return false;
+            }
+
+            return description.trim().length() <= 16384;
+        }
+
+        @Override
+        protected String assemble() {
+            return super.assemble();
         }
     }
 

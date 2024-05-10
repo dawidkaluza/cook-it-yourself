@@ -131,10 +131,10 @@ class RecipeTest {
             .isNotNull();
 
         assertThat(recipe.getName())
-            .isEqualTo(name);
+            .isEqualTo(name.trim());
 
         assertThat(recipe.getDescription())
-            .isEqualTo(description);
+            .isEqualTo(description.trim());
 
         assertThat(recipe.getIngredients())
             .singleElement()
