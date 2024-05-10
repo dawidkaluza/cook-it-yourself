@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import pl.dkaluza.domaincore.Assertions;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
+import pl.dkaluza.kitchenservice.domain.Cook;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
@@ -78,5 +79,18 @@ class RecipePersistenceAdapter implements RecipeRepository  {
                 e
             );
         }
+    }
+
+    @Override
+    public Cook insertCook(Cook cook) {
+        var cookId = cook.getId();
+        if (cookRepository.existsById(cookId.getId())) {
+            // simply ignore when re-inserting, at least for now
+            return cook;
+        }
+
+        var cookEntity = new CookEntity(cookId.getId());
+        cookRepository.save(cookEntity);
+        return cook;
     }
 }
