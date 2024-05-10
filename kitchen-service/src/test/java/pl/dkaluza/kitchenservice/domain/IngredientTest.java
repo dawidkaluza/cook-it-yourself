@@ -61,7 +61,7 @@ class IngredientTest {
                 (obj) -> obj.getAmount().getValue(),
                 (obj) -> obj.getAmount().getMeasure()
             ).containsExactly(
-                null, name,
+                null, name.trim(),
                 value, measure
             );
 
@@ -72,8 +72,8 @@ class IngredientTest {
     private static Stream<Arguments> newIngredientValidParamsProvider() {
         return Stream.of(
             Arguments.of("Onion", new BigDecimal("1"), "pc"),
-            Arguments.of("Ham", new BigDecimal("1"), "pc"),
-            Arguments.of("H".repeat(256), new BigDecimal("0.1"), "kg")
+            Arguments.of(" Ham   ", new BigDecimal("1"), "pc"),
+            Arguments.of(" " + "H".repeat(256) + "    ", new BigDecimal("0.1"), "kg")
         );
     }
 
@@ -119,7 +119,7 @@ class IngredientTest {
                 (obj) -> obj.getAmount().getMeasure()
             )
             .containsExactly(
-                id, name,
+                id, name.trim(),
                 value, measure
             );
 
@@ -129,7 +129,8 @@ class IngredientTest {
 
     private static Stream<Arguments> fromPersistenceValidParamsProvider() {
         return Stream.of(
-            Arguments.of(3L, "Onion", new BigDecimal("1"), "pc")
+            Arguments.of(3L, "Onion", new BigDecimal("1"), "pc"),
+            Arguments.of(3L, " Onion   ", new BigDecimal("1"), "pc")
         );
     }
 }

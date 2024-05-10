@@ -68,6 +68,7 @@ class AmountTest {
         return Stream.of(
             Arguments.of("0.1", ""),
             Arguments.of("1.0", "kg"),
+            Arguments.of("1.0", " kg   "),
             Arguments.of("1213213.333", "g".repeat(32)),
             Arguments.of("2.0", " " + "g".repeat(32) + " ")
         );

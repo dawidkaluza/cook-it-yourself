@@ -48,10 +48,14 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             return !(length < 3 || length > 256);
         }
 
+        private static Assembler<String> nameAssembler(String name) {
+            return name == null ? () -> null : name::trim;
+        }
+
         private static Factory<String> nameFactory(String name, String prefix) {
-            return DefaultFactory.newWithObject(
+            return DefaultFactory.newWithAssembler(
                 ValidationExecutor.of(validator(isNameValid(name), prefix + "name", "Name must have from 3 to 256 chars")),
-                name
+                nameAssembler(name)
             );
         }
 
@@ -72,7 +76,7 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             var amountFactory = amountFactory(value, measure, prefix);
 
             return new IngredientFactory(
-                () -> new Ingredient(null, name, amountFactory.assemble()),
+                () -> new Ingredient(null, nameAssembler(name).assemble(), amountFactory.assemble()),
                 nameFactory, amountFactory
             );
         }
@@ -87,7 +91,7 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             var amountFactory = amountFactory(value, measure, prefix);
 
             return new IngredientFactory(
-                () -> new Ingredient(idFactory.assemble(), name, amountFactory.assemble()),
+                () -> new Ingredient(idFactory.assemble(), nameAssembler(name).assemble(), amountFactory.assemble()),
                 idFactory, nameFactory, amountFactory
             );
         }

@@ -116,7 +116,8 @@ class StepTest {
 
     private static Stream<Arguments> fromPersistenceValidParamsProvider() {
         return Stream.of(
-            Arguments.of(1L, "Run")
+            Arguments.of(1L, "Run"),
+            Arguments.of(1L, " Run  ")
         );
     }
 }
