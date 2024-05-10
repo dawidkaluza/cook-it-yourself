@@ -1,0 +1,20 @@
+FROM eclipse-temurin:17.0.11_9-jdk
+
+ARG UNAME=developer
+ARG UID=1000
+ARG GNAME=developer
+ARG GID=1000
+
+RUN groupadd -r -g ${GID} ${GNAME} &&  \
+    useradd -l -r -m -u ${UID} -g ${GNAME} ${UNAME}
+USER ${UNAME}
+WORKDIR /home/${UNAME}/app
+
+COPY --chown=${UNAME} gradle ./gradle
+COPY --chown=${UNAME} settings.gradle build.gradle gradlew ./
+
+RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
+    ./gradlew resolveDependencies --no-daemon && cp -R ~/.gradle ~/.gradle_temp
+RUN mv ~/.gradle_temp ~/.gradle
+
+CMD ./gradlew compileJava --continuous --no-daemon & ./gradlew bootRun --no-daemon

@@ -74,7 +74,7 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         } catch (ValidationException e) {
             throw new IllegalStateException(
                 "Caught unexpected validation exception. " +
-                "Make sure that data retrieved from persistence layer is valid",
+                "Make sure that data retrieved from persistence layer is valid.",
                 e
             );
         }

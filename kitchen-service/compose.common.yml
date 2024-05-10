@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:15.2-alpine
+    healthcheck:
+      test: pg_isready -d user -U developer
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    environment:
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=developer
+      - POSTGRES_DB=kitchen

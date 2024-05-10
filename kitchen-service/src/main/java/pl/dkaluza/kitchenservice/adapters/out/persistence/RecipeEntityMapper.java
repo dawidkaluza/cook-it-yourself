@@ -6,13 +6,15 @@ import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.CookId;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 
+import java.time.Duration;
 import java.util.List;
 
 @Mapper
 interface RecipeEntityMapper {
-    @Mapping(target = "id", source = "id.id")
-    @Mapping(target = "portionSizeAmount", source = "portionSize.value")
-    @Mapping(target = "portionSizeMeasure", source = "portionSize.measure")
+    @Mapping(target = "id", source = "recipe.id.id")
+    @Mapping(target = "cookingTime", source = "recipe.cookingTime.seconds")
+    @Mapping(target = "portionSizeAmount", source = "recipe.portionSize.value")
+    @Mapping(target = "portionSizeMeasure", source = "recipe.portionSize.measure")
     @Mapping(target = "cookId", source = "cookId.id")
     RecipeEntity toEntity(Recipe recipe, CookId cookId);
 
@@ -36,7 +38,7 @@ interface RecipeEntityMapper {
         }
 
         return builder
-            .cookingTime(recipeEntity.cookingTime())
+            .cookingTime(Duration.ofSeconds(recipeEntity.cookingTime()))
             .portionSize(recipeEntity.portionSizeAmount(), recipeEntity.portionSizeMeasure())
             .cookId(cookId)
             .build().produce();

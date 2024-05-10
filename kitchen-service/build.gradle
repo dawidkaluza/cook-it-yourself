@@ -41,14 +41,14 @@ ext {
 dependencies {
     implementation 'pl.dkaluza:domain-core:0.0.1-SNAPSHOT'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+//    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
 }
@@ -78,7 +78,6 @@ testing {
 
                 implementation 'pl.dkaluza:domain-core:0.0.1-SNAPSHOT'
                 implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation 'org.springframework.security:spring-security-test'
                 implementation 'org.jdbi:jdbi3-core:3.45.1'
                 implementation 'com.rabbitmq:amqp-client:5.21.0'
                 implementation "org.testcontainers:testcontainers:${testcontainersVersion}"

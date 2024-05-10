@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS cook (
-    id SERIAL PRIMARY KEY
+    id INT PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS recipe (
     id SERIAL PRIMARY KEY,
     name VARCHAR(256) NOT NULL,
     description TEXT NOT NULL,
-    cooking_time INTERVAL NOT NULL,
+    cooking_time BIGINT NOT NULL,
     portion_size_amount NUMERIC(9, 2) NOT NULL,
     portion_size_measure VARCHAR(32) NOT NULL,
     cook_id INT NOT NULL,

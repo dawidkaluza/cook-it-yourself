@@ -1,0 +1,32 @@
+include:
+  - path:
+      - compose.common.yml
+      - compose.infra.yml
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider localhost:8080/actuator/health || exit 1
+      interval: 2s
+      timeout: 5s
+      retries: 45
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./src/:/home/developer/app/src/
+    networks:
+      - main
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=kitchen
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=developer
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
