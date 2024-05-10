@@ -39,8 +39,17 @@ class RecipeTest {
                     .name(null)
                     .description(null)
                     .cookingTime(Duration.ZERO)
-                    .portionSize(null, null),
-                new String[] { "name", "description", "ingredients", "methodSteps", "cookingTime", "portionSize.value", "portionSize.measure"}
+                    .portionSize(null, null)
+                    .cookId(null),
+                new String[] {
+                    "name",
+                    "description",
+                    "ingredients",
+                    "methodSteps",
+                    "cookingTime",
+                    "portionSize.value", "portionSize.measure",
+                    "cookId"
+                }
             ),
             Arguments.of(
                 Recipe.newRecipeBuilder()
@@ -49,14 +58,16 @@ class RecipeTest {
                     .ingredient(null, null, null)
                     .methodStep(null)
                     .cookingTime(Duration.ZERO)
-                    .portionSize(null, null),
+                    .portionSize(null, null)
+                    .cookId(null),
                 new String[] {
                     "name",
                     "description",
                     "ingredients.name", "ingredients.value", "ingredients.measure",
                     "methodSteps.text",
                     "cookingTime",
-                    "portionSize.value", "portionSize.measure"
+                    "portionSize.value", "portionSize.measure",
+                    "cookId"
                 }
             ),
             Arguments.of(
@@ -64,14 +75,16 @@ class RecipeTest {
                     .name("   aa  ")
                     .description(" " + "b".repeat(16385) + "   ")
                     .cookingTime(Duration.ofMillis(1))
-                    .portionSize(null, null),
+                    .portionSize(null, null)
+                    .cookId(null),
                 new String[] {
                     "name",
                     "description",
                     "ingredients",
                     "methodSteps",
                     "cookingTime",
-                    "portionSize.value", "portionSize.measure"
+                    "portionSize.value", "portionSize.measure",
+                    "cookId"
                 }
             ),
             Arguments.of(
@@ -79,12 +92,14 @@ class RecipeTest {
                     .name("   " + "a".repeat(257) + " ")
                     .description("")
                     .cookingTime(Duration.ofSeconds(1))
-                    .portionSize(null, null),
+                    .portionSize(null, null)
+                    .cookId(null),
                 new String[] {
                     "name",
                     "ingredients",
                     "methodSteps",
-                    "portionSize.value", "portionSize.measure"
+                    "portionSize.value", "portionSize.measure",
+                    "cookId"
                 }
             )
         );
@@ -97,7 +112,8 @@ class RecipeTest {
         String ingredientName, BigDecimal ingredientValue, String ingredientMeasure,
         String stepText,
         Duration cookingTime,
-        BigDecimal portionSizeValue, String portionSizeMeasure
+        BigDecimal portionSizeValue, String portionSizeMeasure,
+        Long cookId
     ) {
         // When
         var recipe = Recipe.newRecipeBuilder()
@@ -107,6 +123,7 @@ class RecipeTest {
             .methodStep(stepText)
             .cookingTime(cookingTime)
             .portionSize(portionSizeValue, portionSizeMeasure)
+            .cookId(cookId)
             .build().produce();
 
         // Then
@@ -137,6 +154,9 @@ class RecipeTest {
 
         assertThat(recipe.getPortionSize())
             .isEqualTo(Amount.of(portionSizeValue, portionSizeMeasure).produce());
+
+        assertThat(recipe.getCookId().getId())
+            .isEqualTo(cookId);
     }
 
     private static Stream<Arguments> newRecipeBuilderValidParamsProvider() {
@@ -145,19 +165,22 @@ class RecipeTest {
                 "Boiled sausages", "How to boil sausages",
                 "sausage", new BigDecimal(2), "pc",
                 "Boil sausages for about 3 mins",
-                Duration.ofMinutes(3), new BigDecimal(2), "pc"
+                Duration.ofMinutes(3), new BigDecimal(2), "pc",
+                1L
             ),
             Arguments.of(
                 "   xyz ", "   " + "a".repeat(16384) + " ",
                 "sausage", new BigDecimal(1), "pc",
                 "diy",
-                Duration.ofSeconds(1), new BigDecimal(1), "pc"
+                Duration.ofSeconds(1), new BigDecimal(1), "pc",
+                2L
             ),
             Arguments.of(
                 "a".repeat(256), "a".repeat(16384),
                 "sausage", new BigDecimal(1), "",
                 "diy",
-                Duration.ofSeconds(1), new BigDecimal(1), ""
+                Duration.ofSeconds(1), new BigDecimal(1), "",
+                3L
             )
         );
     }
@@ -173,6 +196,7 @@ class RecipeTest {
             .methodStep(null, "Diy")
             .cookingTime(Duration.ofMinutes(3))
             .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
             .build();
 
         // When
@@ -202,6 +226,7 @@ class RecipeTest {
             .methodStep(methodStepId, "Diy")
             .cookingTime(Duration.ofMinutes(3))
             .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
             .build();
 
         // When

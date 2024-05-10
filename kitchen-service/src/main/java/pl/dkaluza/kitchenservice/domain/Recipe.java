@@ -21,8 +21,9 @@ public class Recipe extends AbstractPersistable<RecipeId> {
     private final List<Step> methodSteps;
     private final Duration cookingTime;
     private final Amount portionSize;
+    private final CookId cookId;
 
-    private Recipe(RecipeId id, String name, String description, List<Ingredient> ingredients, List<Step> methodSteps, Duration cookingTime, Amount portionSize) {
+    private Recipe(RecipeId id, String name, String description, List<Ingredient> ingredients, List<Step> methodSteps, Duration cookingTime, Amount portionSize, CookId cookId) {
         super(id);
         this.name = name;
         this.description = description;
@@ -30,6 +31,7 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         this.methodSteps = methodSteps;
         this.cookingTime = cookingTime;
         this.portionSize = portionSize;
+        this.cookId = cookId;
     }
 
     public static NewRecipeBuilder newRecipeBuilder() {
@@ -64,12 +66,17 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         return portionSize;
     }
 
+    public CookId getCookId() {
+        return cookId;
+    }
+
     private static abstract class RecipeBuilder<T extends RecipeBuilder<T>> {
         private String name;
         private String description;
         private Duration cookingTime;
         private BigDecimal portionSizeValue;
         private String portionSizeMeasure;
+        private Long cookId;
 
         private RecipeBuilder() { }
 
@@ -116,6 +123,15 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
         String portionSizeMeasure() {
             return portionSizeMeasure;
+        }
+
+        public T cookId(Long cookId) {
+            this.cookId = cookId;
+            return getThis();
+        }
+
+        Long cookId() {
+            return cookId;
         }
 
         private static boolean isNameValid(String name) {
@@ -169,6 +185,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
                 Validator.validator(value != null && value.signum() > 0, prefix + "value", "Value must be a positive number")
             );
         }
+
+        static CookId.CookIdFactory newCookIdFactory(Long id) {
+            return new CookId.CookIdFactory(id, "cookId");
+        }
     }
 
     public final static class NewRecipeBuilder extends RecipeBuilder<NewRecipeBuilder> {
@@ -197,9 +217,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
         @Override
         public Factory<Recipe> build() {
-            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
             var ingredientsFactory = IngredientsFactory.newIngredients(ingredients);
             var methodStepsFactory = StepsFactory.newSteps(methodSteps);
+            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
+            var cookIdFactory = newCookIdFactory(cookId());
 
             return new FactoriesComposite<>(
                 () -> new Recipe(
@@ -208,12 +229,14 @@ public class Recipe extends AbstractPersistable<RecipeId> {
                     ingredientsFactory.assemble(),
                     methodStepsFactory.assemble(),
                     cookingTime(),
-                    portionSizeFactory.assemble()
+                    portionSizeFactory.assemble(),
+                    cookIdFactory.assemble()
                 ),
                 newNameFactory(name()), newDescriptionFactory(description()),
                 ingredientsFactory, methodStepsFactory,
                 newCookingTimeFactory(cookingTime()),
-                portionSizeFactory
+                portionSizeFactory,
+                cookIdFactory
             );
         }
     }
@@ -251,9 +274,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         @Override
         public Factory<Recipe> build() {
             var idFactory = new RecipeIdFactory(id);
-            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
             var ingredientsFactory = IngredientsFactory.fromPersistence(ingredients);
             var methodStepsFactory = StepsFactory.fromPersistence(methodSteps);
+            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
+            var cookIdFactory = newCookIdFactory(cookId());
 
             return new FactoriesComposite<>(
                 () -> new Recipe(
@@ -262,12 +286,14 @@ public class Recipe extends AbstractPersistable<RecipeId> {
                     ingredientsFactory.assemble(),
                     methodStepsFactory.assemble(),
                     cookingTime(),
-                    portionSizeFactory.assemble()
+                    portionSizeFactory.assemble(),
+                    cookIdFactory.assemble()
                 ),
                 idFactory, newNameFactory(name()), newDescriptionFactory(description()),
                 ingredientsFactory, methodStepsFactory,
                 newCookingTimeFactory(cookingTime()),
-                portionSizeFactory
+                portionSizeFactory,
+                cookIdFactory
             );
         }
     }

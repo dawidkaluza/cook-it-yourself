@@ -17,6 +17,10 @@ public class CookId extends LongIndex {
             super(id, () -> new CookId(id));
         }
 
+        CookIdFactory(Long id, String fieldName) {
+            super(id, () -> new CookId(id), "", fieldName);
+        }
+
         @Override
         protected CookId assemble() {
             return super.assemble();
