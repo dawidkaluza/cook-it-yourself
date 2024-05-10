@@ -1,0 +1,44 @@
+package pl.dkaluza.kitchenservice.adapters.out.persistence;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import pl.dkaluza.domaincore.exceptions.ValidationException;
+import pl.dkaluza.kitchenservice.domain.CookId;
+import pl.dkaluza.kitchenservice.domain.Recipe;
+
+import java.util.List;
+
+@Mapper
+interface RecipeEntityMapper {
+    @Mapping(target = "id", source = "id.id")
+    @Mapping(target = "portionSizeAmount", source = "portionSize.value")
+    @Mapping(target = "portionSizeMeasure", source = "portionSize.measure")
+    @Mapping(target = "cookId", source = "cookId.id")
+    RecipeEntity toEntity(Recipe recipe, CookId cookId);
+
+    default Recipe toDomain(RecipeEntity recipeEntity, List<IngredientEntity> ingredientEntities, List<StepEntity> stepEntities, Long cookId) throws ValidationException {
+        var builder = Recipe.fromPersistenceRecipeBuilder()
+            .id(recipeEntity.id())
+            .name(recipeEntity.name())
+            .description(recipeEntity.description());
+
+        for (var ingredientEntity : ingredientEntities) {
+            builder.ingredient(
+                ingredientEntity.id(),
+                ingredientEntity.name(), ingredientEntity.amount(), ingredientEntity.measure()
+            );
+        }
+
+        for (var stepEntity : stepEntities) {
+            builder.methodStep(
+                stepEntity.id(), stepEntity.text()
+            );
+        }
+
+        return builder
+            .cookingTime(recipeEntity.cookingTime())
+            .portionSize(recipeEntity.portionSizeAmount(), recipeEntity.portionSizeMeasure())
+            .cookId(cookId)
+            .build().produce();
+    }
+}
