@@ -13,19 +13,24 @@ public abstract class LongIndex extends Index<Long> {
 
     public static class LongIndexFactory<T extends LongIndex> extends DefaultFactory<T> {
         protected LongIndexFactory(Long id, Assembler<T> assembler) {
-            this(id, assembler, "");
+            this(id, assembler, "", "id");
         }
 
         protected LongIndexFactory(Long id, Assembler<T> assembler, String prefix) {
+            this(id, assembler, prefix, "id");
+        }
+
+        // Due to backwards compatibility, having only fieldName in here (without prefix, which is quite redundant) wasn't an option.
+        protected LongIndexFactory(Long id, Assembler<T> assembler, String prefix, String fieldName) {
             super(
-                getValidationExecutor(id, prefix),
+                getValidationExecutor(id, prefix + fieldName),
                 assembler
             );
         }
 
-        private static ValidationExecutor getValidationExecutor(Long id, String prefix) {
+        private static ValidationExecutor getValidationExecutor(Long id, String fieldName) {
             return ValidationExecutor.builder()
-                .withValidator(validator(id != null && id > 0L, prefix + "id", "Id must be a positive number"))
+                .withValidator(validator(id != null && id > 0L, fieldName, "Id must be a positive number"))
                 .build();
         }
     }
