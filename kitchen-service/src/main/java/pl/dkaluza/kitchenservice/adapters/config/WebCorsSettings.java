@@ -8,6 +8,10 @@ import java.util.List;
 @Component
 @ConfigurationProperties("ciy.web.cors")
 public class WebCorsSettings {
+    /**
+     * List of origins allowed to make requests to API.
+     * Configured via CORS policy.
+     */
     private List<String> allowedOrigins;
 
     public List<String> getAllowedOrigins() {

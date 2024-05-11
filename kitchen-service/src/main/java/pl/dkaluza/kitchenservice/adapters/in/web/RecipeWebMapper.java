@@ -3,6 +3,7 @@ package pl.dkaluza.kitchenservice.adapters.in.web;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.Ingredient;
 import pl.dkaluza.kitchenservice.domain.Recipe;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Mapper
 abstract class RecipeWebMapper {
-    Recipe toRecipe(Authentication euth, AddRecipeRequest reqBody) throws ValidationException {
+    Recipe toRecipe(Authentication auth, AddRecipeRequest reqBody) throws ValidationException {
         var builder = Recipe.newRecipeBuilder()
             .name(reqBody.name())
             .description(reqBody.description());
@@ -32,8 +33,10 @@ abstract class RecipeWebMapper {
             .cookingTime(Duration.ofSeconds(reqBody.cookingTime()))
             .portionSize(reqBody.portionSize().amount(), reqBody.portionSize().measure());
 
+        // TODO adjust later once you decide where and if user id will be stored in the token
+        var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("id");
         builder
-            .cookId(1L); // TODO figure out how to retrieve cookId from auth
+            .cookId(Long.valueOf(userId));
 
         return builder.build().produce();
     }
