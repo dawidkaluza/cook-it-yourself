@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 
 @RestController
 @RequestMapping("/recipe")
@@ -17,7 +18,7 @@ class RecipeController {
     }
 
     @PostMapping
-    ResponseEntity<?> addRecipe(Authentication auth, @RequestBody AddRecipeRequest reqBody) {
+    ResponseEntity<?> addRecipe(Authentication auth, @RequestBody AddRecipeRequest reqBody) throws ObjectAlreadyPersistedException {
         return recipeFacade.addRecipe(auth, reqBody);
     }
 }

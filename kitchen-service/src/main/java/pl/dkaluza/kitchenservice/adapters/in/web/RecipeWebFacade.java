@@ -22,7 +22,7 @@ class RecipeWebFacade {
         this.kitchenService = kitchenService;
     }
 
-    ResponseEntity<?> addRecipe(Authentication auth, AddRecipeRequest reqBody) {
+    ResponseEntity<?> addRecipe(Authentication auth, AddRecipeRequest reqBody) throws ObjectAlreadyPersistedException {
         try {
             var recipe = recipeWebMapper.toRecipe(auth, reqBody);
             recipe = kitchenService.addRecipe(recipe);
@@ -38,14 +38,6 @@ class RecipeWebFacade {
                 .body(
                     new ErrorResponse(
                         "Invalid fields values", ZonedDateTime.now(ZoneOffset.UTC), errorRespBodyFields
-                    )
-                );
-        } catch (ObjectAlreadyPersistedException e) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(
-                    new ErrorResponse(
-                        "One of given objects is already persisted", ZonedDateTime.now(ZoneOffset.UTC)
                     )
                 );
         } catch (CookNotFoundException e) {
