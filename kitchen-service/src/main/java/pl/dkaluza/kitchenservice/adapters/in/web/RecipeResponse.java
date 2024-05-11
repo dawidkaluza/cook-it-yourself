@@ -5,7 +5,7 @@ import java.util.List;
 
 record RecipeResponse(
     Long id, String name, String description,
-    List<Ingredient> ingredients, List<Step> steps,
+    List<Ingredient> ingredients, List<Step> methodSteps,
     Long cookingTime, PortionSize portionSize,
     Long cookId
 ) {

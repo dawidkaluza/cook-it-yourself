@@ -34,9 +34,13 @@ abstract class RecipeWebMapper {
             .portionSize(reqBody.portionSize().amount(), reqBody.portionSize().measure());
 
         // TODO adjust later once you decide where and if user id will be stored in the token
-        var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("id");
-        builder
-            .cookId(Long.valueOf(userId));
+        if (auth == null ) {
+            builder.cookId(null);
+        } else {
+            var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("id");
+            builder
+                .cookId(Long.valueOf(userId));
+        }
 
         return builder.build().produce();
     }
