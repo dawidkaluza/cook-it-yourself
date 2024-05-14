@@ -9,11 +9,9 @@ import pl.dkaluza.userservice.domain.exceptions.UserNotFoundException;
 import pl.dkaluza.userservice.ports.in.UserService;
 
 class DefaultUserDetailsService implements UserDetailsService {
-    private final UserDetailsMapper userDetailsMapper;
     private final UserService userService;
 
-    public DefaultUserDetailsService(UserDetailsMapper userDetailsMapper, UserService userService) {
-        this.userDetailsMapper = userDetailsMapper;
+    public DefaultUserDetailsService(UserService userService) {
         this.userService = userService;
     }
 
@@ -23,7 +21,7 @@ class DefaultUserDetailsService implements UserDetailsService {
             var user = userService.loadUserByEmail(
                 EmailAddress.of(email).produce()
             );
-            return userDetailsMapper.toUserDetails(user);
+            return DefaultUserDetails.of(user);
         } catch (UserNotFoundException e) {
             throw new UsernameNotFoundException("User with email=" + email + " not found", e);
         } catch (ValidationException e) {
