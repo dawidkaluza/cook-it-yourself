@@ -14,10 +14,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RecipePersistenceAdapterTest {
     private InMemoryRecipePersistenceAdapter recipePersistenceAdapter;
+    private InMemoryCookPersistenceAdapter cookPersistenceAdapter;
 
     @BeforeEach
     void beforeEach() {
         recipePersistenceAdapter = new InMemoryRecipePersistenceAdapter();
+        cookPersistenceAdapter = new InMemoryCookPersistenceAdapter();
     }
 
     @Test
@@ -30,7 +32,7 @@ class RecipePersistenceAdapterTest {
     @Test
     void insertRecipe_alreadyPersistedObjects_throwException() {
         // Given
-        recipePersistenceAdapter.insertCook(Cook.of(1L).produce());
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
 
         var recipe = Recipe.fromPersistenceRecipeBuilder()
             .id(1L)
@@ -52,7 +54,7 @@ class RecipePersistenceAdapterTest {
     @Test
     void insertRecipe_notExistingCookId_throwException() {
         // Given
-        recipePersistenceAdapter.insertCook(Cook.of(1L).produce());
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
 
         var recipe = Recipe.newRecipeBuilder()
             .name("xyz")
@@ -73,7 +75,7 @@ class RecipePersistenceAdapterTest {
     @Test
     void insertRecipe_newRecipe_returnInsertedRecipe() {
         // Given
-        recipePersistenceAdapter.insertCook(Cook.of(1L).produce());
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
 
         var newRecipe = Recipe.newRecipeBuilder()
             .name("xyz")

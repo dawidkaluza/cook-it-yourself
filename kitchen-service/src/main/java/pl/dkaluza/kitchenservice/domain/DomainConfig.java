@@ -9,6 +9,7 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import pl.dkaluza.kitchenservice.ports.out.CookRepository;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
 @Configuration
@@ -20,11 +21,12 @@ class DomainConfig {
     }
 
     @Bean
-    DefaultKitchenService defaultUserService(RecipeRepository recipeRepository) {
-        var kitchenService = new DefaultKitchenService(recipeRepository);
+    DefaultKitchenService defaultUserService(RecipeRepository recipeRepository, CookRepository cookRepository) {
+        var kitchenService = new DefaultKitchenService(recipeRepository, cookRepository);
         var attrSource = new NameMatchTransactionAttributeSource();
 
         attrSource.addTransactionalMethod("addRecipe", new DefaultTransactionAttribute());
+        attrSource.addTransactionalMethod("registerCook", new DefaultTransactionAttribute());
         return transactional(kitchenService, attrSource);
     }
 

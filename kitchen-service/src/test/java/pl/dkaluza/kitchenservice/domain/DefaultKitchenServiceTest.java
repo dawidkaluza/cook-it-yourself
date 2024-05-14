@@ -2,7 +2,9 @@ package pl.dkaluza.kitchenservice.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryCookPersistenceAdapter;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryRecipePersistenceAdapter;
+import pl.dkaluza.kitchenservice.ports.out.CookRepository;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
 import java.math.BigDecimal;
@@ -11,13 +13,13 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.*;
 
 class DefaultKitchenServiceTest {
-    private RecipeRepository recipeRepository;
     private DefaultKitchenService kitchenService;
 
     @BeforeEach
     void beforeEach() {
-        recipeRepository = new InMemoryRecipePersistenceAdapter();
-        kitchenService = new DefaultKitchenService(recipeRepository);
+        var recipeRepository = new InMemoryRecipePersistenceAdapter();
+        var cookRepository = new InMemoryCookPersistenceAdapter();
+        kitchenService = new DefaultKitchenService(recipeRepository, cookRepository);
     }
 
     @Test
@@ -30,7 +32,7 @@ class DefaultKitchenServiceTest {
     @Test
     void addRecipe_validRecipe_returnNewRecipe() {
         // Given
-        recipeRepository.insertCook(Cook.of(1L).produce());
+        kitchenService.registerCook(Cook.newCook(1L).produce());
 
         var newRecipe = Recipe.newRecipeBuilder()
             .name("xyz")
@@ -63,4 +65,11 @@ class DefaultKitchenServiceTest {
         }
     }
 
+    void registerCook_nullCook_throwException() {
+
+    }
+
+    void registerCook_alreadyOrNotExisting_returnPersisted() {
+
+    }
 }
