@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import pl.dkaluza.kitchenservice.domain.Cook;
 
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,25 +27,22 @@ class CookPersistenceAdapterTest {
 
     @ParameterizedTest
     @MethodSource("saveCookVariousCooksProvider")
-    void saveCook_newOrPersistedCook_returnPersistedCook(Function<Long, Cook> cookCreator) {
+    void saveCook_newOrPersistedCook_returnPersistedCook(Cook givenCook) {
         // Given
-        var id = 1L;
-        var givenCook = cookCreator.apply(id);
-
-        // WHen
+        // When
         var persistedCook = cookPersistenceAdapter.saveCook(givenCook);
 
         // Then
         assertThat(persistedCook)
             .isNotNull()
-            .extracting(cook -> cook.getId().getId(), Cook::isPersisted)
-            .containsExactly(id, true);
+            .extracting(Cook::getId, Cook::isPersisted)
+            .containsExactly(givenCook.getId(), true);
     }
 
-    private static Stream<Function<Long, Cook>> saveCookVariousCooksProvider() {
+    private static Stream<Cook> saveCookVariousCooksProvider() {
         return Stream.of(
-            (id) -> Cook.newCook(id).produce(),
-            (id) -> Cook.fromPersistence(id).produce()
+            Cook.newCook(1L).produce(),
+            Cook.fromPersistence(1L).produce()
         );
     }
 }
