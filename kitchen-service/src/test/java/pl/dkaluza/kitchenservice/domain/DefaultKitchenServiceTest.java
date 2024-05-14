@@ -2,15 +2,17 @@ package pl.dkaluza.kitchenservice.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryCookPersistenceAdapter;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryRecipePersistenceAdapter;
-import pl.dkaluza.kitchenservice.ports.out.CookRepository;
-import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DefaultKitchenServiceTest {
     private DefaultKitchenService kitchenService;
@@ -65,11 +67,39 @@ class DefaultKitchenServiceTest {
         }
     }
 
+    @Test
     void registerCook_nullCook_throwException() {
-
+        assertThatThrownBy(
+            () -> kitchenService.registerCook(null)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    void registerCook_alreadyOrNotExisting_returnPersisted() {
+    @ParameterizedTest
+    @ValueSource(longs = { 1L, 2L })
+    void registerCook_persistedCook_throwException(Long id) {
+        // Given
+        kitchenService.registerCook(Cook.newCook(1L).produce());
 
+        // When
+        // NOTE: it does not matter if cook is already registered or not - only object's state is verified.
+        assertThatThrownBy(
+            () -> kitchenService.registerCook(Cook.fromPersistence(id).produce())
+        ).isInstanceOf(ObjectAlreadyPersistedException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 1L, 2L })
+    void registerCook_newCook_returnPersisted(Long id) {
+        // Given
+        kitchenService.registerCook(Cook.newCook(1L).produce());
+
+        // When
+        var registeredCook = kitchenService.registerCook(Cook.newCook(id).produce());
+
+        // Then
+        assertThat(registeredCook)
+            .isNotNull()
+            .extracting(cook -> cook.getId().getId(), Cook::isPersisted)
+            .containsExactly(id, true);
     }
 }
