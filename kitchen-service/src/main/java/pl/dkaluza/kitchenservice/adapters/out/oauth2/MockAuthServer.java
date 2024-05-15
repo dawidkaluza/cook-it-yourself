@@ -59,7 +59,7 @@ class MockAuthServer implements InitializingBean, DisposableBean {
         var payload = new Payload(
             JWT_PAYLOAD_TEMPLATE
                 .replace("ISSUED_AT", Long.toString(unixTimeNow))
-                .replace("EXPIRES_AT", Long.toString(unixTimeNow + 86400))
+                .replace("EXPIRES_AT", Long.toString(unixTimeNow + 604800)) // +1 week
         );
         mockJwtEndpoint(client, new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload, new RSASSASigner(rsaKey));
     }
