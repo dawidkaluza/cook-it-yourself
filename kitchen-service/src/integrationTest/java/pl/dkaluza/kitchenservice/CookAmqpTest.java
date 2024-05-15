@@ -1,8 +1,6 @@
 package pl.dkaluza.kitchenservice;
 
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +11,7 @@ import pl.dkaluza.kitchenservice.config.RabbitFacade;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-import static org.awaitility.Awaitility.*;
+import static org.awaitility.Awaitility.await;
 
 
 @EnableTestcontainers
@@ -61,7 +59,4 @@ class CookAmqpTest {
                 return count > 0;
             });
     }
-
-
-
 }
