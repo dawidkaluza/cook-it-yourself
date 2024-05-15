@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 
 @Component
@@ -24,7 +23,7 @@ class RecipeAmqpListener {
             key = "user.signUp"
         )
     )
-    public void onUserSignedUp(OnUserSignedUp message) throws ValidationException, ObjectAlreadyPersistedException {
+    public void onUserSignedUp(OnUserSignedUp message) throws ValidationException {
         recipeFacade.registerCook(message);
     }
 }
