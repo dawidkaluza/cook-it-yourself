@@ -52,8 +52,6 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.wiremock:wiremock-standalone:3.5.4'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.amqp:spring-rabbit-test'
 }
 
 testing {
@@ -108,6 +106,19 @@ tasks.register('resolveDependencies') {
                     .forEach { c -> c.resolve() }
         }
     }
+}
+
+tasks.register('copyComposeCommon', Copy) {
+    from "$rootDir/compose.common.yml"
+    into "$buildDir/resources/integrationTest/"
+}
+
+tasks.named('processIntegrationTestResources') {
+    dependsOn('copyComposeCommon')
+}
+
+tasks.named('integrationTest') {
+    environment 'KITCHEN_SERVICE_ENV', 'prod'
 }
 
 tasks.named("bootJar") {
