@@ -27,8 +27,8 @@ class MockAuthServer implements InitializingBean, DisposableBean {
             "sub": "1",
             "aud": "ciy-web",
             "name": "Dawid",
-            "iat": "ISSUED_AT",
-            "exp": "EXPIRES_AT"
+            "iat": ISSUED_AT,
+            "exp": EXPIRES_AT
         }
         """;
 
