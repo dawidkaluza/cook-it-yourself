@@ -9,12 +9,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
 class RecipeAmqpListenerTest {
-    private RecipeAmqpFacade recipeAmqpFacade;
+    private RecipeAmqpListener recipeAmqpListener;
 
     @BeforeEach
     void beforeEach() {
         var kitchenService = mock(KitchenService.class);
-        recipeAmqpFacade = new RecipeAmqpFacade(kitchenService);
+        var recipeAmqpFacade = new RecipeAmqpFacade(kitchenService);
+        recipeAmqpListener = new RecipeAmqpListener(recipeAmqpFacade);
     }
 
     @Test
@@ -24,7 +25,7 @@ class RecipeAmqpListenerTest {
 
         // When, then
         assertThatExceptionOfType(ValidationException.class)
-            .isThrownBy(() -> recipeAmqpFacade.registerCook(msg));
+            .isThrownBy(() -> recipeAmqpListener.onUserSignedUp(msg));
     }
 
     @Test
@@ -33,7 +34,7 @@ class RecipeAmqpListenerTest {
         var msg = new OnUserSignedUp(1L);
 
         // When, then
-        recipeAmqpFacade.registerCook(msg);
+        recipeAmqpListener.onUserSignedUp(msg);
     }
 
 }
