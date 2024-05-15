@@ -25,8 +25,14 @@ services:
       - POSTGRES_DB=kitchen
       - POSTGRES_USER=developer
       - POSTGRES_PASSWORD=developer
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=developer
+      - RABBITMQ_PASSWORD=developer
     ports:
       - "8080:8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy

@@ -10,3 +10,14 @@ services:
       - POSTGRES_USER=developer
       - POSTGRES_PASSWORD=developer
       - POSTGRES_DB=kitchen
+
+  rabbitmq:
+    image: rabbitmq:3.11.11-management-alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_port_connectivity
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    environment:
+      - RABBITMQ_DEFAULT_USER=developer
+      - RABBITMQ_DEFAULT_PASS=developer
