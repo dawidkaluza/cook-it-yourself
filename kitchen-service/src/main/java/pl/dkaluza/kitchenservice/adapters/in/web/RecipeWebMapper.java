@@ -22,7 +22,7 @@ abstract class RecipeWebMapper {
         var ingredients = reqBody.ingredients();
         if (ingredients != null) {
             for (var ingredient : ingredients) {
-                builder.ingredient(ingredient.name(), ingredient.amount(), ingredient.measure());
+                builder.ingredient(ingredient.name(), ingredient.value(), ingredient.measure());
             }
         }
 
@@ -38,7 +38,7 @@ abstract class RecipeWebMapper {
         }
 
         if (reqBody.portionSize() != null) {
-            builder.portionSize(reqBody.portionSize().amount(), reqBody.portionSize().measure());
+            builder.portionSize(reqBody.portionSize().value(), reqBody.portionSize().measure());
         }
 
         if (auth == null) {
@@ -54,7 +54,7 @@ abstract class RecipeWebMapper {
 
     @Mapping(target = "id", source = "recipe.id.id")
     @Mapping(target = "cookingTime", source = "recipe.cookingTime.seconds")
-    @Mapping(target = "portionSize.amount", source = "recipe.portionSize.value")
+    @Mapping(target = "portionSize.value", source = "recipe.portionSize.value")
     @Mapping(target = "portionSize.measure", source = "recipe.portionSize.measure")
     @Mapping(target = "cookId", source = "recipe.cookId.id")
     abstract RecipeResponse toResponse(Recipe recipe);

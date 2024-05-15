@@ -34,11 +34,4 @@ public class RabbitFacade {
     public Channel getChannel() {
         return channel;
     }
-
-    public void subscribe(String exchange, String routingKey, DeliverCallback deliverCallback, CancelCallback cancelCallback) throws IOException {
-        channel.exchangeDeclare(exchange, "topic", true);
-        String queueName = channel.queueDeclare().getQueue();
-        channel.queueBind(queueName, exchange, routingKey);
-        channel.basicConsume(queueName, true, deliverCallback, cancelCallback);
-    }
 }

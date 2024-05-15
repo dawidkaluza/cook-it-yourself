@@ -1,5 +1,6 @@
 package pl.dkaluza.kitchenservice;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -8,8 +9,10 @@ import pl.dkaluza.kitchenservice.config.EnableTestcontainers;
 import pl.dkaluza.kitchenservice.config.JdbiFacade;
 import pl.dkaluza.kitchenservice.config.RabbitFacade;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 import static org.awaitility.Awaitility.await;
 
@@ -29,6 +32,12 @@ class CookAmqpTest {
         jdbiFacade.start();
         var handle = jdbiFacade.getHandle();
         handle.execute("DELETE FROM cook");
+    }
+
+    @AfterEach
+    void afterEach() throws Exception {
+        rabbitFacade.stop();
+        jdbiFacade.stop();
     }
 
     @ParameterizedTest

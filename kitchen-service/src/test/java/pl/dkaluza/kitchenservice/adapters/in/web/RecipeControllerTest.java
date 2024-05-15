@@ -75,6 +75,7 @@ class RecipeControllerTest {
             .contains(expectedFieldErrors);
     }
 
+    // TODO test that every error field is mapped as expected!
     private static Stream<Arguments> addRecipeInvalidDataProvider() {
         return Stream.of(
             Arguments.of(
@@ -218,8 +219,8 @@ class RecipeControllerTest {
             assertThat(respIngredient.name())
                 .isEqualTo(reqIngredient.name());
 
-            assertThat(respIngredient.amount())
-                .isEqualTo(reqIngredient.amount());
+            assertThat(respIngredient.value())
+                .isEqualTo(reqIngredient.value());
 
             assertThat(respIngredient.measure())
                 .isEqualTo(reqIngredient.measure());
@@ -252,8 +253,8 @@ class RecipeControllerTest {
 
         assertThat(respBody.portionSize())
             .isNotNull()
-            .extracting(RecipeResponse.PortionSize::amount, RecipeResponse.PortionSize::measure)
-            .containsExactly(reqBody.portionSize().amount(), reqBody.portionSize().measure());
+            .extracting(RecipeResponse.PortionSize::value, RecipeResponse.PortionSize::measure)
+            .containsExactly(reqBody.portionSize().value(), reqBody.portionSize().measure());
 
         assertThat(respBody.cookId())
             .isEqualTo(userId);

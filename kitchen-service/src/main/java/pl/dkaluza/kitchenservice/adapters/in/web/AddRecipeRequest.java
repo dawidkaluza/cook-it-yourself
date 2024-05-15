@@ -9,9 +9,9 @@ record AddRecipeRequest(
     Long cookingTime,
     PortionSize portionSize
 ) {
-    record Ingredient(String name, BigDecimal amount, String measure) { }
+    record Ingredient(String name, BigDecimal value, String measure) { }
 
     record Step(String text) { }
 
-    record PortionSize(BigDecimal amount, String measure) { }
+    record PortionSize(BigDecimal value, String measure) { }
 }
