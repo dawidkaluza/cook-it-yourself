@@ -29,6 +29,8 @@ class CookPersistenceAdapterTest {
     @MethodSource("saveCookVariousCooksProvider")
     void saveCook_newOrPersistedCook_returnPersistedCook(Cook givenCook) {
         // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+
         // When
         var persistedCook = cookPersistenceAdapter.saveCook(givenCook);
 
@@ -42,7 +44,8 @@ class CookPersistenceAdapterTest {
     private static Stream<Cook> saveCookVariousCooksProvider() {
         return Stream.of(
             Cook.newCook(1L).produce(),
-            Cook.fromPersistence(1L).produce()
+            Cook.fromPersistence(1L).produce(),
+            Cook.newCook(2L).produce()
         );
     }
 }

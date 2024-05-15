@@ -9,11 +9,11 @@ class InMemoryCookEntityRepository extends InMemoryRepository<CookEntity, Long> 
 
     @Override
     protected CookEntity newEntity(CookEntity cookEntity, Long id) {
-        return new CookEntity(id);
+        return CookEntity.fromPersistence(id);
     }
 
     @Override
     protected Long getEntityId(CookEntity cookEntity) {
-        return cookEntity.id();
+        return cookEntity.getId();
     }
 }

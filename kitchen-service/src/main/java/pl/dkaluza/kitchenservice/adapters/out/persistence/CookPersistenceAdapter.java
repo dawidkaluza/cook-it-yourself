@@ -17,12 +17,16 @@ class CookPersistenceAdapter implements CookRepository {
     @Override
     public Cook saveCook(Cook cook) {
         Assertions.assertArgument(cook != null, "Cook is null");
-        var cookId = cook.getId();
-        var cookEntity = new CookEntity(cookId.getId());
-        cookEntity = cookRepository.save(cookEntity);
+
+        var id = cook.getId().getId();
+        if (!cookRepository.existsById(id)) {
+            var cookEntity = CookEntity.newCook(id);
+            cookEntity = cookRepository.save(cookEntity);
+            id = cookEntity.getId();
+        }
 
         try {
-            return Cook.fromPersistence(cookEntity.id()).produce();
+            return Cook.fromPersistence(id).produce();
         } catch (ValidationException e) {
             throw new IllegalStateException(
                 "Caught unexpected validation exception. " +
