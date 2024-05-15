@@ -20,23 +20,31 @@ abstract class RecipeWebMapper {
             .description(reqBody.description());
 
         var ingredients = reqBody.ingredients();
-        for (var ingredient : ingredients) {
-            builder.ingredient(ingredient.name(), ingredient.amount(), ingredient.measure());
+        if (ingredients != null) {
+            for (var ingredient : ingredients) {
+                builder.ingredient(ingredient.name(), ingredient.amount(), ingredient.measure());
+            }
         }
 
         var methodSteps = reqBody.methodSteps();
-        for (var methodStep : methodSteps) {
-            builder.methodStep(methodStep.text());
+        if (methodSteps != null) {
+            for (var methodStep : methodSteps) {
+                builder.methodStep(methodStep.text());
+            }
         }
 
-        builder
-            .cookingTime(Duration.ofSeconds(reqBody.cookingTime()))
-            .portionSize(reqBody.portionSize().amount(), reqBody.portionSize().measure());
+        if (reqBody.cookingTime() != null) {
+            builder.cookingTime(Duration.ofSeconds(reqBody.cookingTime()));
+        }
+
+        if (reqBody.portionSize() != null) {
+            builder.portionSize(reqBody.portionSize().amount(), reqBody.portionSize().measure());
+        }
 
         if (auth == null) {
             builder.cookId(null);
         } else {
-            var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("subject");
+            var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("sub");
             builder
                 .cookId(Long.valueOf(userId));
         }

@@ -263,7 +263,7 @@ class RecipeControllerTest {
 
     private Authentication authentication(Long id) {
         return new JwtAuthenticationToken(
-            new Jwt("xyz", Instant.now(), Instant.now(), Map.of("x", "y"), Map.of("subject", id.toString()))
+            new Jwt("xyz", Instant.now(), Instant.now(), Map.of("x", "y"), Map.of("sub", id.toString()))
         );
     }
 }
