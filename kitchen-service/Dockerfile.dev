@@ -17,4 +17,5 @@ RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
     ./gradlew resolveDependencies --no-daemon && cp -R ~/.gradle ~/.gradle_temp
 RUN mv ~/.gradle_temp ~/.gradle
 
-CMD ./gradlew compileJava --continuous --no-daemon & ./gradlew bootRun --no-daemon
+CMD ./gradlew compileJava --continuous --no-daemon && \
+    ./gradlew compileJava --continuous --no-daemon & ./gradlew bootRun --no-daemon
