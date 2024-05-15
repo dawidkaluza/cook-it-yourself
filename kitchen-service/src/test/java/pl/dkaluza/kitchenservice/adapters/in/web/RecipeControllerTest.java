@@ -2,6 +2,9 @@ package pl.dkaluza.kitchenservice.adapters.in.web;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -15,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -33,23 +37,11 @@ class RecipeControllerTest {
         recipeController = new RecipeController(facade);
     }
 
-    @Test
-    void addRecipe_invalidData_returnErrorResponse() {
+    @ParameterizedTest
+    @MethodSource("addRecipeInvalidDataProvider")
+    void addRecipe_invalidData_returnErrorResponse(Authentication auth, AddRecipeRequest reqBody, String[] expectedFieldErrors) {
         // Given
         mockAddRecipe();
-
-        var auth = authentication(3L);
-        var reqBody = new AddRecipeRequest(
-            "", "",
-            List.of(
-                new AddRecipeRequest.Ingredient("sausage", new BigDecimal(2), "pc")
-            ),
-            List.of(
-                new AddRecipeRequest.Step("Boil sausages for about 3 mins")
-            ),
-            180L,
-            new AddRecipeRequest.PortionSize(new BigDecimal(2), "pc")
-        );
 
         // When
         var resp = recipeController.addRecipe(auth, reqBody);
@@ -80,7 +72,40 @@ class RecipeControllerTest {
         assertThat(respBodyErrorFields)
             .isNotNull()
             .extracting(ErrorResponse.Field::name)
-            .contains("name");
+            .contains(expectedFieldErrors);
+    }
+
+    private static Stream<Arguments> addRecipeInvalidDataProvider() {
+        return Stream.of(
+            Arguments.of(
+                authentication(3L),
+                new AddRecipeRequest(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                new String[]{"name", "description", "ingredients", "methodSteps", "cookingTime", "portionSize.value", "portionSize.measure"}
+            ),
+
+            Arguments.of(
+                authentication(3L),
+                new AddRecipeRequest(
+                    "", "",
+                    List.of(
+                        new AddRecipeRequest.Ingredient("sausage", new BigDecimal(2), "pc")
+                    ),
+                    List.of(
+                        new AddRecipeRequest.Step("Boil sausages for about 3 mins")
+                    ),
+                    0L,
+                    new AddRecipeRequest.PortionSize(new BigDecimal(2), "pc")
+                ),
+                new String[]{"name", "cookingTime"}
+            )
+        );
     }
 
     @Test
@@ -234,6 +259,12 @@ class RecipeControllerTest {
             .isEqualTo(userId);
     }
 
+    private static Authentication authentication(Long id) {
+        return new JwtAuthenticationToken(
+            new Jwt("xyz", Instant.now(), Instant.now(), Map.of("x", "y"), Map.of("sub", id.toString()))
+        );
+    }
+
     private void mockAddRecipe() {
         when(kitchenService.addRecipe(any())).thenAnswer(inv -> {
             Recipe recipe = inv.getArgument(0);
@@ -259,11 +290,5 @@ class RecipeControllerTest {
                 .cookId(recipe.getCookId().getId())
                 .build().produce();
         });
-    }
-
-    private Authentication authentication(Long id) {
-        return new JwtAuthenticationToken(
-            new Jwt("xyz", Instant.now(), Instant.now(), Map.of("x", "y"), Map.of("sub", id.toString()))
-        );
     }
 }
