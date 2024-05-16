@@ -108,7 +108,7 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         var recipeEntities = recipeRepository.findByFilters(filters.getName(), cookId, (pageNo - 1) * pageSize, pageSize);
         var recipes = fetchAndMap(recipeEntities);
         var totalRecipes = recipeRepository.countByFilters(filters.getName(), cookId);
-        var totalPages = (int) Math.ceil((double) totalRecipes / pageSize);
+        var totalPages = totalRecipes > 0 ? (int) Math.ceil((double) totalRecipes / pageSize) : 1;
         return toPage(recipes, pageNo, totalPages);
     }
 

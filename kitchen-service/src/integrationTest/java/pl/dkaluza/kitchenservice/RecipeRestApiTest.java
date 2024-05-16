@@ -21,7 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import pl.dkaluza.kitchenservice.config.EnableTestcontainers;
 import pl.dkaluza.kitchenservice.config.JdbiFacade;
+import pl.dkaluza.kitchenservice.domain.Recipe;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -191,9 +193,135 @@ class RecipeRestApiTest {
         // TODO assert that all objects are associated with each other through foreign keys
     }
 
+    @Test
+    void browseRecipes_noJwt_returnError() {
+        given()
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe")
+        .then()
+            .statusCode(403);
+    }
+
+    @Test
+    void browseRecipes_invalidPageParams_returnError() {
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .param("page", "0")
+            .param("pageSize", "0")
+        .when()
+            .get("/recipe")
+        .then()
+            .statusCode(422)
+            .body("message", notNullValue())
+            .body("timestamp", notNullValue())
+            .body("fields.name", hasItems("page", "pageSize"));
+    }
+
+    @Test
+    void browseRecipes_noMatchingRecipes_returnNoRecipes() throws Exception {
+        insertCook(1L);
+
+        addRecipe(addRecipeReqBody(
+            "Boiled sausages", "",
+            "sausage", "3", "pc",
+            "Diy",
+            180,
+            "3", "pc"
+        ));
+
+        addRecipe(addRecipeReqBody(
+            "Iced coffee", "",
+            "coffee", "50", "g",
+            "Diy",
+            180,
+            "250", "ml"
+        ));
+
+        addRecipe(addRecipeReqBody(
+            "Toasts", "",
+            "Bread", "4", "pc",
+            "Diy",
+            180,
+            "4", ""
+        ));
+
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .param("name", "Sth veeeery specific")
+        .when()
+            .get("/recipe")
+        .then()
+            .statusCode(200)
+            .body("items", emptyIterable())
+            .body("totalPages", is(1));
+    }
+
+    @Test
+    void browseRecipes_noParams_returnAllUserRecipes() throws Exception {
+        insertCook(1L);
+
+        addRecipe(addRecipeReqBody(
+            "Boiled sausages", "",
+            "sausage", "3", "pc",
+            "Diy",
+            180,
+            "3", "pc"
+        ));
+
+        addRecipe(addRecipeReqBody(
+            "Iced coffee", "",
+            "coffee", "50", "g",
+            "Diy",
+            180,
+            "250", "ml"
+        ));
+
+        addRecipe(addRecipeReqBody(
+            "Toasts", "",
+            "Bread", "4", "pc",
+            "Diy",
+            180,
+            "4", ""
+        ));
+
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe")
+        .then()
+            .statusCode(200)
+            .body("items.name", hasItems("Boiled sausages", "Iced coffee", "Toasts"))
+            .body("totalPages", is(1));
+    }
+
+    @Test
+    void browseRecipes_variousParams_returnExpectedRecipes() {
+
+    }
+
+    // TODO reimpl to use AMQP API
     private void insertCook(Long id) {
         var handle = jdbiFacade.getHandle();
         handle.execute("INSERT INTO cook VALUES (?)", id);
+    }
+
+    private Long addRecipe(String reqBody) {
+        var res = given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .body(reqBody)
+            .post("/recipe");
+
+        return new JsonPath(res.getBody().asString()).getLong("id");
     }
 
     private void assertThatPersistenceIsEmpty() {
