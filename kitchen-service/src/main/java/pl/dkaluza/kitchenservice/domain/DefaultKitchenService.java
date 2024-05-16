@@ -29,4 +29,9 @@ class DefaultKitchenService implements KitchenService {
         ObjectAlreadyPersistedException.throwIfPersisted(cook);
         return cookRepository.saveCook(cook);
     }
+
+    @Override
+    public Page<Recipe> browseRecipes(PageRequest pageReq, BrowseRecipesFilters filters) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -1,8 +1,7 @@
 package pl.dkaluza.kitchenservice.ports.in;
 
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
-import pl.dkaluza.kitchenservice.domain.Cook;
-import pl.dkaluza.kitchenservice.domain.Recipe;
+import pl.dkaluza.kitchenservice.domain.*;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 
 public interface KitchenService {
@@ -14,6 +13,14 @@ public interface KitchenService {
      * @throws CookNotFoundException if given cook id can't be found
      */
     Recipe addRecipe(Recipe recipe) throws ObjectAlreadyPersistedException, CookNotFoundException;
+
+    /**
+     * Returns page with recipes matching provided criteria.
+     * @param pageReq details about page to be shown
+     * @param filters filters for browsed recipes
+     * @return a page of recipes
+     */
+    Page<Recipe> browseRecipes(PageRequest pageReq, BrowseRecipesFilters filters);
 
     /**
      * Registers a new cook in the application.
