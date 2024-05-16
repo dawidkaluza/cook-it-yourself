@@ -14,7 +14,7 @@ COPY --chown=${UNAME} gradle ./gradle
 COPY --chown=${UNAME} settings.gradle build.gradle gradlew ./
 
 RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
-    ./gradlew resolveDependencies --no-daemon && cp -R ~/.gradle ~/.gradle_temp
+    ./gradlew resolveDependencies --refresh-dependencies --no-daemon && cp -R ~/.gradle ~/.gradle_temp
 RUN mv ~/.gradle_temp ~/.gradle
 
 CMD ./gradlew compileJava --continuous --no-daemon && \

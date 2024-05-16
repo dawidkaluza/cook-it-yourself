@@ -18,7 +18,7 @@ interface RecipeEntityMapper {
     @Mapping(target = "cookId", source = "cookId.id")
     RecipeEntity toEntity(Recipe recipe, CookId cookId);
 
-    default Recipe toDomain(RecipeEntity recipeEntity, List<IngredientEntity> ingredientEntities, List<StepEntity> stepEntities, Long cookId) throws ValidationException {
+    default Recipe toDomain(RecipeEntity recipeEntity, List<IngredientEntity> ingredientEntities, List<StepEntity> stepEntities) throws ValidationException {
         var builder = Recipe.fromPersistenceRecipeBuilder()
             .id(recipeEntity.id())
             .name(recipeEntity.name())
@@ -40,7 +40,7 @@ interface RecipeEntityMapper {
         return builder
             .cookingTime(Duration.ofSeconds(recipeEntity.cookingTime()))
             .portionSize(recipeEntity.portionSizeAmount(), recipeEntity.portionSizeMeasure())
-            .cookId(cookId)
+            .cookId(recipeEntity.cookId())
             .build().produce();
     }
 }

@@ -1,7 +1,11 @@
 package pl.dkaluza.kitchenservice.ports.in;
 
+import pl.dkaluza.domaincore.Page;
+import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
-import pl.dkaluza.kitchenservice.domain.*;
+import pl.dkaluza.kitchenservice.domain.RecipeFilters;
+import pl.dkaluza.kitchenservice.domain.Cook;
+import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 
 public interface KitchenService {
@@ -16,11 +20,11 @@ public interface KitchenService {
 
     /**
      * Returns page with recipes matching provided criteria.
-     * @param pageReq details about page to be shown
      * @param filters filters for browsed recipes
+     * @param pageReq details about page to be shown
      * @return a page of recipes
      */
-    Page<Recipe> browseRecipes(PageRequest pageReq, BrowseRecipesFilters filters);
+    Page<Recipe> browseRecipes(RecipeFilters filters, PageRequest pageReq);
 
     /**
      * Registers a new cook in the application.

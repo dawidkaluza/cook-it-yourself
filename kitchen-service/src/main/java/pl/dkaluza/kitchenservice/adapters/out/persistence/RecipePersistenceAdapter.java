@@ -2,11 +2,12 @@ package pl.dkaluza.kitchenservice.adapters.out.persistence;
 
 import org.springframework.stereotype.Component;
 import pl.dkaluza.domaincore.Assertions;
+import pl.dkaluza.domaincore.Page;
+import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
-import pl.dkaluza.kitchenservice.domain.Cook;
-import pl.dkaluza.kitchenservice.domain.CookId;
 import pl.dkaluza.kitchenservice.domain.Recipe;
+import pl.dkaluza.kitchenservice.domain.RecipeFilters;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
@@ -72,13 +73,42 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         }
 
         try {
-            return recipeMapper.toDomain(recipeEntity, ingredientEntities, stepEntities, cookId.getId());
+            return recipeMapper.toDomain(recipeEntity, ingredientEntities, stepEntities);
         } catch (ValidationException e) {
             throw new IllegalStateException(
                 "Caught unexpected validation exception. " +
                 "Make sure that data retrieved from persistence layer is valid.",
                 e
             );
+        }
+    }
+
+    @Override
+    public Page<Recipe> findRecipes(RecipeFilters filters, PageRequest pageReq) {
+        Assertions.assertArgument(filters != null, "filters is null");
+        Assertions.assertArgument(pageReq != null, "pageReq is null");
+
+        var cookId = filters.getCookId() == null ? null : filters.getCookId().getId();
+        var pageNo = pageReq.getPageNumber();
+        var pageSize = pageReq.getPageSize();
+        var recipeEntities = recipeRepository.findByFilters(filters.getName(), cookId, (pageNo - 1) * pageSize, pageSize);
+
+        var recipes = new ArrayList<Recipe>();
+        for (var recipeEntity : recipeEntities) {
+            var recipeId = recipeEntity.id();
+            var ingredientEntities = ingredientRepository.findAllByRecipeId(recipeId);
+            var stepEntities = stepRepository.findAllByRecipeId(recipeId);
+
+            var recipe = recipeMapper.toDomain(recipeEntity, ingredientEntities, stepEntities);
+            recipes.add(recipe);
+        }
+
+        var totalRecipes = recipeRepository.countByFilters(filters.getName(), cookId);
+        var totalPages = (int) Math.ceil((double) totalRecipes / pageSize);
+        try {
+            return Page.of(recipes, pageNo, totalPages).produce();
+        } catch (ValidationException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
