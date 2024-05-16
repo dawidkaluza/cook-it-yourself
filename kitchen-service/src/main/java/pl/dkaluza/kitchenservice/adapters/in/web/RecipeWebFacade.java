@@ -4,21 +4,34 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
+import pl.dkaluza.kitchenservice.domain.RecipeFilters;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 class RecipeWebFacade {
+    private static final Map<String, String> GET_RECIPES_ERROR_FIELDS_MAP;
+
+    static {
+        GET_RECIPES_ERROR_FIELDS_MAP = new HashMap<>();
+        GET_RECIPES_ERROR_FIELDS_MAP.put("pageNumber", "page");
+    }
+
     private final RecipeWebMapper recipeWebMapper;
+    private final PageWebMapper pageWebMapper;
     private final KitchenService kitchenService;
 
-    public RecipeWebFacade(RecipeWebMapper recipeWebMapper, KitchenService kitchenService) {
+    public RecipeWebFacade(RecipeWebMapper recipeWebMapper, PageWebMapper pageWebMapper, KitchenService kitchenService) {
         this.recipeWebMapper = recipeWebMapper;
+        this.pageWebMapper = pageWebMapper;
         this.kitchenService = kitchenService;
     }
 
@@ -46,6 +59,37 @@ class RecipeWebFacade {
                 .body(
                     new ErrorResponse(
                         "Cook with given id could not be found", ZonedDateTime.now(ZoneOffset.UTC)
+                    )
+                );
+        }
+    }
+
+    ResponseEntity<?> browseRecipes(Authentication auth, int page, int pageSize, String name) {
+        try {
+            var cookId = recipeWebMapper.toRequiredCookId(auth);
+            var filters = RecipeFilters.of(name, cookId);
+            var pageReq = PageRequest.of(page, pageSize).produce();
+            var recipesPage = kitchenService.browseRecipes(filters, pageReq);
+            var responseRecipes = recipesPage.getItems().stream()
+                .map(recipeWebMapper::toShortResponse)
+                .toList();
+            var responseRecipesPage = pageWebMapper.toResponse(responseRecipes, recipesPage.getTotalPages());
+            return ResponseEntity.ok(responseRecipesPage);
+        } catch (ValidationException e) {
+            var errors = e.getErrors().stream()
+                .map(fieldError ->
+                    new ErrorResponse.Field(
+                        GET_RECIPES_ERROR_FIELDS_MAP.getOrDefault(fieldError.name(), fieldError.name()),
+                        fieldError.message()
+                    )
+                )
+                .toList();
+
+            return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(
+                    new ErrorResponse(
+                        "Invalid fields values", ZonedDateTime.now(ZoneOffset.UTC), errors
                     )
                 );
         }

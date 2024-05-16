@@ -2,10 +2,7 @@ package pl.dkaluza.kitchenservice.adapters.in.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 
 @RestController
@@ -20,5 +17,15 @@ class RecipeController {
     @PostMapping
     ResponseEntity<?> addRecipe(Authentication auth, @RequestBody AddRecipeRequest reqBody) throws ObjectAlreadyPersistedException {
         return recipeFacade.addRecipe(auth, reqBody);
+    }
+
+    @GetMapping
+    ResponseEntity<?> browseRecipes(
+        Authentication auth,
+        @RequestParam(required = false, defaultValue = "1") int page,
+        @RequestParam(required = false, defaultValue = "10") int pageSize,
+        @RequestParam(required = false, defaultValue = "") String name
+    ) {
+        return recipeFacade.browseRecipes(auth, page, pageSize, name);
     }
 }

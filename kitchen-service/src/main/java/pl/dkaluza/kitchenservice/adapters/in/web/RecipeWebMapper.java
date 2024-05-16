@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
+import pl.dkaluza.kitchenservice.domain.CookId;
 import pl.dkaluza.kitchenservice.domain.Ingredient;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.Step;
@@ -41,13 +42,7 @@ abstract class RecipeWebMapper {
             builder.portionSize(reqBody.portionSize().value(), reqBody.portionSize().measure());
         }
 
-        if (auth == null) {
-            builder.cookId(null);
-        } else {
-            var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("sub");
-            builder
-                .cookId(Long.valueOf(userId));
-        }
+        builder.cookId(toCookId(auth));
 
         return builder.build().produce();
     }
@@ -72,5 +67,29 @@ abstract class RecipeWebMapper {
         return steps.stream()
             .map(step -> new RecipeResponse.Step(step.getId().getId(), step.getText()))
             .toList();
+    }
+
+    @Mapping(target = "id", source = "recipe.id.id")
+    abstract ShortRecipeResponse toShortResponse(Recipe recipe);
+
+    Long toCookId(Authentication auth) {
+        if (auth == null) {
+            return null;
+        }
+
+        var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("sub");
+        return Long.valueOf(userId);
+    }
+
+    CookId toRequiredCookId(Authentication auth) {
+        try {
+            return CookId.of(toCookId(auth)).produce();
+        } catch (ValidationException e) {
+            throw new IllegalStateException(
+                "Couldn't acquire required cookId from authentication object." +
+                "The object seems to not be valid.",
+                e
+            );
+        }
     }
 }

@@ -10,11 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ class RecipeControllerTest {
         kitchenService = mock();
         var facade = new RecipeWebFacade(
             Mappers.getMapper(RecipeWebMapper.class),
+            Mappers.getMapper(PageWebMapper.class),
             kitchenService
         );
         recipeController = new RecipeController(facade);
@@ -258,6 +261,96 @@ class RecipeControllerTest {
 
         assertThat(respBody.cookId())
             .isEqualTo(userId);
+    }
+
+    @Test
+    void browseRecipes_invalidPageParams_returnErrorResponse() {
+        // Given
+        var auth = authentication(1L);
+        var page = 0;
+        var pageSize = 0;
+        var name = "";
+
+        // When
+        var resp = recipeController.browseRecipes(auth, page, pageSize, name);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+
+        assertThat(respBody.fields())
+            .isNotNull()
+            .extracting(ErrorResponse.Field::name)
+            .contains("page", "pageSize");
+    }
+
+    @Test
+    void browseRecipes_validParams_returnExpectedRecipes() {
+        // Given
+        var mockRecipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(1L, "sausage", new BigDecimal(2), "pc")
+            .methodStep( 1L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
+            .build().produce();
+
+        when(kitchenService.browseRecipes(any(), any())).thenReturn(
+            Page.of(List.of(mockRecipe)).produce()
+        );
+
+        var auth = authentication(1L);
+        var page = 1;
+        var pageSize = 10;
+        var name = "";
+
+        // When
+        var resp = recipeController.browseRecipes(auth, page, pageSize, name);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.OK);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(PageResponse.class);
+
+        @SuppressWarnings("unchecked")
+        var respBody = (PageResponse<ShortRecipeResponse>) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.totalPages())
+            .isEqualTo(1);
+
+        assertThat(respBody.items())
+            .isNotNull()
+            .singleElement()
+            .extracting(ShortRecipeResponse::id, ShortRecipeResponse::name, ShortRecipeResponse::description)
+            .containsExactly(1L, "Boiled sausages", "");
     }
 
     private static Authentication authentication(Long id) {
