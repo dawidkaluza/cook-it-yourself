@@ -170,7 +170,7 @@ public abstract class InMemoryRepository<T, ID> implements ListCrudRepository<T,
         var sortedEntities = findAll(pageable.getSort());
         var pagedEntities = new ArrayList<T>();
         int start = (int) pageable.getOffset();
-        int end = start + pageable.getPageSize();
+        int end = Math.min(sortedEntities.size(), start + pageable.getPageSize());
         for (int i = start; i < end; i++) {
             pagedEntities.add(sortedEntities.get(i));
         }
