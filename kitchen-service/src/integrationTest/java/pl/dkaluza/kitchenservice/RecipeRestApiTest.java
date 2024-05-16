@@ -187,6 +187,8 @@ class RecipeRestApiTest {
             resBodyAsJsonPath.getInt("methodSteps[0].id"),
             "SELECT COUNT(id) FROM step WHERE id = ?"
         );
+
+        // TODO assert that all objects are associated with each other through foreign keys
     }
 
     private void insertCook(Long id) {
