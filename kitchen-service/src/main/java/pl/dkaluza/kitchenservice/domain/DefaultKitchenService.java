@@ -28,6 +28,11 @@ class DefaultKitchenService implements KitchenService {
     public Page<Recipe> browseRecipes(RecipeFilters filters, PageRequest pageReq) {
         Assertions.assertArgument(filters != null, "filters is null");
         Assertions.assertArgument(pageReq != null, "pageReq is null");
+
+        if (filters.isEmpty()) {
+            return recipeRepository.findAllRecipes(pageReq);
+        }
+
         return recipeRepository.findRecipes(filters, pageReq);
     }
 

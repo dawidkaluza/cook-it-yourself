@@ -153,6 +153,104 @@ class RecipePersistenceAdapterTest {
     }
 
     @Test
+    void findAllRecipes_nullParams_throwException() {
+        assertThatThrownBy(
+            () -> recipePersistenceAdapter.findAllRecipes(null)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("findAllRecipesParamsProvider")
+    void findAllRecipes_variousParams_returnExpectedResult(
+        PageRequest pageReq,
+        String[] expectedRecipes,
+        int expectedPageNo, int expectedTotalPages
+    ) {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+        cookPersistenceAdapter.saveCook(Cook.newCook(2L).produce());
+
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(1L)
+                .build().produce()
+        );
+
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Iced coffee")
+                .description("")
+                .ingredient("coffee", new BigDecimal(50), "g")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(50), "g")
+                .cookId(1L)
+                .build().produce()
+        );
+
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Toasts")
+                .description("")
+                .ingredient("Bread", new BigDecimal(4), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(2L)
+                .build().produce()
+        );
+
+        // When
+        var actualPage = recipePersistenceAdapter.findAllRecipes(pageReq);
+
+        // Then
+        assertThat(actualPage)
+            .isNotNull();
+
+        var actualItems = actualPage.getItems();
+        assertThat(actualItems)
+            .isNotNull()
+            .extracting(Recipe::getName)
+            .containsExactly(expectedRecipes);
+
+        assertThat(actualPage.getPageNumber())
+            .isEqualTo(expectedPageNo);
+
+        assertThat(actualPage.getTotalPages())
+            .isEqualTo(expectedTotalPages);
+    }
+
+
+    private static Stream<Arguments> findAllRecipesParamsProvider() {
+        return Stream.of(
+            Arguments.of(
+                PageRequest.of(1, 10).produce(),
+                new String[] { "Boiled sausages", "Iced coffee", "Toasts" },
+                1,
+                1
+            ),
+            Arguments.of(
+                PageRequest.of(2, 1).produce(),
+                new String[] { "Iced coffee" },
+                2,
+                3
+            ),
+            Arguments.of(
+                PageRequest.of(5, 5).produce(),
+                new String[] { },
+                5,
+                1
+            )
+        );
+    }
+
+    @Test
     void findRecipes_nullParams_throwException() {
         assertThatThrownBy(
             () -> recipePersistenceAdapter.findRecipes(null, null)

@@ -20,4 +20,14 @@ public class RecipeFilters {
     public CookId getCookId() {
         return cookId;
     }
+
+    /**
+     * Returns true when there is no filtering defined within given RecipeFilters object, hence there is
+     * no point of applying filtering logic using it.
+     *
+     * @return true when filters object is empty.
+     */
+    public boolean isEmpty() {
+        return name == null && cookId == null;
+    }
 }

@@ -10,5 +10,7 @@ import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 public interface RecipeRepository {
     Recipe insertRecipe(Recipe recipe) throws ObjectAlreadyPersistedException, CookNotFoundException;
 
+    Page<Recipe> findAllRecipes(PageRequest pageReq);
+
     Page<Recipe> findRecipes(RecipeFilters filters, PageRequest pageReq);
 }
