@@ -1,10 +1,11 @@
 package pl.dkaluza.kitchenservice.adapters.out.persistence;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import pl.dkaluza.kitchenservice.domain.RecipeFilters;
 import pl.dkaluza.spring.data.test.InMemoryRepository;
 import pl.dkaluza.spring.data.test.LongIdGenerator;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 class InMemoryRecipeEntityRepository extends InMemoryRepository<RecipeEntity, Long> implements RecipeEntityRepository {
     public InMemoryRecipeEntityRepository() {
@@ -21,9 +22,28 @@ class InMemoryRecipeEntityRepository extends InMemoryRepository<RecipeEntity, Lo
         return recipe.id();
     }
 
-    @SuppressWarnings("SpringDataMethodInconsistencyInspection")
     @Override
-    public Page<RecipeEntity> findByFilters(RecipeFilters filters, Pageable pageable) {
-        return null;
+    public List<RecipeEntity> findByFilters(String name, Long cookId, int pageOffset, int pageSize) {
+        var recipes = findAll().stream()
+            .filter(entity -> name == null || entity.name().contains(name))
+            .filter(entity -> cookId == null || entity.cookId().equals(cookId))
+            .sorted(Comparator.comparing(RecipeEntity::id))
+            .toList();
+
+        var pageOffsetEnd = Math.min(recipes.size(), pageOffset + pageSize);
+        if (pageOffset >= pageOffsetEnd) {
+            return Collections.emptyList();
+        }
+
+        return recipes.subList(pageOffset, pageOffsetEnd);
+    }
+
+    @Override
+    public int countByFilters(String name, Long cookId) {
+        return findAll().stream()
+            .filter(entity -> name == null || entity.name().contains(name))
+            .filter(entity -> cookId == null || entity.cookId().equals(cookId))
+            .toList()
+            .size();
     }
 }

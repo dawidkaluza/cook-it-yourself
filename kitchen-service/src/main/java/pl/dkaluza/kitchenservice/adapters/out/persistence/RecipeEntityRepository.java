@@ -1,6 +1,5 @@
 package pl.dkaluza.kitchenservice.adapters.out.persistence;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -11,6 +10,7 @@ interface RecipeEntityRepository extends CrudRepository<RecipeEntity, Long> {
         "SELECT * FROM recipe AS r " +
         "WHERE (:name IS NULL OR r.name LIKE '%' || :name || '%') " +
         "AND (:cookId IS NULL OR r.cook_id = :cookId) " +
+        "ORDER BY id DESC " +
         "OFFSET :pageOffset LIMIT :pageSize"
     )
     List<RecipeEntity> findByFilters(String name, Long cookId, int pageOffset, int pageSize);

@@ -2,12 +2,18 @@ package pl.dkaluza.kitchenservice.adapters.out.persistence;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import pl.dkaluza.domaincore.Page;
+import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.kitchenservice.domain.*;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,7 +66,7 @@ class RecipePersistenceAdapterTest {
             .name("xyz")
             .description("")
             .ingredient("sausage", new BigDecimal(2), "pc")
-            .methodStep( "Diy")
+            .methodStep("Diy")
             .cookingTime(Duration.ofMinutes(3))
             .portionSize(new BigDecimal(2), "pc")
             .cookId(3L)
@@ -81,7 +87,7 @@ class RecipePersistenceAdapterTest {
             .name("xyz")
             .description("")
             .ingredient("sausage", new BigDecimal(2), "pc")
-            .methodStep( "Diy")
+            .methodStep("Diy")
             .cookingTime(Duration.ofMinutes(3))
             .portionSize(new BigDecimal(2), "pc")
             .cookId(1L)
@@ -144,5 +150,118 @@ class RecipePersistenceAdapterTest {
 
         assertThat(insertedRecipe.getCookId())
             .isEqualTo(newRecipe.getCookId());
+    }
+
+    @Test
+    void findRecipes_nullParams_throwException() {
+        assertThatThrownBy(
+            () -> recipePersistenceAdapter.findRecipes(null, null)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("findRecipesParamsProvider")
+    void findRecipes_variousParams_returnExpectedResult(
+        RecipeFilters filers, PageRequest pageReq,
+        String[] expectedRecipes, int expectedPageNo, int expectedTotalPages
+    ) {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+        cookPersistenceAdapter.saveCook(Cook.newCook(2L).produce());
+
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(1L)
+                .build().produce()
+        );
+
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Iced coffee")
+                .description("")
+                .ingredient("coffee", new BigDecimal(50), "g")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(50), "g")
+                .cookId(1L)
+                .build().produce()
+        );
+
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Toasts")
+                .description("")
+                .ingredient("Bread", new BigDecimal(4), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(2L)
+                .build().produce()
+        );
+
+        // When
+        var actualPage = recipePersistenceAdapter.findRecipes(filers, pageReq);
+
+        // Then
+        assertThat(actualPage)
+            .isNotNull();
+
+        var actualItems = actualPage.getItems();
+        assertThat(actualItems)
+            .isNotNull()
+            .extracting(Recipe::getName)
+            .containsExactly(expectedRecipes);
+
+        assertThat(actualPage.getPageNumber())
+            .isEqualTo(expectedPageNo);
+
+        assertThat(actualPage.getTotalPages())
+            .isEqualTo(expectedTotalPages);
+    }
+
+    private static Stream<Arguments> findRecipesParamsProvider() {
+        return Stream.of(
+            Arguments.of(
+                RecipeFilters.of(null, null),
+                PageRequest.of(1, 10).produce(),
+                new String[] { "Boiled sausages", "Iced coffee", "Toasts" },
+                1,
+                1
+            ),
+            Arguments.of(
+                RecipeFilters.of("a", null),
+                PageRequest.of(1, 10).produce(),
+                new String[] { "Boiled sausages", "Toasts" },
+                1,
+                1
+            ),
+            Arguments.of(
+                RecipeFilters.of(null, CookId.of(2L).produce()),
+                PageRequest.of(1, 10).produce(),
+                new String[] { "Toasts" },
+                1,
+                1
+            ),
+            Arguments.of(
+                RecipeFilters.of(null, null),
+                PageRequest.of(2, 1).produce(),
+                new String[] { "Iced coffee" },
+                2,
+                3
+            ),
+            Arguments.of(
+                RecipeFilters.of(null, null),
+                PageRequest.of(5, 5).produce(),
+                new String[] { },
+                5,
+                1
+            )
+        );
     }
 }
