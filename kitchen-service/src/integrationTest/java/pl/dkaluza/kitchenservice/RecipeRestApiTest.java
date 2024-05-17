@@ -21,9 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import pl.dkaluza.kitchenservice.config.EnableTestcontainers;
 import pl.dkaluza.kitchenservice.config.JdbiFacade;
-import pl.dkaluza.kitchenservice.domain.Recipe;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -303,8 +301,46 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void browseRecipes_variousParams_returnExpectedRecipes() {
+    void browseRecipes_nameFilterApplied_returnExpectedRecipes() throws Exception {
+        insertCook(1L);
 
+        addRecipe(addRecipeReqBody(
+            "Boiled sausages", "a",
+            "sausage", "3", "pc",
+            "Diy",
+            180,
+            "3", "pc"
+        ));
+
+        addRecipe(addRecipeReqBody(
+            "Iced coffee", "b",
+            "coffee", "50", "g",
+            "Diy",
+            180,
+            "250", "ml"
+        ));
+
+        addRecipe(addRecipeReqBody(
+            "Toasts", "c",
+            "Bread", "4", "pc",
+            "Diy",
+            180,
+            "4", ""
+        ));
+
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .param("name", "a")
+        .when()
+            .get("/recipe")
+        .then()
+            .statusCode(200)
+            .body("items.id", hasSize(2))
+            .body("items.name", hasItems("Boiled sausages", "Toasts"))
+            .body("items.description", hasItems("a", "c"))
+            .body("totalPages", is(1));
     }
 
     // TODO reimpl to use AMQP API
