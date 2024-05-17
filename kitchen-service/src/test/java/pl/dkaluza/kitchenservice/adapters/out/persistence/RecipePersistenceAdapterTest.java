@@ -219,7 +219,6 @@ class RecipePersistenceAdapterTest {
 
         // Then
         assertThat(optionalRecipe)
-            .isPresent()
             .hasValue(recipe);
     }
 
