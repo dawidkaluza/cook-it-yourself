@@ -10,6 +10,8 @@ import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryCookPersistenceAdapter;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryRecipePersistenceAdapter;
+import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -69,6 +71,71 @@ class DefaultKitchenServiceTest {
             assertThat(step.isPersisted())
                 .isTrue();
         }
+    }
+
+    @Test
+    void viewRecipe_nullParams_throwException() {
+        assertThatThrownBy(
+            () -> kitchenService.viewRecipe(null, null)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void viewRecipe_recipeNotFound_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+
+        // When, then
+        assertThatThrownBy(
+            () -> kitchenService.viewRecipe(RecipeId.of(1L).produce(), cook.getId())
+        ).isInstanceOf(RecipeNotFoundException.class);
+    }
+
+    @Test
+    void viewRecipe_recipeNotOwned_throwException() {
+        // Given
+        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var secondCook = kitchenService.registerCook(Cook.newCook(2L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(firstCook.getId().getId())
+                .build().produce()
+        );
+
+        // When, then
+        assertThatThrownBy(
+            () -> kitchenService.viewRecipe(recipe.getId(), secondCook.getId())
+        ).isInstanceOf(RecipeNotOwnedException.class);
+    }
+
+    @Test
+    void viewRecipe_validParams_returnRecipe() {
+        // Given
+        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(firstCook.getId().getId())
+                .build().produce()
+        );
+
+        // When
+        var viewedRecipe = kitchenService.viewRecipe(recipe.getId(), firstCook.getId());
+
+        // Then
+        assertThat(viewedRecipe)
+            .isEqualTo(recipe);
     }
 
     @Test

@@ -342,6 +342,89 @@ class RecipeRestApiTest {
             .body("items.description", hasItems("a", "c"))
             .body("totalPages", is(1));
     }
+    
+    @Test
+    void viewRecipe_noJwt_returnError() throws Exception {
+        insertCook(1L);
+        addRecipe(addRecipeReqBody());
+
+        given()
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe/1")
+        .then()
+            .statusCode(403);
+    }
+
+    @Test
+    void viewRecipe_invalidId_returnError() throws Exception {
+        insertCook(1L);
+        addRecipe(addRecipeReqBody());
+
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe/0")
+        .then()
+            .statusCode(422)
+            .body("message", notNullValue())
+            .body("timestamp", notNullValue())
+            .body("fields.name", hasItems("id"));
+    }
+
+    @Test
+    void viewRecipe_recipeNotFound_returnError() throws Exception {
+        insertCook(1L);
+        var id = addRecipe(addRecipeReqBody());
+
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe/{id}", id + 1) //+1 to look for a recipe that definitely does not exist
+        .then()
+            .statusCode(404)
+            .body("message", notNullValue())
+            .body("timestamp", notNullValue());
+    }
+
+    @Test
+    void viewRecipe_validRequest_returnRecipe() throws Exception {
+        // Given
+        insertCook(1L);
+        var reqBody = addRecipeReqBody();
+        var id = addRecipe(reqBody);
+
+        var req = given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON);
+
+        // When
+        var res = req.get("/recipe/{id}", id);
+
+        // Then
+        var reqBodyJsonPath = new JsonPath(reqBody);
+        res.then()
+            .statusCode(200)
+            .body("id", is(id))
+            .body("name", is(reqBodyJsonPath.getString("name")))
+            .body("description", is(reqBodyJsonPath.getString("description")))
+            .body("ingredients[0].id", notNullValue())
+            .body("ingredients[0].name", is(reqBodyJsonPath.getString("ingredients[0].name")))
+            .body("ingredients[0].value", is(reqBodyJsonPath.getString("ingredients[0].value")))
+            .body("ingredients[0].measure", is(reqBodyJsonPath.getString("ingredients[0].measure")))
+            .body("methodSteps[0].id", notNullValue())
+            .body("methodSteps[0].text", is(reqBodyJsonPath.getString("methodSteps[0].text")))
+            .body("cookingTime", is(reqBodyJsonPath.getInt("cookingTime")))
+            .body("portionSize.value", is(reqBodyJsonPath.getString("portionSize.value")))
+            .body("portionSize.measure", is(reqBodyJsonPath.getString("portionSize.measure")))
+            .body("cookId", is(1));
+    }
 
     // TODO reimpl to use AMQP API
     private void insertCook(Long id) {

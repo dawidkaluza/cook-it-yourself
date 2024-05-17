@@ -70,6 +70,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         return cookId;
     }
 
+    public boolean isOwnedBy(CookId cookId) {
+        return this.cookId.equals(cookId);
+    }
+
     private static abstract class RecipeBuilder<T extends RecipeBuilder<T>> {
         private String name;
         private String description;

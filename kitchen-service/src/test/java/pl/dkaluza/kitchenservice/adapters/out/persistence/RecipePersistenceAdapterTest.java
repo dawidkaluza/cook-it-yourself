@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.kitchenservice.domain.*;
@@ -150,6 +149,78 @@ class RecipePersistenceAdapterTest {
 
         assertThat(insertedRecipe.getCookId())
             .isEqualTo(newRecipe.getCookId());
+    }
+
+    @Test
+    void findRecipeById_nullParams_throwException() {
+        assertThatThrownBy(
+            () -> recipePersistenceAdapter.findRecipeById(null)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void findRecipeById_nonExistingRecipe_returnEmptyOptional() {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+        var recipe = recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("xyz")
+                .description("")
+                .ingredient("sausage", new BigDecimal(2), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(2), "pc")
+                .cookId(1L)
+                .build().produce()
+        );
+
+        var id = recipe.getId().getId() + 1;
+
+        // When
+        var optionalRecipe = recipePersistenceAdapter.findRecipeById(RecipeId.of(id).produce());
+
+        // Then
+        assertThat(optionalRecipe)
+            .isEmpty();
+    }
+
+    @Test
+    void findRecipeById_existingRecipe_returnRecipe() {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+        var recipe = recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(2), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(2), "pc")
+                .cookId(1L)
+                .build().produce()
+        );
+        recipePersistenceAdapter.insertRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Iced coffee")
+                .description("")
+                .ingredient("coffee", new BigDecimal(50), "g")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(50), "g")
+                .cookId(1L)
+                .build().produce()
+        );
+
+        var recipeId = recipe.getId();
+        var id = recipeId.getId();
+
+        // When
+        var optionalRecipe = recipePersistenceAdapter.findRecipeById(RecipeId.of(id).produce());
+
+        // Then
+        assertThat(optionalRecipe)
+            .isPresent()
+            .hasValue(recipe);
     }
 
     @Test

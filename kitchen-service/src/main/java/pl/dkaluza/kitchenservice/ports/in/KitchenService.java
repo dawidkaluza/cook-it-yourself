@@ -3,10 +3,10 @@ package pl.dkaluza.kitchenservice.ports.in;
 import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
-import pl.dkaluza.kitchenservice.domain.RecipeFilters;
-import pl.dkaluza.kitchenservice.domain.Cook;
-import pl.dkaluza.kitchenservice.domain.Recipe;
+import pl.dkaluza.kitchenservice.domain.*;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
 
 public interface KitchenService {
     /**
@@ -25,6 +25,16 @@ public interface KitchenService {
      * @return a page of recipes
      */
     Page<Recipe> browseRecipes(RecipeFilters filters, PageRequest pageReq);
+
+    /**
+     * Finds recipe by given id and returns it.
+     * @param recipeId id to look for.
+     * @param cookId id of cook who wants to view the recipe.
+     * @return found recipe.
+     * @throws RecipeNotFoundException if the recipe can't be found.
+     * @throws RecipeNotOwnedException if the recipe does not belong to given cook.
+     */
+    Recipe viewRecipe(RecipeId recipeId, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException;
 
     /**
      * Registers a new cook in the application.

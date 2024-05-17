@@ -9,11 +9,13 @@ import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.RecipeFilters;
+import pl.dkaluza.kitchenservice.domain.RecipeId;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 class RecipePersistenceAdapter implements RecipeRepository  {
@@ -85,6 +87,12 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         }
     }
 
+    @Override
+    public Optional<Recipe> findRecipeById(RecipeId id) {
+        Assertions.assertArgument(id != null, "id is null");
+        return recipeRepository.findById(id.getId()).map(this::fetchAndMap);
+    }
+
     public Page<Recipe> findAllRecipes(PageRequest pageReq) {
         Assertions.assertArgument(pageReq != null, "pageReq is null");
 
@@ -93,7 +101,7 @@ class RecipePersistenceAdapter implements RecipeRepository  {
                 pageReq.getPageNumber() - 1, pageReq.getPageSize(), Sort.by(Sort.Direction.DESC, "id")
             )
         );
-        var recipes = fetchAndMap(recipeEntitiesPage.getContent());
+        var recipes = recipeEntitiesPage.getContent().stream().map(this::fetchAndMap).toList();
         return toPage(recipes, pageReq.getPageNumber(), recipeEntitiesPage.getTotalPages());
     }
 
@@ -106,24 +114,18 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         var pageNo = pageReq.getPageNumber();
         var pageSize = pageReq.getPageSize();
         var recipeEntities = recipeRepository.findByFilters(filters.getName(), cookId, (pageNo - 1) * pageSize, pageSize);
-        var recipes = fetchAndMap(recipeEntities);
+        var recipes = recipeEntities.stream().map(this::fetchAndMap).toList();
         var totalRecipes = recipeRepository.countByFilters(filters.getName(), cookId);
         var totalPages = totalRecipes > 0 ? (int) Math.ceil((double) totalRecipes / pageSize) : 1;
         return toPage(recipes, pageNo, totalPages);
     }
 
-    private List<Recipe> fetchAndMap(List<RecipeEntity> recipeEntities) {
+    private Recipe fetchAndMap(RecipeEntity recipeEntity) {
         try {
-            var recipes = new ArrayList<Recipe>();
-            for (var recipeEntity : recipeEntities) {
-                var recipeId = recipeEntity.id();
-                var ingredientEntities = ingredientRepository.findAllByRecipeId(recipeId);
-                var stepEntities = stepRepository.findAllByRecipeId(recipeId);
-
-                var recipe = recipeMapper.toDomain(recipeEntity, ingredientEntities, stepEntities);
-                recipes.add(recipe);
-            }
-            return recipes;
+            var recipeId = recipeEntity.id();
+            var ingredientEntities = ingredientRepository.findAllByRecipeId(recipeId);
+            var stepEntities = stepRepository.findAllByRecipeId(recipeId);
+            return recipeMapper.toDomain(recipeEntity, ingredientEntities, stepEntities);
         } catch (ValidationException e) {
             throw new IllegalStateException(e);
         }
