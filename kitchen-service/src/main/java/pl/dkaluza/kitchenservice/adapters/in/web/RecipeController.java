@@ -31,6 +31,6 @@ class RecipeController {
 
     @GetMapping("/{id}")
     ResponseEntity<?> viewRecipe(Authentication auth, @PathVariable Long id) {
-        throw new UnsupportedOperationException();
+        return recipeFacade.viewRecipe(auth, id);
     }
 }

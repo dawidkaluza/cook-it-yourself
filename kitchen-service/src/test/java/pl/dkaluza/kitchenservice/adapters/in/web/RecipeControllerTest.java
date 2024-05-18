@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
 import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 
 import java.math.BigDecimal;
@@ -351,6 +353,136 @@ class RecipeControllerTest {
             .singleElement()
             .extracting(ShortRecipeResponse::id, ShortRecipeResponse::name, ShortRecipeResponse::description)
             .containsExactly(1L, "Boiled sausages", "");
+    }
+
+    @Test
+    void viewRecipe_invalidId_returnError() {
+        // Given
+        var auth = authentication(1L);
+        var id = 0L;
+
+        // When
+        var resp = recipeController.viewRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+
+        assertThat(respBody.fields())
+            .isNotNull()
+            .extracting(ErrorResponse.Field::name)
+            .contains("id");
+    }
+
+    @Test
+    void viewRecipe_recipeNotFound_returnError() {
+        // Given
+        when(kitchenService.viewRecipe(any(), any()))
+            .thenThrow(new RecipeNotFoundException("Recipe not found"));
+
+        var auth = authentication(1L);
+        var id = 1L;
+
+        // When
+        var resp = recipeController.viewRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.NOT_FOUND);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+    }
+
+    @Test
+    void viewRecipe_recipeNotOwned_returnError() {
+        // Given
+        when(kitchenService.viewRecipe(any(), any()))
+            .thenThrow(new RecipeNotOwnedException("Recipe not owned"));
+
+        var auth = authentication(1L);
+        var id = 1L;
+
+        // When
+        var resp = recipeController.viewRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void viewRecipe_validRequest_returnRecipe() {
+        // Given
+        var mockRecipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(1L, "sausage", new BigDecimal(2), "pc")
+            .methodStep( 1L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
+            .build().produce();
+
+        when(kitchenService.viewRecipe(any(), any())).thenReturn(mockRecipe);
+
+        var auth = authentication(1L);
+        var id = 1L;
+
+        // When
+        var resp = recipeController.viewRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.OK);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(RecipeResponse.class);
+
+        var respBody = (RecipeResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull()
+            .extracting(RecipeResponse::id, RecipeResponse::name, RecipeResponse::description)
+            .containsExactly(mockRecipe.getId().getId(), mockRecipe.getName(), mockRecipe.getDescription());
     }
 
     private static Authentication authentication(Long id) {
