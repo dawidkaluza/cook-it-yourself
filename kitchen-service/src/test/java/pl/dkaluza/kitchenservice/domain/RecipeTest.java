@@ -3,7 +3,9 @@ package pl.dkaluza.kitchenservice.domain;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import pl.dkaluza.domaincore.FieldError;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 
@@ -248,5 +250,31 @@ class RecipeTest {
             .singleElement()
             .extracting(step -> step.getId().getId())
             .isEqualTo(methodStepId);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "1, true",
+        "2, false"
+    })
+    void iwOwnedBy_variousParams_returnExpectedResponse(Long cookIdValue, boolean expectedResult) {
+        // Given
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("xyz")
+            .description("")
+            .ingredient(1L, "sausage", new BigDecimal(2), "pc")
+            .methodStep(1L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
+            .build().produce();
+
+        var cookId = CookId.of(cookIdValue).produce();
+
+        // When, then
+        assertThat(recipe.isOwnedBy(cookId))
+            .isEqualTo(expectedResult);
+
     }
 }
