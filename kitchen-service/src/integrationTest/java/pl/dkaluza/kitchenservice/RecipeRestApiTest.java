@@ -8,6 +8,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
+import org.hamcrest.Matcher;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -165,12 +166,12 @@ class RecipeRestApiTest {
             .body("description", is(reqBodyJsonPath.getString("description")))
             .body("ingredients[0].id", notNullValue())
             .body("ingredients[0].name", is(reqBodyJsonPath.getString("ingredients[0].name")))
-            .body("ingredients[0].value", is(reqBodyJsonPath.getString("ingredients[0].value")))
+            .body("ingredients[0].value", numericEqualTo(reqBodyJsonPath.getString("ingredients[0].value")))
             .body("ingredients[0].measure", is(reqBodyJsonPath.getString("ingredients[0].measure")))
             .body("methodSteps[0].id", notNullValue())
             .body("methodSteps[0].text", is(reqBodyJsonPath.getString("methodSteps[0].text")))
             .body("cookingTime", is(reqBodyJsonPath.getInt("cookingTime")))
-            .body("portionSize.value", is(reqBodyJsonPath.getString("portionSize.value")))
+            .body("portionSize.value", numericEqualTo(reqBodyJsonPath.getString("portionSize.value")))
             .body("portionSize.measure", is(reqBodyJsonPath.getString("portionSize.measure")))
             .body("cookId", is(1));
 
@@ -411,17 +412,17 @@ class RecipeRestApiTest {
         var reqBodyJsonPath = new JsonPath(reqBody);
         res.then()
             .statusCode(200)
-            .body("id", is(id))
+            .body("id", is(id.intValue()))
             .body("name", is(reqBodyJsonPath.getString("name")))
             .body("description", is(reqBodyJsonPath.getString("description")))
             .body("ingredients[0].id", notNullValue())
             .body("ingredients[0].name", is(reqBodyJsonPath.getString("ingredients[0].name")))
-            .body("ingredients[0].value", is(reqBodyJsonPath.getString("ingredients[0].value")))
+            .body("ingredients[0].value", numericEqualTo(reqBodyJsonPath.getString("ingredients[0].value")))
             .body("ingredients[0].measure", is(reqBodyJsonPath.getString("ingredients[0].measure")))
             .body("methodSteps[0].id", notNullValue())
             .body("methodSteps[0].text", is(reqBodyJsonPath.getString("methodSteps[0].text")))
             .body("cookingTime", is(reqBodyJsonPath.getInt("cookingTime")))
-            .body("portionSize.value", is(reqBodyJsonPath.getString("portionSize.value")))
+            .body("portionSize.value", numericEqualTo(reqBodyJsonPath.getString("portionSize.value")))
             .body("portionSize.measure", is(reqBodyJsonPath.getString("portionSize.measure")))
             .body("cookId", is(1));
     }
@@ -431,7 +432,6 @@ class RecipeRestApiTest {
         var handle = jdbiFacade.getHandle();
         handle.execute("INSERT INTO cook VALUES (?)", id);
     }
-
     private Long addRecipe(String reqBody) {
         var res = given()
             .filter(new JwtFilter())
@@ -521,6 +521,10 @@ class RecipeRestApiTest {
         reqBody.put("portionSize", portionSize);
 
         return reqBody.toString();
+    }
+
+    private static Matcher<?> numericEqualTo(String expectedValue) {
+        return new NumericMatcher(expectedValue);
     }
 
     private static class JwtFilter implements Filter {
