@@ -1,6 +1,11 @@
+import Link from "next/link";
+
 const Page = () => {
   return (
-    <h1>Hello, it's cook it yourself!</h1>
+    <p className="text-center">
+      Welcome my new cook! Would you like to start the journey with the app?
+      {" "} <Link href="#">Sign in</Link> first.
+    </p>
   );
 };
 
