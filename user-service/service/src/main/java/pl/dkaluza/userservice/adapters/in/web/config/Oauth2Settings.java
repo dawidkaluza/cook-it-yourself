@@ -35,8 +35,6 @@ class Oauth2Settings {
      */
     private List<String> clientOrigins;
 
-    private List<String> clientsOrigins;
-
     public String getClientId() {
         return clientId;
     }
@@ -75,10 +73,5 @@ class Oauth2Settings {
 
     public void setClientOrigins(List<String> clientOrigins) {
         this.clientOrigins = clientOrigins;
-    }
-
-    @Deprecated
-    public void setClientsOrigins(List<String> clientsOrigins) {
-        this.clientsOrigins = clientsOrigins;
     }
 }
