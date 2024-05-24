@@ -52,7 +52,7 @@ class WebSecurityConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .issuerUri(oauth2Settings.getAuthServerUrl())
-                .authorizationUri(oauth2Settings.getAuthServerUrl() + "/oauth2/authorize")
+                .authorizationUri(oauth2Settings.getAuthServerClientUrl() + "/oauth2/authorize")
                 .tokenUri(oauth2Settings.getAuthServerUrl() + "/oauth2/token")
                 .jwkSetUri(oauth2Settings.getAuthServerUrl() + "/oauth2/jwks")
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")

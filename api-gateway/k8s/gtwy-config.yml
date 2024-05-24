@@ -4,5 +4,6 @@ metadata:
   name: gtwy-config
 data:
   USER_SERVICE_URL: "http://user-service"
+  USER_SERVICE_CLIENT_URL: "http://localhost:9090"
   KITCHEN_SERVICE_URL: "http://kitchen-service"
   WEB_APP_URL: "http://localhost:3000"

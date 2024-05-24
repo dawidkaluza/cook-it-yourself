@@ -10,3 +10,4 @@ data:
   RABBITMQ_PORT: "5672"
   REDIS_HOST: "user-service-redis"
   REDIS_PORT: "6379"
+  API_GATEWAY_URL: "http://127.0.0.1:8080"

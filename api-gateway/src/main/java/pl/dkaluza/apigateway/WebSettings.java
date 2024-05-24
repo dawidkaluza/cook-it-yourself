@@ -10,6 +10,8 @@ import java.util.List;
 class WebSettings {
     private String userServiceUrl;
 
+    private String userServiceClientUrl;
+
     private String kitchenServiceUrl;
 
     private String webAppUrl;
@@ -22,6 +24,14 @@ class WebSettings {
 
     public void setUserServiceUrl(String userServiceUrl) {
         this.userServiceUrl = userServiceUrl;
+    }
+
+    public String getUserServiceClientUrl() {
+        return userServiceClientUrl;
+    }
+
+    public void setUserServiceClientUrl(String userServiceClientUrl) {
+        this.userServiceClientUrl = userServiceClientUrl;
     }
 
     public String getKitchenServiceUrl() {

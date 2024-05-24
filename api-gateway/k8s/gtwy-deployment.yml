@@ -15,7 +15,7 @@ spec:
         app: api-gateway
     spec:
       containers:
-      - image: ghcr.io/dawidkaluza/cook-it-yourself/api-gateway:develop
+      - image: ghcr.io/dawidkaluza/cook-it-yourself/api-gateway:develop@sha256:0332f11c98c5a294c4146b74401f29ea9d231ca3161c81ec6835f9413bc9691b
         name: api-gateway
         envFrom:
           - configMapRef:

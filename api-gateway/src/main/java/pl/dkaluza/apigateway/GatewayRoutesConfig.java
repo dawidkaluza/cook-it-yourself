@@ -16,7 +16,7 @@ class GatewayRoutesConfig {
     @Bean
     RouterFunction<ServerResponse> kitchenServiceRoute(WebSettings webSettings) {
         return route("kitchen-service")
-            .route(path("/kitchen/**"), http(webSettings.getKitchenServiceUrl()))
+            .route(path("/api/kitchen/**"), http(webSettings.getKitchenServiceUrl()))
             .before(rewritePath("/api/kitchen/(?<segment>.*)", "/${segment}"))
             .filter(tokenRelay())
             .build();

@@ -16,6 +16,8 @@ class Oauth2Settings {
 
     private String authServerUrl;
 
+    private String authServerClientUrl;
+
     public String getRegistrationId() {
         return registrationId;
     }
@@ -54,5 +56,13 @@ class Oauth2Settings {
 
     public void setAuthServerUrl(String authServerUrl) {
         this.authServerUrl = authServerUrl;
+    }
+
+    public String getAuthServerClientUrl() {
+        return authServerClientUrl;
+    }
+
+    public void setAuthServerClientUrl(String authServerClientUrl) {
+        this.authServerClientUrl = authServerClientUrl;
     }
 }
