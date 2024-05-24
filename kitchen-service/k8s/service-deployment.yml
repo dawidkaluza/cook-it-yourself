@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kitchen-service
+  labels:
+    app: kitchen-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kitchen-service
+  template:
+    metadata:
+      labels:
+        app: kitchen-service
+    spec:
+      containers:
+      - image: ghcr.io/dawidkaluza/cook-it-yourself/kitchen-service:develop
+        name: kitchen-service
+        envFrom:
+          - configMapRef:
+              name: kitchen-service-config
+          - secretRef:
+              name: kitchen-service-secrets
+        ports:
+          - containerPort: 8080

@@ -1,46 +1,46 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service-postgres
+  name: kitchen-service-postgres
   labels:
-    app: user-service-postgres
+    app: kitchen-service-postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service-postgres
+      app: kitchen-service-postgres
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: user-service-postgres
+        app: kitchen-service-postgres
     spec:
       containers:
       - image: postgres:15.2-alpine
-        name: user-service-postgres
+        name: kitchen-service-postgres
         env:
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: user-service-secrets
+              name: kitchen-service-secrets
               key: POSTGRES_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: user-service-secrets
+              name: kitchen-service-secrets
               key: POSTGRES_PASSWORD
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: user-service-config
+              name: kitchen-service-config
               key: POSTGRES_DB
         ports:
         - containerPort: 5432
         volumeMounts:
-        - name: user-service-postgres-data
+        - name: kitchen-service-postgres-data
           mountPath: /var/lib/postgresql/data
       volumes:
-      - name: user-service-postgres-data
+      - name: kitchen-service-postgres-data
         persistentVolumeClaim:
-          claimName: user-service-postgres-pv-claim
+          claimName: kitchen-service-postgres-pv-claim

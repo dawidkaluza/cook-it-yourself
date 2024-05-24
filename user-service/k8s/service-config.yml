@@ -6,7 +6,7 @@ data:
   POSTGRES_HOST: "user-service-postgres"
   POSTGRES_PORT: "5432"
   POSTGRES_DB: "user"
-  RABBITMQ_HOST: "user-service-rabbitmq"
+  RABBITMQ_HOST: "rabbitmq"
   RABBITMQ_PORT: "5672"
   REDIS_HOST: "user-service-redis"
   REDIS_PORT: "6379"

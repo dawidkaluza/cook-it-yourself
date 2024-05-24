@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: api-gateway
   labels:
-    app: user-service
+    app: api-gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service
+      app: api-gateway
   template:
     metadata:
       labels:
-        app: user-service
+        app: api-gateway
     spec:
       containers:
-      - image: ghcr.io/dawidkaluza/cook-it-yourself/user-service:develop
-        name: user-service
+      - image: ghcr.io/dawidkaluza/cook-it-yourself/api-gateway:develop
+        name: api-gateway
         envFrom:
           - configMapRef:
-              name: user-service-config
+              name: gtwy-config
           - secretRef:
-              name: user-service-secrets
+              name: gtwy-secrets
         ports:
           - containerPort: 8080

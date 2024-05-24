@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kitchen-service-config
+data:
+  POSTGRES_HOST: "kitchen-service-postgres"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "kitchen"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"

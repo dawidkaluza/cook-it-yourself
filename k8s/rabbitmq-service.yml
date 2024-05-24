@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-service-rabbitmq
+  name: rabbitmq
   labels:
-    app: user-service-rabbitmq
+    app: rabbitmq
 spec:
   ports:
     - name: "5672"
@@ -13,5 +13,5 @@ spec:
       port: 15672
       targetPort: 15672
   selector:
-    app: user-service-rabbitmq
+    app: rabbitmq
   clusterIP: None

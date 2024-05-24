@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: user-service-postgres-pv-claim
+  name: kitchen-service-postgres-pv-claim
 spec:
   storageClassName: ""
-  volumeName: user-service-postgres-pv
+  volumeName: kitchen-service-postgres-pv
   resources:
     requests:
       storage: 5Gi
