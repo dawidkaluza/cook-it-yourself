@@ -4,11 +4,33 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "ciy.oauth2")
+@ConfigurationProperties("ciy.oauth2")
 class Oauth2Settings {
+    private String registrationId;
+
+    private String clientId;
+
     private String clientSecret;
 
-    private String userServiceUrl;
+    private String clientName;
+
+    private String authServerUrl;
+
+    public String getRegistrationId() {
+        return registrationId;
+    }
+
+    public void setRegistrationId(String registrationId) {
+        this.registrationId = registrationId;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
 
     public String getClientSecret() {
         return clientSecret;
@@ -18,11 +40,19 @@ class Oauth2Settings {
         this.clientSecret = clientSecret;
     }
 
-    public String getUserServiceUrl() {
-        return userServiceUrl;
+    public String getClientName() {
+        return clientName;
     }
 
-    public void setUserServiceUrl(String userServiceUrl) {
-        this.userServiceUrl = userServiceUrl;
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public String getAuthServerUrl() {
+        return authServerUrl;
+    }
+
+    public void setAuthServerUrl(String authServerUrl) {
+        this.authServerUrl = authServerUrl;
     }
 }

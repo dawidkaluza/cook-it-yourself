@@ -13,15 +13,28 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig {
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, WebSettings webSettings) throws Exception {
         return http
-            .cors(CorsConfigurer::disable)
+            .cors(cors -> {
+                var config = new CorsConfiguration();
+                config.addAllowedHeader("*");
+                config.addAllowedMethod("*");
+                config.setAllowedOrigins(webSettings.getCorsAllowedOrigins());
+                config.setAllowCredentials(true);
+
+                var source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
+
+                cors.configurationSource(source);
+            })
             .csrf(CsrfConfigurer::disable)
             .oauth2Login(Customizer.withDefaults())
             .oauth2Client(Customizer.withDefaults())
@@ -32,16 +45,16 @@ class WebSecurityConfig {
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository(Oauth2Settings oauth2Settings) {
         return new InMemoryClientRegistrationRepository(
-            ClientRegistration.withRegistrationId("ciy")
-                .clientId("api-gateway")
+            ClientRegistration.withRegistrationId(oauth2Settings.getRegistrationId())
+                .clientId(oauth2Settings.getClientId())
                 .clientSecret(oauth2Settings.getClientSecret())
-                .clientName("API Gateway")
+                .clientName(oauth2Settings.getClientName())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .issuerUri(oauth2Settings.getUserServiceUrl())
-                .authorizationUri(oauth2Settings.getUserServiceUrl() + "/oauth/authorize")
-                .tokenUri(oauth2Settings.getUserServiceUrl() + "/oauth/token")
-                .jwkSetUri(oauth2Settings.getUserServiceUrl() + "/oauth2/jwks")
+                .issuerUri(oauth2Settings.getAuthServerUrl())
+                .authorizationUri(oauth2Settings.getAuthServerUrl() + "/oauth2/authorize")
+                .tokenUri(oauth2Settings.getAuthServerUrl() + "/oauth2/token")
+                .jwkSetUri(oauth2Settings.getAuthServerUrl() + "/oauth2/jwks")
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .build()
         );
