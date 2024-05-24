@@ -17,13 +17,13 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationEndpointFilter;
@@ -54,9 +54,9 @@ class WebSecurityConfig {
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
             .authorizationEndpoint(authorization ->
                 authorization.consentPage(webAppSettings.getConsentUri())
-            );
-//            .oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
-//              YAGNI, at least for now
+            )
+            .oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
+
         http
             .cors(Customizer.withDefaults())
             // Redirect to the login page when not authenticated from the
@@ -184,7 +184,7 @@ class WebSecurityConfig {
         for (var origin : webAppSettings.getOrigins()) {
             config.addAllowedOrigin(origin);
         }
-        for (var origin : oauth2Settings.getClientsOrigins()) {
+        for (var origin : oauth2Settings.getClientOrigins()) {
             config.addAllowedOrigin(origin);
         }
         config.setAllowCredentials(true);
@@ -214,19 +214,17 @@ class WebSecurityConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository() {
+    public RegisteredClientRepository registeredClientRepository(Oauth2Settings oauth2Settings) {
         RegisteredClient webappClient = RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("ciy-web")
-            .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+            .clientId(oauth2Settings.getClientId())
+            .clientSecret(oauth2Settings.getClientSecret())
+            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .redirectUri("http://webapp/sign-in")
-            .postLogoutRedirectUri("http://webapp/sign-in?sign-out")
-            .clientSettings(
-                ClientSettings.builder()
-                    .requireProofKey(true)
-                    .requireAuthorizationConsent(false)
-                    .build()
-            )
+            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+            .scope(OidcScopes.OPENID)
+            .scope(OidcScopes.PROFILE)
+            .redirectUri(oauth2Settings.getRedirectUri())
+            .postLogoutRedirectUri(oauth2Settings.getSignOutUri())
             .build();
 
         return new InMemoryRegisteredClientRepository(webappClient);
@@ -242,8 +240,7 @@ class WebSecurityConfig {
             var userDetails = (DefaultUserDetails) context.getPrincipal().getPrincipal();
 
             context.getClaims()
-                .subject(userDetails.getId().toString())
-                .claim("name", userDetails.getName());
+                .subject(userDetails.getId().toString());
         };
     }
 }

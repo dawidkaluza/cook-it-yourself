@@ -19,19 +19,6 @@ services:
       - ./service/src/:/home/developer/app/service/src/
     networks:
       - main
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=user
-      - POSTGRES_USER=developer
-      - POSTGRES_PASSWORD=developer
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USER=developer
-      - RABBITMQ_PASSWORD=developer
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=developer
     ports:
       - "8080:8080"
     depends_on:
