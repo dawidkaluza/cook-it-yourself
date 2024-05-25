@@ -12,6 +12,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -51,10 +53,13 @@ class WebSecurityConfig {
                 .clientName(oauth2Settings.getClientName())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .scope(OidcScopes.OPENID)
                 .issuerUri(oauth2Settings.getAuthServerUrl())
                 .authorizationUri(oauth2Settings.getAuthServerClientUrl() + "/oauth2/authorize")
                 .tokenUri(oauth2Settings.getAuthServerUrl() + "/oauth2/token")
                 .jwkSetUri(oauth2Settings.getAuthServerUrl() + "/oauth2/jwks")
+                .userInfoUri(oauth2Settings.getAuthServerUrl() + "/userinfo")
+                .userNameAttributeName(IdTokenClaimNames.SUB)
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .build()
         );
