@@ -5,7 +5,7 @@ metadata:
 spec:
   storageClassName: ""
   claimRef:
-    name: user-service-postgres-pv-claim
+    name: user-service-postgres-pvc
     namespace: default
   capacity:
     storage: 5Gi
@@ -14,3 +14,19 @@ spec:
     - ReadWriteOncePod
   hostPath:
     path: "/mnt/data/user-service/postgres"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-service-postgres-pvc
+spec:
+  storageClassName: ""
+  volumeName: user-service-postgres-pv
+  resources:
+    requests:
+      storage: 5Gi
+  # noinspection KubernetesUnknownValues
+  accessModes:
+    - ReadWriteOncePod

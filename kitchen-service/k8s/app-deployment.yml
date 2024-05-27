@@ -15,7 +15,7 @@ spec:
         app: kitchen-service
     spec:
       containers:
-      - image: ghcr.io/dawidkaluza/cook-it-yourself/kitchen-service:develop
+      - image: ghcr.io/dawidkaluza/cook-it-yourself/kitchen-service:latest
         name: kitchen-service
         envFrom:
           - configMapRef:

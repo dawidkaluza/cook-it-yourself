@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - image: postgres:15.2-alpine
-        name: user-service-postgres
+        name: postgres
         env:
         - name: POSTGRES_USER
           valueFrom:
@@ -43,4 +43,4 @@ spec:
       volumes:
       - name: user-service-postgres-data
         persistentVolumeClaim:
-          claimName: user-service-postgres-pv-claim
+          claimName: user-service-postgres-pvc

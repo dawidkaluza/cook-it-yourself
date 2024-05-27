@@ -5,7 +5,7 @@ metadata:
 spec:
   storageClassName: ""
   claimRef:
-    name: kitchen-service-postgres-pv-claim
+    name: kitchen-service-postgres-pvc
     namespace: default
   capacity:
     storage: 5Gi
@@ -14,3 +14,18 @@ spec:
     - ReadWriteOncePod
   hostPath:
     path: "/mnt/data/kitchen-service/postgres"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kitchen-service-postgres-pvc
+spec:
+  storageClassName: ""
+  volumeName: kitchen-service-postgres-pv
+  resources:
+    requests:
+      storage: 5Gi
+  # noinspection KubernetesUnknownValues
+  accessModes:
+    - ReadWriteOncePod

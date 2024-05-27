@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - image: postgres:15.2-alpine
-        name: kitchen-service-postgres
+        name: postgres
         env:
         - name: POSTGRES_USER
           valueFrom:
@@ -43,4 +43,4 @@ spec:
       volumes:
       - name: kitchen-service-postgres-data
         persistentVolumeClaim:
-          claimName: kitchen-service-postgres-pv-claim
+          claimName: kitchen-service-postgres-pvc

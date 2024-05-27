@@ -8,5 +8,5 @@ data:
   POSTGRES_DB: "kitchen"
   RABBITMQ_HOST: "rabbitmq"
   RABBITMQ_PORT: "5672"
-  API_GATEWAY_URL: "http://127.0.0.1:8080"
+  API_GATEWAY_URL: "http://api-ciy.localhost:8080"
   USER_SERVICE_URL: "http://user-service:8080"
