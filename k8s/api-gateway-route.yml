@@ -1,17 +1,18 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: user-service
+  name: api-gateway
 spec:
   parentRefs:
     - name: gateway
       sectionName: http
+  hostnames:
+    - "api.ciy.localhost"
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /
-      # TODO eventually user service should accessible from /auth paths or sth like that
       backendRefs:
-        - name: kitchen-service-postgres
-          port: 5432
+        - name: api-gateway
+          port: 8080
