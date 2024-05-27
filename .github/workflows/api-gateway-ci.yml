@@ -1,0 +1,68 @@
+name: API-Gateway CI
+
+on:
+  push:
+    branches: [ "master" ]
+    paths: [ 'api-gateway/**', '.github/workflows/api-gateway-ci.yml' ]
+  pull_request:
+    branches: [ "master" ]
+    paths: [ 'api-gateway/**', '.github/workflows/api-gateway-ci.yml' ]
+
+jobs:
+  build:
+    name: 'Build, test and publish'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      - name: Build and test
+        working-directory: ./api-gateway
+        run: ./gradlew integrationTest build
+
+      - name: Store test results
+        if: ${{ success() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            api-gateway/build/test-results/
+            api-gateway/build/reports/
+
+      - name: Report test results
+        if: ${{ success() || failure() }}
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test reports
+          path: 'api-gateway/build/test-results/**/*.xml'
+          reporter: java-junit
+
+      - name: Log into GitHub Container Registry
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build container image and publish
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api-gateway
+          push: true
+          tags: ghcr.io/dawidkaluza/cook-it-yourself/api-gateway:latest
