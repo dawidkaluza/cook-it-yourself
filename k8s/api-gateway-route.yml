@@ -9,10 +9,6 @@ spec:
   hostnames:
     - "api.ciy.localhost"
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
+    - backendRefs:
         - name: api-gateway
           port: 8080

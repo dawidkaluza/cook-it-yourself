@@ -9,10 +9,6 @@ spec:
   hostnames:
     - "auth.ciy.localhost"
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
+    - backendRefs:
         - name: user-service
           port: 8080
