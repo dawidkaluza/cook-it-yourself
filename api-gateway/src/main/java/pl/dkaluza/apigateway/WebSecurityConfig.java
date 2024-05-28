@@ -37,7 +37,7 @@ class WebSecurityConfig {
                 cors.configurationSource(source);
             })
             .csrf(CsrfConfigurer::disable)
-            .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(webSettings.getWebAppUrl()))
+            .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(webSettings.getWebAppUrl() + "/sign-in?success")) // todo make the suffix configurable
             .oauth2Client(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .build();
