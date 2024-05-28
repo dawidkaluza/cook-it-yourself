@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -38,7 +37,7 @@ class WebSecurityConfig {
                 cors.configurationSource(source);
             })
             .csrf(CsrfConfigurer::disable)
-            .oauth2Login(Customizer.withDefaults())
+            .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(webSettings.getWebAppUrl()))
             .oauth2Client(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .build();
@@ -60,7 +59,7 @@ class WebSecurityConfig {
                 .jwkSetUri(oauth2Settings.getAuthServerUrl() + "/oauth2/jwks")
                 .userInfoUri(oauth2Settings.getAuthServerUrl() + "/userinfo")
                 .userNameAttributeName(IdTokenClaimNames.SUB)
-                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                .redirectUri("{baseUrl}/api/login/oauth2/code/{registrationId}") // TODO make this /api/ prerfix configurable
                 .build()
         );
     }

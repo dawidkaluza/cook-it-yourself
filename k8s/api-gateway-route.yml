@@ -7,8 +7,18 @@ spec:
     - name: gateway
       sectionName: http
   hostnames:
-    - "api.ciy.localhost"
+    - "ciy.localhost"
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
         - name: api-gateway
           port: 8080

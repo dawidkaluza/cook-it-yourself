@@ -8,5 +8,5 @@ data:
   POSTGRES_DB: "kitchen"
   RABBITMQ_HOST: "rabbitmq"
   RABBITMQ_PORT: "5672"
-  API_GATEWAY_URL: "http://api-ciy.localhost:8080"
+  API_GATEWAY_URL: "http://ciy.localhost:8080" # it's only for cors policy
   USER_SERVICE_URL: "http://user-service:8080"
