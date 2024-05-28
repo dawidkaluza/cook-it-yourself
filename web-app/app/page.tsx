@@ -1,10 +1,7 @@
-import Link from "next/link";
-
 const Page = () => {
   return (
     <p className="text-center">
-      Welcome my new cook! Would you like to start the journey with the app?
-      {" "} <Link href="#">Sign in</Link> first.
+      Welcome my cook! Use navigation above to start your cooking journey.
     </p>
   );
 };
