@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
+import static org.springframework.cloud.gateway.server.mvc.filter.AfterFilterFunctions.*;
 import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath;
 import static org.springframework.cloud.gateway.server.mvc.filter.TokenRelayFilterFunctions.tokenRelay;
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
@@ -19,6 +20,7 @@ class GatewayRoutesConfig {
             .route(path("/kitchen/**"), http(webSettings.getKitchenServiceUrl()))
             .before(rewritePath("/kitchen/(?<segment>.*)", "/${segment}"))
             .filter(tokenRelay())
+            .after(dedupeResponseHeader("Access-Control-Allow-Credentials Access-Control-Allow-Origin", DedupeStrategy.RETAIN_UNIQUE))
             .build();
     }
 }
