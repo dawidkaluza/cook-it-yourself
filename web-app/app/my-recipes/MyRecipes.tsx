@@ -1,4 +1,17 @@
-import { Suspense } from 'react'
+"use client"
+
+import {Suspense, useEffect, useState} from 'react'
+
+type PageResponse<T> = {
+  items: [T];
+  totalPages: number;
+};
+
+type Recipe = {
+  id: number;
+  name: string;
+  description: string;
+};
 
 export const MyRecipes = () => {
   return (
@@ -28,28 +41,31 @@ const MyRecipesSkeleton = () => {
   )
 };
 
-const getData = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve({
-      items: [
-        {
-          id: 1,
-          name: "Boiled sausages",
-          description: "Boileeeeed sausagesss"
-        },
-        {
-          id: 2,
-          name: "Spaghetti",
-          description: "Spaghetti bolognese"
-        }
-      ],
-      totalPages: 1
-    }), 1000)
-  })
+const getData = async () : Promise<PageResponse<Recipe>> => {
+  const response = await fetch("http://ciy.localhost:8080/api/kitchen/recipe", {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    }
+  });
+
+  return await response.json();
 };
 
-const MyRecipesList = async () => {
-  const recipes = await getData();
+const MyRecipesList = () => {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+
+  useEffect(() => {
+    async function loadData() {
+      const initialRecipes = await getData();
+      setRecipes(initialRecipes.items);
+    }
+
+    loadData();
+  }, []);
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -58,7 +74,7 @@ const MyRecipesList = async () => {
         </div>
       </div>
       <div className="row row-cols-1 row-cols-md-2">
-        {recipes.items.map((recipe) =>
+        {recipes.map((recipe) =>
           <div key={recipe.id} className="col" style={{ margin: "2em 0" }}>
             <RecipeCard recipe={recipe} />
           </div>
