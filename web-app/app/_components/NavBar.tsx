@@ -2,8 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import {useAuth} from "@/hooks/auth/useAuth";
 import {usePathname} from "next/navigation";
+import {useAuth} from "@/app/_hooks/auth/useAuth";
 
 const NavBar = () => {
   const { isSignedIn } = useAuth();

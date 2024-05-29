@@ -1,8 +1,8 @@
 "use client"
 
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAuth} from "@/hooks/auth/useAuth";
 import {useEffect} from "react";
+import {useAuth} from "@/app/_hooks/auth/useAuth";
 
 export const SignIn = () => {
   const router = useRouter();

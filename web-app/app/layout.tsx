@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'
-import {NavBar} from "@/components/NavBar";
+import {NavBar} from "@/app/_components/NavBar";
 
 export const metadata: Metadata = {
   title: "Cook It Yourself",
