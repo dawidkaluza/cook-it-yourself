@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -15,22 +17,22 @@ import pl.dkaluza.kitchenservice.adapters.config.WebSettings;
 class RecipeWebSecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, WebSettings webSettings) throws Exception {
-        //noinspection Convert2MethodRef
         http
             .securityMatcher("/recipe/**")
-            .cors(cors -> {
-                var config = new CorsConfiguration();
-                config.addAllowedHeader("*");
-                config.addAllowedMethod("*");
-                config.setAllowedOrigins(webSettings.getCorsAllowedOrigins());
-                config.setAllowCredentials(true);
-
-                var source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", config);
-
-                cors.configurationSource(source);
-            })
-            .csrf(csrf -> csrf.disable())
+            .cors(CorsConfigurer::disable)
+//            .cors(cors -> {
+//                var config = new CorsConfiguration();
+//                config.addAllowedHeader("*");
+//                config.addAllowedMethod("*");
+//                config.setAllowedOrigins(webSettings.getCorsAllowedOrigins());
+//                config.setAllowCredentials(true);
+//
+//                var source = new UrlBasedCorsConfigurationSource();
+//                source.registerCorsConfiguration("/**", config);
+//
+//                cors.configurationSource(source);
+//            })
+            .csrf(CsrfConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(handler -> handler.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
             .authorizeHttpRequests(authorize ->
