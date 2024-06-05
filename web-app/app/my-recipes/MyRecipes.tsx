@@ -1,6 +1,7 @@
 "use client"
 
 import {Suspense, useEffect, useState} from 'react'
+import Link from "next/link";
 
 type PageResponse<T> = {
   items: [T];
@@ -73,19 +74,37 @@ const MyRecipesList = () => {
           <h1>My recipes</h1>
         </div>
       </div>
+
+      {!recipes.length &&
+        <div className="row">
+          <div className="col">
+            <p className="text-center">No recipes found.</p>
+          </div>
+        </div>
+      }
+
       <div className="row row-cols-1 row-cols-md-2">
         {recipes.map((recipe) =>
-          <div key={recipe.id} className="col" style={{ margin: "2em 0" }}>
-            <RecipeCard recipe={recipe} />
+          <div key={recipe.id} className="col" style={{margin: "2em 0"}}>
+            <RecipeCard recipe={recipe}/>
           </div>
         )}
+      </div>
+
+      <div className="row justify-content-end">
+        <div className="col-12">
+          <hr/>
+        </div>
+        <div className="col-3">
+          <AddRecipeButton />
+        </div>
       </div>
     </div>
   );
 };
 
 const RecipeCard = (
-  { recipe } : { recipe: { id: number; name: string; description: string } }
+  {recipe}: { recipe: { id: number; name: string; description: string } }
 ) => {
   return (
     <div className="card">
@@ -113,5 +132,12 @@ const RecipeCardSkeleton = () => {
         </a>
       </div>
     </div>
+  );
+};
+
+const AddRecipeButton = () => {
+  // noinspection HtmlUnknownTarget
+  return (
+    <Link href="/my-recipes/add" className="btn btn-success">Add recipe</Link>
   );
 };
