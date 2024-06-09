@@ -5,7 +5,7 @@ const DescriptionInput = () => {
       <div className="col-sm-10">
         <textarea
           name="description"
-          id="description" className="form-control" placeholder="Description"
+          id="description" className="form-control" placeholder="A few words describing your recipe"
           style={{height: "100px"}}
         />
       </div>

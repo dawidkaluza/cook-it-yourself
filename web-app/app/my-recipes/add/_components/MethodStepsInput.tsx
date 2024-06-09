@@ -62,7 +62,7 @@ const MethodStepsInput = () => {
             <textarea
               name="newMethodStep" id="newMethodStep" className="form-control"
               value={newStep}
-              placeholder="Method step"
+              placeholder="Instructions step-by-step to cook your recipe"
               style={{height: "100px"}}
               onChange={(e) => setNewStep(e.currentTarget.value)}
               onKeyDown={(e) => e.key === 'Enter' && addStep()}
