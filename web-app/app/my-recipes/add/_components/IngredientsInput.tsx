@@ -13,7 +13,6 @@ const IngredientsInput = () => {
   const [newIngredient, setNewIngredient] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
-  // TODO test it properly since it does not fully work
   const addNewIngredient = () => {
     if (newIngredient.trim().length === 0) {
       return;
@@ -65,7 +64,7 @@ const IngredientsInput = () => {
 
   return (
     <div className="row mb-4">
-      <label htmlFor="ingredient" className="col-sm-2 col-form-label">Ingredients</label>
+      <label htmlFor="newIngredient" className="col-sm-2 col-form-label">Ingredients</label>
       <div className="col-sm-10">
         {ingredients.map(ingredient => (
           <div key={ingredient.id} className="row">
@@ -97,7 +96,7 @@ const IngredientsInput = () => {
         <div className="row">
           <div className="input-group">
             <input
-              name="ingredient" id="ingredient" className="form-control"
+              name="newIngredient" id="newIngredient" className="form-control"
               value={newIngredient}
               placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
               onChange={(e) => setNewIngredient(e.currentTarget.value)}
