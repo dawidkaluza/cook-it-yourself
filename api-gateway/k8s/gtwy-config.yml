@@ -3,7 +3,8 @@ kind: ConfigMap
 metadata:
   name: gtwy-config
 data:
-  USER_SERVICE_URL: "http://user-service:8080"
+  API_GATEWAY_URL: "http://ciy.localhost:8080/api"
+  USER_SERVICE_SERVER_URL: "http://user-service:8080"
   USER_SERVICE_CLIENT_URL: "http://auth.ciy.localhost:8080"
   KITCHEN_SERVICE_URL: "http://kitchen-service:8080"
   WEB_APP_URL: "http://ciy.localhost:3000"

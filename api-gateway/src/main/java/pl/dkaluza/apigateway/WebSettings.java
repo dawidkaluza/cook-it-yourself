@@ -8,22 +8,36 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties("ciy.web")
 class WebSettings {
-    private String userServiceUrl;
+    private String apiGatewayUrl;
+
+    private String userServiceServerUrl;
 
     private String userServiceClientUrl;
+
+    private String userServiceClientSecret;
 
     private String kitchenServiceUrl;
 
     private String webAppUrl;
 
+    private String webAppSignInPage;
+
     private List<String> corsAllowedOrigins;
 
-    public String getUserServiceUrl() {
-        return userServiceUrl;
+    public String getApiGatewayUrl() {
+        return apiGatewayUrl;
     }
 
-    public void setUserServiceUrl(String userServiceUrl) {
-        this.userServiceUrl = userServiceUrl;
+    public void setApiGatewayUrl(String apiGatewayUrl) {
+        this.apiGatewayUrl = apiGatewayUrl;
+    }
+
+    public String getUserServiceServerUrl() {
+        return userServiceServerUrl;
+    }
+
+    public void setUserServiceServerUrl(String userServiceServerUrl) {
+        this.userServiceServerUrl = userServiceServerUrl;
     }
 
     public String getUserServiceClientUrl() {
@@ -32,6 +46,14 @@ class WebSettings {
 
     public void setUserServiceClientUrl(String userServiceClientUrl) {
         this.userServiceClientUrl = userServiceClientUrl;
+    }
+
+    public String getUserServiceClientSecret() {
+        return userServiceClientSecret;
+    }
+
+    public void setUserServiceClientSecret(String userServiceClientSecret) {
+        this.userServiceClientSecret = userServiceClientSecret;
     }
 
     public String getKitchenServiceUrl() {
@@ -48,6 +70,18 @@ class WebSettings {
 
     public void setWebAppUrl(String webAppUrl) {
         this.webAppUrl = webAppUrl;
+    }
+
+    public String getWebAppSignInPage() {
+        return webAppSignInPage;
+    }
+
+    public String getWebAppSignInUrl() {
+        return webAppUrl + webAppSignInPage;
+    }
+
+    public void setWebAppSignInPage(String webAppSignInPage) {
+        this.webAppSignInPage = webAppSignInPage;
     }
 
     public List<String> getCorsAllowedOrigins() {

@@ -37,29 +37,29 @@ class WebSecurityConfig {
                 cors.configurationSource(source);
             })
             .csrf(CsrfConfigurer::disable)
-            .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(webSettings.getWebAppUrl() + "/sign-in?success")) // todo make the suffix configurable
+            .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(webSettings.getWebAppSignInUrl()))
             .oauth2Client(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .build();
     }
 
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository(Oauth2Settings oauth2Settings) {
+    public ClientRegistrationRepository clientRegistrationRepository(WebSettings webSettings) {
         return new InMemoryClientRegistrationRepository(
-            ClientRegistration.withRegistrationId(oauth2Settings.getRegistrationId())
-                .clientId(oauth2Settings.getClientId())
-                .clientSecret(oauth2Settings.getClientSecret())
-                .clientName(oauth2Settings.getClientName())
+            ClientRegistration.withRegistrationId("ciy")
+                .clientId("api-gateway")
+                .clientSecret(webSettings.getUserServiceClientSecret())
+                .clientName("API Gateway")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .scope(OidcScopes.OPENID)
-                .issuerUri(oauth2Settings.getAuthServerUrl())
-                .authorizationUri(oauth2Settings.getAuthServerClientUrl() + "/oauth2/authorize")
-                .tokenUri(oauth2Settings.getAuthServerUrl() + "/oauth2/token")
-                .jwkSetUri(oauth2Settings.getAuthServerUrl() + "/oauth2/jwks")
-                .userInfoUri(oauth2Settings.getAuthServerUrl() + "/userinfo")
+                .issuerUri(webSettings.getUserServiceServerUrl())
+                .authorizationUri(webSettings.getUserServiceClientUrl() + "/oauth2/authorize")
+                .tokenUri(webSettings.getUserServiceServerUrl() + "/oauth2/token")
+                .jwkSetUri(webSettings.getUserServiceServerUrl() + "/oauth2/jwks")
+                .userInfoUri(webSettings.getUserServiceServerUrl() + "/userinfo")
                 .userNameAttributeName(IdTokenClaimNames.SUB)
-                .redirectUri("{baseUrl}/api/login/oauth2/code/{registrationId}") // TODO make this /api/ prerfix configurable
+                .redirectUri(webSettings.getApiGatewayUrl() + "/login/oauth2/code/{registrationId}")
                 .build()
         );
     }
