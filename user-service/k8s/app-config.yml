@@ -11,4 +11,3 @@ data:
   REDIS_HOST: "user-service-redis"
   REDIS_PORT: "6379"
   API_GATEWAY_URL: "http://ciy.localhost:8080/api"
-  CIY_OAUTH2_CLIENT_ORIGINS: "http://ciy.localhost:8080/"

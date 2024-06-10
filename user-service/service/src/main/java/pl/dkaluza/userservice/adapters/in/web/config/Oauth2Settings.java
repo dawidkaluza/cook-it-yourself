@@ -21,14 +21,19 @@ class Oauth2Settings {
     private String clientSecret;
 
     /**
-     * Client redirect URI, it's where users will be redirected with authorization code generated for the client.
+     * URL where client is accessed by resource owners.
      */
-    private String redirectUri;
+    private String clientUrl;
 
     /**
-     * Client sign out URI, it's where users will be redirected after signing out at authorization server.
+     * Path where resource owners will be redirected with code during authorization code flow.
      */
-    private String signOutUri;
+    private String redirectPath;
+
+    /**
+     * Path where resource owners will be redirected after signing out.
+     */
+    private String signOutPath;
 
     /**
      * Client origins - allowed origins for CORS policy.
@@ -51,20 +56,36 @@ class Oauth2Settings {
         this.clientSecret = clientSecret;
     }
 
-    public String getRedirectUri() {
-        return redirectUri;
+    public String getClientUrl() {
+        return clientUrl;
     }
 
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
+    public void setClientUrl(String clientUrl) {
+        this.clientUrl = clientUrl;
+    }
+
+    public String getRedirectPath() {
+        return redirectPath;
+    }
+
+    public void setRedirectPath(String redirectPath) {
+        this.redirectPath = redirectPath;
+    }
+
+    public String getRedirectUri() {
+        return clientUrl + redirectPath;
+    }
+
+    public String getSignOutPath() {
+        return signOutPath;
+    }
+
+    public void setSignOutPath(String signOutPath) {
+        this.signOutPath = signOutPath;
     }
 
     public String getSignOutUri() {
-        return signOutUri;
-    }
-
-    public void setSignOutUri(String signOutUri) {
-        this.signOutUri = signOutUri;
+        return clientUrl + signOutPath;
     }
 
     public List<String> getClientOrigins() {

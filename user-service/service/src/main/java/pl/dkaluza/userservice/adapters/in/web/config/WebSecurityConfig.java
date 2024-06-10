@@ -215,7 +215,7 @@ class WebSecurityConfig {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(Oauth2Settings oauth2Settings) {
-        RegisteredClient webappClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        var client = RegisteredClient.withId(UUID.randomUUID().toString())
             .clientId(oauth2Settings.getClientId())
             .clientSecret(oauth2Settings.getClientSecret())
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -227,7 +227,7 @@ class WebSecurityConfig {
             .postLogoutRedirectUri(oauth2Settings.getSignOutUri())
             .build();
 
-        return new InMemoryRegisteredClientRepository(webappClient);
+        return new InMemoryRegisteredClientRepository(client);
     }
 
     @Bean
