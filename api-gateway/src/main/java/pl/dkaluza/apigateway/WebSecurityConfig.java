@@ -39,7 +39,10 @@ class WebSecurityConfig {
             .csrf(CsrfConfigurer::disable)
             .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(webSettings.getWebAppSignInUrl()))
             .oauth2Client(Customizer.withDefaults())
-            .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/kitchen/**").permitAll()
+                .anyRequest().authenticated()
+            )
             .build();
     }
 
