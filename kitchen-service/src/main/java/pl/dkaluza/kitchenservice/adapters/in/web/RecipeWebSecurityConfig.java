@@ -1,5 +1,6 @@
 package pl.dkaluza.kitchenservice.adapters.in.web;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -9,8 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.dkaluza.kitchenservice.adapters.config.WebSettings;
 
 @Configuration
@@ -20,21 +19,13 @@ class RecipeWebSecurityConfig {
         http
             .securityMatcher("/recipe/**")
             .cors(CorsConfigurer::disable)
-//            .cors(cors -> {
-//                var config = new CorsConfiguration();
-//                config.addAllowedHeader("*");
-//                config.addAllowedMethod("*");
-//                config.setAllowedOrigins(webSettings.getCorsAllowedOrigins());
-//                config.setAllowCredentials(true);
-//
-//                var source = new UrlBasedCorsConfigurationSource();
-//                source.registerCorsConfiguration("/**", config);
-//
-//                cors.configurationSource(source);
-//            })
             .csrf(CsrfConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(handler -> handler.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
+            .exceptionHandling(handler ->
+                handler
+                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                    .accessDeniedHandler((req, res, exc) -> res.sendError(HttpServletResponse.SC_FORBIDDEN))
+            )
             .authorizeHttpRequests(authorize ->
                 authorize.anyRequest().authenticated()
             ).oauth2ResourceServer(oauth2 ->
