@@ -1,5 +1,5 @@
 
-type Recipe = {
+export type Recipe = {
   id: number | undefined;
   name: string;
   description: string;
@@ -9,21 +9,19 @@ type Recipe = {
   portionSize: PortionSize;
 };
 
-type Ingredient = {
+export type Ingredient = {
   id: number | undefined;
   name: string;
   value: string;
   measure: string;
 };
 
-type Step = {
+export type Step = {
   id: number | undefined;
   text: string;
 };
 
-type PortionSize = {
+export type PortionSize = {
   value: string;
   measure: string;
 };
-
-export { Recipe, Ingredient, Step, PortionSize };
