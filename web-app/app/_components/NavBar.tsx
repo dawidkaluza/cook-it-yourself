@@ -53,13 +53,14 @@ const NavBarItem = ({
 };
 
 const SignInButton = () => {
+  // noinspection HtmlUnknownTarget
   return (
-    <a
-      href={process.env.API_GATEWAY_CLIENT_URL + "/oauth2/authorization/ciy"}
+    <Link
+      href="/sign-in"
       className="btn btn-primary btn-sm"
     >
       Sign in
-    </a>
+    </Link>
   );
 };
 

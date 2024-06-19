@@ -1,4 +1,14 @@
-function fetchApi(endpoint: string, method?: string, body?: any, headers?: object): Promise<any> {
+import {redirect} from "next/navigation";
+
+type ApiRequest = {
+  endpoint: string;
+  method?: string;
+  body?: any;
+  headers?: object;
+  ignoreAuth?: boolean;
+};
+
+function fetchApi({ endpoint, method, body, headers, ignoreAuth } : ApiRequest): Promise<any> {
   return new Promise((resolve, reject) => {
     let baseUrl;
 
@@ -26,25 +36,33 @@ function fetchApi(endpoint: string, method?: string, body?: any, headers?: objec
           resolve(null);
         } else {
           response.json()
-            .then(data => resolve(JSON.parse(data)));
+            .then(data => {
+              resolve(data)
+            });
         }
       } else {
         switch (response.status) {
           case 401: {
-            console.error("Unauthorized");
-            reject({
-              unauthorized: true,
-              response,
-            });
+            if (ignoreAuth) {
+              reject({
+                unauthorized: true,
+                response,
+              });
+            } else {
+              redirect("/sign-in");
+            }
             break;
           }
 
           case 403: {
-            console.error("Access denied");
-            reject({
-              accessDenied: true,
-              response,
-            });
+            if (ignoreAuth) {
+              reject({
+                accessDenied: true,
+                response,
+              });
+            } else {
+              redirect("/sign-in");
+            }
             break;
           }
 

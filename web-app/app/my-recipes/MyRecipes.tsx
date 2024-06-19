@@ -1,7 +1,7 @@
-"use client"
-
-import {Suspense, useEffect, useState} from 'react'
+import {Suspense} from 'react'
 import Link from "next/link";
+import {fetchApi} from "@/app/_api/fetchApi";
+import {cookies} from "next/headers";
 
 type PageResponse<T> = {
   items: [T];
@@ -42,30 +42,19 @@ const MyRecipesSkeleton = () => {
   )
 };
 
-const getData = async () : Promise<PageResponse<Recipe>> => {
-  const response = await fetch("http://ciy.localhost:8080/api/kitchen/recipe", {
-    method: "GET",
-    credentials: "include",
+const getMyRecipes = async () : Promise<PageResponse<Recipe>> => {
+  const cookieStore = cookies();
+  return await fetchApi({
+    endpoint: "/kitchen/recipe",
     headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
+      "Cookie": cookieStore.toString()
     }
-  });
-
-  return await response.json();
+  }) as PageResponse<Recipe>;
 };
 
-const MyRecipesList = () => {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-
-  useEffect(() => {
-    async function loadData() {
-      const initialRecipes = await getData();
-      setRecipes(initialRecipes.items);
-    }
-
-    loadData();
-  }, []);
+const MyRecipesList = async () => {
+  const recipesResponse = await getMyRecipes();
+  const recipes = recipesResponse.items;
 
   return (
     <div className="container-fluid">

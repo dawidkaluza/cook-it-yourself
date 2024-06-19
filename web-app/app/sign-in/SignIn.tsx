@@ -12,8 +12,9 @@ export const SignIn = () => {
   useEffect(() => {
     if (searchParams.has('success')) {
       signIn();
+      router.push("/");
+    } else {
+      router.push(process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL + "/oauth2/authorization/ciy");
     }
-
-    router.push("/");
   }, []);
 };
