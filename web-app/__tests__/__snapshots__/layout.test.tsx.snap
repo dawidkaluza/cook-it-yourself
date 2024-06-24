@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`layout component > renders 1`] = `
+<div>
+  <html
+    data-bs-theme="dark"
+    lang="en"
+  >
+    <body>
+      <nav
+        class="navbar navbar-expand bg-body-tertiary"
+      >
+        <div
+          class="container-fluid text-center"
+        >
+          <a
+            class="navbar-brand"
+            href="/"
+          >
+            Cook it yourself
+          </a>
+          <a
+            class="btn btn-primary btn-sm"
+            href="/sign-in"
+          >
+            Sign in
+          </a>
+        </div>
+      </nav>
+      <main
+        style="margin: 1em;"
+      >
+        <p
+          class="text-center"
+        >
+          Welcome my cook! Use navigation above to start your cooking journey.
+        </p>
+      </main>
+    </body>
+  </html>
+</div>
+`;
