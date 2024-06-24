@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Main component > renders 1`] = `
+<div>
+  <main
+    style="margin: 1em;"
+  >
+    <p>
+      Main page
+    </p>
+  </main>
+</div>
+`;
