@@ -1,8 +1,7 @@
-import {beforeEach, describe, expect, test, vi} from 'vitest'
+import {describe, expect, Mock, test, vi} from 'vitest'
 import {NavBar} from "@/app/_components/NavBar";
 import {render, screen} from "@testing-library/react";
 import {isSignedIn} from "@/app/_api/actions";
-import {Mock} from "node:test";
 
 vi.mock("@/app/_api/actions", async (importOriginal) => {
   const mod = await importOriginal<typeof import("@/app/_api/actions")>();
@@ -16,7 +15,7 @@ vi.mock("@/app/_api/actions", async (importOriginal) => {
 describe('NavBar component', () => {
   test('render when signed out', () => {
     // Given
-    (isSignedIn as Mock<any>).mockImplementation(() => false);
+    (isSignedIn as Mock).mockImplementation(() => false);
 
     // When
     const navBar = render(<NavBar />);
@@ -39,7 +38,7 @@ describe('NavBar component', () => {
 
   test('render when signed in', () => {
     // Given
-    (isSignedIn as Mock<any>).mockImplementation(() => true);
+    (isSignedIn as Mock).mockImplementation(() => true);
 
     // When
     const navBar = render(<NavBar />);
