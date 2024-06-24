@@ -14,19 +14,48 @@ vi.mock("@/app/_api/actions", async (importOriginal) => {
 });
 
 describe('NavBar component', () => {
-  test('render when not signed in', () => {
+  test('render when signed out', () => {
     // Given
     (isSignedIn as Mock<any>).mockImplementation(() => false);
 
     // When
-    render(<NavBar />);
+    const navBar = render(<NavBar />);
 
     // Then
+    const indexLink = screen.queryByRole("link", { name: "Cook it yourself" });
+    expect(indexLink).not.toBeNull();
+    expect(indexLink?.getAttribute("href")).toBe("/");
+
     const signInLink = screen.queryByRole("link", { name: "Sign in"});
     expect(signInLink).not.toBeNull();
-    expect(signInLink?.getAttribute("href")).toBe("/sign-in")
+    expect(signInLink?.getAttribute("href")).toBe("/sign-in");
 
     const navBarMenu = screen.queryByRole('list');
     expect(navBarMenu).toBeNull();
-  })
+
+    expect(navBar.container).toMatchSnapshot();
+    navBar.unmount();
+  });
+
+  test('render when signed in', () => {
+    // Given
+    (isSignedIn as Mock<any>).mockImplementation(() => true);
+
+    // When
+    const navBar = render(<NavBar />);
+
+    // Then
+    const indexLink = screen.queryByRole("link", { name: "Cook it yourself" });
+    expect(indexLink).not.toBeNull();
+    expect(indexLink?.getAttribute("href")).toBe("/");
+
+    const signInLink = screen.queryByRole("link", { name: "Sign in"});
+    expect(signInLink).toBeNull();
+
+    const navBarMenu = screen.queryByRole('list');
+    expect(navBarMenu).not.toBeNull();
+
+    expect(navBar.container).toMatchSnapshot();
+    navBar.unmount();
+  });
 });
