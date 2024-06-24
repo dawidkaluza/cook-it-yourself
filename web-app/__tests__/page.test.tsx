@@ -1,15 +1,15 @@
-import { expect, test } from 'vitest'
+import {describe, expect, test} from 'vitest'
 import {render, screen} from "@testing-library/react";
 import Page from "@/app/page";
 
-test('Page has welcome message', () => {
-  render(<Page />);
+describe("page component", () => {
+  test("render", () => {
+    // Given, when
+    const page = render(<Page />);
 
-  const welcomeText = screen.queryByText(/Welcome my cook/);
-  expect(welcomeText).toBeDefined();
+    // Then
+    const welcomeText = screen.queryByText(/Welcome my cook/);
+    expect(welcomeText).not.toBeNull();
+    expect(page.container).toMatchSnapshot();
+  })
 });
-
-test('Page matches existing snapshot', () => {
-  const page = render(<Page />);
-  expect(page.container).toMatchSnapshot();
-})
