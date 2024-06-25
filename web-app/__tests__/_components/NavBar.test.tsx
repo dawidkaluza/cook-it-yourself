@@ -1,13 +1,10 @@
 import {describe, expect, Mock, test, vi} from 'vitest'
 import {NavBar} from "@/app/_components/NavBar";
 import {render, screen} from "@testing-library/react";
-import {isSignedIn} from "@/app/_api/actions";
+import {isSignedIn} from "@/app/_api/auth";
 
-vi.mock("@/app/_api/actions", async (importOriginal) => {
-  const mod = await importOriginal<typeof import("@/app/_api/actions")>();
-
+vi.mock("@/app/_api/auth", () => {
   return {
-    ...mod,
     isSignedIn: vi.fn(),
   };
 });

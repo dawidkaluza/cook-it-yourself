@@ -3,11 +3,8 @@ import {render, screen} from "@testing-library/react";
 import RootLayout from "@/app/layout";
 import Page from "@/app/page";
 
-vi.mock("@/app/_api/actions", async (importOriginal) => {
-  const mod = await importOriginal<typeof import("@/app/_api/actions")>();
-
+vi.mock("@/app/_api/auth", () => {
   return {
-    ...mod,
     isSignedIn: () => false,
   };
 });

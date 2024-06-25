@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import {isSignedIn} from "@/app/_api/actions";
 import {NavBarMenu} from "@/app/_components/NavBarMenu";
+import {isSignedIn} from "@/app/_api/auth";
 
 const NavBar = () => {
   const signedIn = isSignedIn();
