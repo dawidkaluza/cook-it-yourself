@@ -1,0 +1,128 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MyRecipesList component > renders with my recipes 1`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row"
+    >
+      <div
+        class="col"
+      >
+        <h1>
+          My recipes
+        </h1>
+      </div>
+    </div>
+    <div
+      class="row row-cols-1 row-cols-md-2"
+    >
+      <div
+        class="col"
+        style="margin: 2em 0px;"
+      >
+        <div
+          class="card"
+        >
+          <div
+            class="card-body"
+          >
+            <h5
+              class="card-title"
+            >
+              Boiled sausages
+            </h5>
+            <p
+              class="card-text"
+            >
+              How to boil delicious sausages
+            </p>
+            <a
+              class="card-link"
+              href="#"
+            >
+              See more
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="row justify-content-end"
+    >
+      <div
+        class="col-12"
+      >
+        <hr />
+      </div>
+      <div
+        class="col-3"
+      >
+        <a
+          class="btn btn-success"
+          href="/my-recipes/add"
+        >
+          Add recipe
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MyRecipesList component > renders with no recipes 1`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row"
+    >
+      <div
+        class="col"
+      >
+        <h1>
+          My recipes
+        </h1>
+      </div>
+    </div>
+    <div
+      class="row"
+    >
+      <div
+        class="col"
+      >
+        <p
+          class="text-center"
+        >
+          No recipes found.
+        </p>
+      </div>
+    </div>
+    <div
+      class="row row-cols-1 row-cols-md-2"
+    />
+    <div
+      class="row justify-content-end"
+    >
+      <div
+        class="col-12"
+      >
+        <hr />
+      </div>
+      <div
+        class="col-3"
+      >
+        <a
+          class="btn btn-success"
+          href="/my-recipes/add"
+        >
+          Add recipe
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+`;
