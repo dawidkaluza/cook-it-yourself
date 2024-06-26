@@ -9,17 +9,10 @@ type ApiRequest = {
   ignoreAuth?: boolean;
 };
 
-function fetchApi({ endpoint, method, body, headers, ignoreAuth } : ApiRequest): Promise<any> {
+type InternalApiRequest = ApiRequest & { baseUrl: string };
+
+function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : InternalApiRequest): Promise<any> {
   return new Promise((resolve, reject) => {
-    let baseUrl;
-
-    const isClient = typeof window !== 'undefined';
-    if (isClient) {
-      baseUrl = process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL;
-    } else {
-      baseUrl = process.env.API_GATEWAY_SERVER_URL;
-    }
-
     fetch(
       baseUrl + endpoint,
       {
@@ -81,8 +74,14 @@ function fetchApi({ endpoint, method, body, headers, ignoreAuth } : ApiRequest):
 
 export async function fetchFromServer(request : ApiRequest) {
   const { headers } = request;
+  const baseUrl = process.env.API_GATEWAY_SERVER_URL;
+  if (!baseUrl) {
+    throw new Error("API_GATEWAY_SERVER_URL env var not defined");
+  }
+
   return await fetchApi({
     ...request,
+    baseUrl,
     headers: {
       ...headers,
       "Cookie": cookies().toString()
@@ -91,5 +90,13 @@ export async function fetchFromServer(request : ApiRequest) {
 };
 
 export async function fetchFromClient(request : ApiRequest) {
-  return await fetchApi(request);
+  const baseUrl = process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL;
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_API_GATEWAY_CLIENT_URL env var not defined");
+  }
+
+  return await fetchApi({
+    ...request,
+    baseUrl,
+  });
 }
