@@ -1,4 +1,5 @@
 import {redirect} from "next/navigation";
+import {cookies} from "next/headers";
 
 type ApiRequest = {
   endpoint: string;
@@ -78,4 +79,17 @@ function fetchApi({ endpoint, method, body, headers, ignoreAuth } : ApiRequest):
   });
 }
 
-export { fetchApi };
+export async function fetchFromServer(request : ApiRequest) {
+  const { headers } = request;
+  return await fetchApi({
+    ...request,
+    headers: {
+      ...headers,
+      "Cookie": cookies().toString()
+    }
+  });
+};
+
+export async function fetchFromClient(request : ApiRequest) {
+  return await fetchApi(request);
+}

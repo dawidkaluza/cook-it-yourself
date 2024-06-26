@@ -1,4 +1,4 @@
-import {MyRecipes} from "@/app/my-recipes/MyRecipes";
+import {MyRecipes} from "@/app/my-recipes/_components/MyRecipes";
 
 const Page = () => {
   return (

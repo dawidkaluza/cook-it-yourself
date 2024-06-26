@@ -1,18 +1,6 @@
 import {Suspense} from 'react'
 import Link from "next/link";
-import {fetchApi} from "@/app/_api/fetchApi";
-import {cookies} from "next/headers";
-
-type PageResponse<T> = {
-  items: [T];
-  totalPages: number;
-};
-
-type Recipe = {
-  id: number;
-  name: string;
-  description: string;
-};
+import {getMyRecipes} from "@/app/my-recipes/actions";
 
 export const MyRecipes = () => {
   return (
@@ -42,14 +30,22 @@ const MyRecipesSkeleton = () => {
   )
 };
 
-const getMyRecipes = async () : Promise<PageResponse<Recipe>> => {
-  const cookieStore = cookies();
-  return await fetchApi({
-    endpoint: "/kitchen/recipe",
-    headers: {
-      "Cookie": cookieStore.toString()
-    }
-  }) as PageResponse<Recipe>;
+const RecipeCardSkeleton = () => {
+  return (
+    <div className="card">
+      <div className="card-body">
+        <h5 className="card-title placeholder-wave">
+          <span className="placeholder col-3"></span>
+        </h5>
+        <p className="card-text placeholder-wave">
+          <span className="placeholder col-8"></span>
+        </p>
+        <a href="#" className="card-link placeholder-wave">
+          <span className="placeholder col-1"></span>
+        </a>
+      </div>
+    </div>
+  );
 };
 
 const MyRecipesList = async () => {
@@ -101,24 +97,6 @@ const RecipeCard = (
         <h5 className="card-title">{recipe.name}</h5>
         <p className="card-text">{recipe.description}</p>
         <a href="#" className="card-link">See more</a>
-      </div>
-    </div>
-  );
-};
-
-const RecipeCardSkeleton = () => {
-  return (
-    <div className="card">
-      <div className="card-body">
-        <h5 className="card-title placeholder-wave">
-          <span className="placeholder col-3"></span>
-        </h5>
-        <p className="card-text placeholder-wave">
-          <span className="placeholder col-8"></span>
-        </p>
-        <a href="#" className="card-link placeholder-wave">
-          <span className="placeholder col-1"></span>
-        </a>
       </div>
     </div>
   );
