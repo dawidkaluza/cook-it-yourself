@@ -69,4 +69,6 @@ describe("MyRecipesList component", () => {
     expect(recipesComponent.container).toMatchSnapshot();
     recipesComponent.unmount();
   });
+
+  // TODO impl tests for pagination
 });

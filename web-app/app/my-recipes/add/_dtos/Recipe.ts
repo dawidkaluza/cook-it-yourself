@@ -1,6 +1,6 @@
 
 export type Recipe = {
-  id: number | undefined;
+  id?: number;
   name: string;
   description: string;
   ingredients: Ingredient[];
@@ -10,14 +10,14 @@ export type Recipe = {
 };
 
 export type Ingredient = {
-  id: number | undefined;
+  id?: number;
   name: string;
   value: string;
   measure: string;
 };
 
 export type Step = {
-  id: number | undefined;
+  id?: number;
   text: string;
 };
 

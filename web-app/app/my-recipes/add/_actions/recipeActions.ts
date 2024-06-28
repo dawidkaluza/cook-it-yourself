@@ -1,6 +1,6 @@
 "use server";
 
-import {Recipe} from "@/app/my-recipes/add/_domain/Recipe";
+import {Recipe} from "@/app/my-recipes/add/_dtos/Recipe";
 import {cookies} from "next/headers";
 
 export const addRecipe = async (formData: FormData) : Promise<Recipe> => {
