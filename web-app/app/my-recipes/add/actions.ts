@@ -5,8 +5,12 @@ import {ApiError, fetchFromServer} from "@/app/_api/fetch";
 import {number} from "prop-types";
 import {redirect} from "next/navigation";
 
-export async function addRecipe(formData: FormData) {
-  console.log("Send addRecipe request");
+type FieldError = {
+  name: string;
+  message: string;
+};
+
+export async function addRecipe(prevState: any, formData: FormData) {
   const mapToIngredients = (formData: FormData) => {
     const ingredientsNames = formData.getAll("ingredientName");
     const ingredientsAmounts = formData.getAll("ingredientAmount");
@@ -82,12 +86,33 @@ export async function addRecipe(formData: FormData) {
   } catch (error) {
     if (error instanceof ApiError) {
       const response = error.response;
+
+      // TODO cover other possible client errors
       if (response.status === 422) {
         const body = await response.json();
-        console.log("Error fields", body);
-
-        // TODO map error fields to FieldErrors object
+        const fields = body.fields as Array<FieldError>
+        return fields.map(field => {
+          const name = field.name;
+          const message = field.message;
+          const indexOfDot = name.indexOf(".");
+          if (indexOfDot === -1) {
+            return {
+              name,
+              message
+            }
+          } else {
+            const mainName = name.slice(0, indexOfDot);
+            return {
+              name: mainName,
+              message
+            };
+          }
+        });
       }
+
+      return [];
     }
+
+    throw error;
   }
 }
