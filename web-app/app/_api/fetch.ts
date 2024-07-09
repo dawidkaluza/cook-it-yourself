@@ -11,6 +11,22 @@ type ApiRequest = {
 
 type InternalApiRequest = ApiRequest & { baseUrl: string };
 
+export class ApiError extends Error {
+  private _response : Response
+  constructor(response : Response) {
+    super("Client error " + response.status);
+    this._response = response;
+  }
+
+  get response(): Response {
+    return this._response;
+  }
+
+  set response(value: Response) {
+    this._response = value;
+  }
+}
+
 function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : InternalApiRequest): Promise<any> {
   return new Promise((resolve, reject) => {
     fetch(
@@ -38,10 +54,7 @@ function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : Int
         switch (response.status) {
           case 401: {
             if (ignoreAuth) {
-              reject({
-                unauthorized: true,
-                response,
-              });
+              reject(new ApiError(response));
             } else {
               redirect("/sign-in");
             }
@@ -50,10 +63,7 @@ function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : Int
 
           case 403: {
             if (ignoreAuth) {
-              reject({
-                accessDenied: true,
-                response,
-              });
+              reject(new ApiError(response));
             } else {
               redirect("/sign-in");
             }
@@ -61,7 +71,7 @@ function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : Int
           }
 
           default: {
-            reject({ response });
+            reject(new ApiError(response) );
             break;
           }
         }
@@ -87,7 +97,7 @@ export async function fetchFromServer(request : ApiRequest) {
       "Cookie": cookies().toString()
     }
   });
-};
+}
 
 export async function fetchFromClient(request : ApiRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL;

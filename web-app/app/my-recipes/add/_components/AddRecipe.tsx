@@ -5,7 +5,7 @@ import {MethodStepsInput} from "@/app/my-recipes/add/_components/MethodStepsInpu
 import {CookingTimeInput} from "@/app/my-recipes/add/_components/CookingTimeInput";
 import {PortionSizeInput} from "@/app/my-recipes/add/_components/PortionSizeInput";
 import {FormButtons} from "@/app/my-recipes/add/_components/FormButtons";
-import {addRecipe} from "@/app/my-recipes/add/_actions/recipeActions";
+import {addRecipe} from "@/app/my-recipes/add/actions";
 
 const AddRecipe = () => {
   return (

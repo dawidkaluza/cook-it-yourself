@@ -70,17 +70,17 @@ const IngredientsInput = () => {
           <div key={ingredient.id} className="row">
             <div className="input-group">
               <input
-                name="ingredient_name" defaultValue={ingredient.name}
+                name="ingredientName" defaultValue={ingredient.name}
                 className="form-control" placeholder="Name" style={{minWidth: "60%"}}
               />
 
               <input
-                name="ingredient_amount" defaultValue={ingredient.amount}
+                name="ingredientAmount" defaultValue={ingredient.amount}
                 className="form-control" placeholder="Amount" style={{minWidth: "20%"}}
               />
 
               <input
-                name="ingredient_unit" defaultValue={ingredient.unit}
+                name="ingredientUnit" defaultValue={ingredient.unit}
                 className="form-control" placeholder="Unit"
               />
 
