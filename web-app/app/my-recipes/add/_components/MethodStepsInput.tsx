@@ -65,7 +65,12 @@ const MethodStepsInput = () => {
               placeholder="Instructions step-by-step to cook your recipe"
               style={{height: "100px"}}
               onChange={(e) => setNewStep(e.currentTarget.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addStep()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addStep();
+                }
+              }}
             />
 
             <div className="input-group-text">

@@ -14,7 +14,7 @@ type InternalApiRequest = ApiRequest & { baseUrl: string };
 export class ApiError extends Error {
   private _response : Response
   constructor(response : Response) {
-    super("Client error " + response.status);
+    super("Api error " + response.status);
     this._response = response;
   }
 

@@ -100,7 +100,12 @@ const IngredientsInput = () => {
               value={newIngredient}
               placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
               onChange={(e) => setNewIngredient(e.currentTarget.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addNewIngredient()}
+              onKeyDown={(e) => {
+                if(e.key === 'Enter') {
+                  e.preventDefault();
+                  addNewIngredient();
+                }
+              }}
             />
             <button className="btn btn-success" type="button" onClick={() => addNewIngredient()}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
