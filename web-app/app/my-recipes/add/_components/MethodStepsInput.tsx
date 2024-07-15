@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react";
+import React, {useState} from "react";
 import {FieldError} from "@/app/my-recipes/add/actions";
 
 type MethodStep = {
@@ -62,13 +62,6 @@ const MethodStepsInput = ({ fieldErrors} : Props) => {
             </div>
           </div>
         ))}
-        {fieldErrors.map(fieldError => {
-          return (
-            <div className="invalid-feedback" key={fieldError.message}>
-              {fieldError.message}
-            </div>
-          )
-        })}
 
         <div className="row">
           <div className="input-group">
@@ -85,7 +78,6 @@ const MethodStepsInput = ({ fieldErrors} : Props) => {
                 }
               }}
             />
-
             <div className="input-group-text">
               <button className="btn btn-sm btn-success" type="button" onClick={() => addStep()}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -97,9 +89,19 @@ const MethodStepsInput = ({ fieldErrors} : Props) => {
             </div>
           </div>
         </div>
+
+        <div className="row">
+          {fieldErrors.map(fieldError => {
+            return (
+              <div key={fieldError.message} className="invalid-feedback d-block">
+                {fieldError.message}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   );
 };
 
-export { MethodStepsInput };
+export {MethodStepsInput};

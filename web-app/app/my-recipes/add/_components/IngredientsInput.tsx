@@ -101,13 +101,6 @@ const IngredientsInput = ({ fieldErrors } : Props) => {
             </div>
           </div>
         ))}
-        {fieldErrors.map(fieldError => {
-          return (
-            <div key={fieldError.message} className="invalid-feedback">
-              {fieldError.message}
-            </div>
-          )
-        })}
         <div className="row">
           <div className="input-group">
             <input
@@ -116,7 +109,7 @@ const IngredientsInput = ({ fieldErrors } : Props) => {
               placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
               onChange={(e) => setNewIngredient(e.currentTarget.value)}
               onKeyDown={(e) => {
-                if(e.key === 'Enter') {
+                if (e.key === 'Enter') {
                   e.preventDefault();
                   addNewIngredient();
                 }
@@ -131,9 +124,18 @@ const IngredientsInput = ({ fieldErrors } : Props) => {
             </button>
           </div>
         </div>
+        <div className="row">
+          {fieldErrors.map(fieldError => {
+            return (
+              <div key={fieldError.message} className="invalid-feedback d-block">
+                {fieldError.message}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   );
 };
 
-export { IngredientsInput };
+export {IngredientsInput};
