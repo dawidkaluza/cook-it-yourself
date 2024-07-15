@@ -12,13 +12,13 @@ const DescriptionInput = ({ fieldErrors } : Props) => {
         <textarea
           name="description"
           id="description"
-          className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+          className="form-control"
           placeholder="A few words describing your recipe"
           style={{height: "100px"}}
         />
         {fieldErrors.map(fieldError => {
           return (
-            <div className="invalid-feedback" key={fieldError.message}>
+            <div className="invalid-feedback d-block" key={fieldError.message}>
               {fieldError.message}
             </div>
           )

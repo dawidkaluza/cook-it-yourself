@@ -12,12 +12,12 @@ const NameInput = ({ fieldErrors } : Props) => {
         <input
           name="name"
           id="name"
-          className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+          className="form-control"
           placeholder="Name of your new recipe"
         />
         {fieldErrors.map(fieldError => {
           return (
-            <div className="invalid-feedback" key={fieldError.message}>
+            <div className="invalid-feedback d-block" key={fieldError.message}>
               {fieldError.message}
             </div>
           )

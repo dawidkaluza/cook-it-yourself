@@ -45,7 +45,7 @@ const MethodStepsInput = ({ fieldErrors} : Props) => {
             <div className="input-group">
               <textarea
                 name="methodSteps"
-                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                className="form-control"
                 placeholder="Method step"
                 defaultValue={step.text}
                 style={{height: "100px"}}

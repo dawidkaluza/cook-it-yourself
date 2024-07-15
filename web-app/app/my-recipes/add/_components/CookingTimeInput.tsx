@@ -13,12 +13,12 @@ const CookingTimeInput = ({ fieldErrors } : Props) => {
           name="cookingTime"
           id="cookingTime"
           type="number"
-          className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+          className="form-control"
           placeholder="In minutes"
         />
         {fieldErrors.map(fieldError => {
           return (
-            <div className="invalid-feedback" key={fieldError.message}>
+            <div className="invalid-feedback d-block" key={fieldError.message}>
               {fieldError.message}
             </div>
           )

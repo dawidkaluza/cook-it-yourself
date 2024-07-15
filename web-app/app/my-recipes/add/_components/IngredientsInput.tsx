@@ -76,19 +76,19 @@ const IngredientsInput = ({ fieldErrors } : Props) => {
             <div className="input-group">
               <input
                 name="ingredientName" defaultValue={ingredient.name}
-                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                className="form-control"
                 placeholder="Name" style={{minWidth: "60%"}}
               />
 
               <input
                 name="ingredientAmount" defaultValue={ingredient.amount}
-                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                className="form-control"
                 placeholder="Amount" style={{minWidth: "20%"}}
               />
 
               <input
                 name="ingredientUnit" defaultValue={ingredient.unit}
-                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                className="form-control"
                 placeholder="Unit"
               />
 

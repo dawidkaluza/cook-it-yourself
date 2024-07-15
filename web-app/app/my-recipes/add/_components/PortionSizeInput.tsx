@@ -12,12 +12,12 @@ const PortionSizeInput = ({ fieldErrors } : Props) => {
         <input
           name="portionSize"
           id="portiomSize"
-          className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+          className="form-control"
           placeholder="Amount and unit (4 plates, 800g, etc.)"
         />
         {fieldErrors.map(fieldError => {
           return (
-            <div className="invalid-feedback" key={fieldError.message}>
+            <div className="invalid-feedback d-block" key={fieldError.message}>
               {fieldError.message}
             </div>
           )
