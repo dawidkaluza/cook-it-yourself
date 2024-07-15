@@ -5,7 +5,7 @@ import {ApiError, fetchFromServer} from "@/app/_api/fetch";
 import {number} from "prop-types";
 import {redirect} from "next/navigation";
 
-type FieldError = {
+export type FieldError = {
   name: string;
   message: string;
 };
