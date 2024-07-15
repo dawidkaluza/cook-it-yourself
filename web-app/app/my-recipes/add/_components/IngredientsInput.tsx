@@ -1,6 +1,11 @@
 "use client";
 
 import React, {useState} from "react";
+import {FieldError} from "@/app/my-recipes/add/actions";
+
+type Props = {
+  fieldErrors: FieldError[];
+};
 
 type Ingredient = {
   id: number;
@@ -9,7 +14,7 @@ type Ingredient = {
   unit: string;
 };
 
-const IngredientsInput = () => {
+const IngredientsInput = ({ fieldErrors } : Props) => {
   const [newIngredient, setNewIngredient] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
@@ -71,17 +76,20 @@ const IngredientsInput = () => {
             <div className="input-group">
               <input
                 name="ingredientName" defaultValue={ingredient.name}
-                className="form-control" placeholder="Name" style={{minWidth: "60%"}}
+                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                placeholder="Name" style={{minWidth: "60%"}}
               />
 
               <input
                 name="ingredientAmount" defaultValue={ingredient.amount}
-                className="form-control" placeholder="Amount" style={{minWidth: "20%"}}
+                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                placeholder="Amount" style={{minWidth: "20%"}}
               />
 
               <input
                 name="ingredientUnit" defaultValue={ingredient.unit}
-                className="form-control" placeholder="Unit"
+                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+                placeholder="Unit"
               />
 
               <button className="btn btn-outline-danger" type="button" onClick={() => deleteIngredient(ingredient.id)}>
@@ -93,6 +101,13 @@ const IngredientsInput = () => {
             </div>
           </div>
         ))}
+        {fieldErrors.map(fieldError => {
+          return (
+            <div key={fieldError.message} className="invalid-feedback">
+              {fieldError.message}
+            </div>
+          )
+        })}
         <div className="row">
           <div className="input-group">
             <input

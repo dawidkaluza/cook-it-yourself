@@ -1,13 +1,18 @@
 "use client"
 
 import {useState} from "react";
+import {FieldError} from "@/app/my-recipes/add/actions";
 
 type MethodStep = {
   id: number;
   text: string;
 };
 
-const MethodStepsInput = () => {
+type Props = {
+  fieldErrors: FieldError[];
+};
+
+const MethodStepsInput = ({ fieldErrors} : Props) => {
   const [newStep, setNewStep] = useState("");
   const [steps, setSteps] = useState<MethodStep[]>([]);
 
@@ -39,7 +44,8 @@ const MethodStepsInput = () => {
           <div key={step.id} className="row">
             <div className="input-group">
               <textarea
-                name="methodSteps" className="form-control"
+                name="methodSteps"
+                className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
                 placeholder="Method step"
                 defaultValue={step.text}
                 style={{height: "100px"}}
@@ -56,6 +62,13 @@ const MethodStepsInput = () => {
             </div>
           </div>
         ))}
+        {fieldErrors.map(fieldError => {
+          return (
+            <div className="invalid-feedback" key={fieldError.message}>
+              {fieldError.message}
+            </div>
+          )
+        })}
 
         <div className="row">
           <div className="input-group">

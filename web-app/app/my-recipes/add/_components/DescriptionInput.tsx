@@ -1,4 +1,3 @@
-
 import {FieldError} from "@/app/my-recipes/add/actions";
 
 type Props = {
@@ -12,9 +11,18 @@ const DescriptionInput = ({ fieldErrors } : Props) => {
       <div className="col-sm-10">
         <textarea
           name="description"
-          id="description" className="form-control" placeholder="A few words describing your recipe"
+          id="description"
+          className={!fieldErrors.length ? "form-control" : "form-control is-invalid"}
+          placeholder="A few words describing your recipe"
           style={{height: "100px"}}
         />
+        {fieldErrors.map(fieldError => {
+          return (
+            <div className="invalid-feedback" key={fieldError.message}>
+              {fieldError.message}
+            </div>
+          )
+        })}
       </div>
     </div>
   );

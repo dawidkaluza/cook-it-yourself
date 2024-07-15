@@ -15,12 +15,12 @@ const AddRecipeForm = () => {
 
   return (
     <form action={action} noValidate className="mt-4">
-      <NameInput fieldErrors={fieldErrors} />
-      <DescriptionInput fieldErrors={fieldErrors} />
-      <IngredientsInput />
-      <MethodStepsInput />
-      <CookingTimeInput />
-      <PortionSizeInput />
+      <NameInput fieldErrors={fieldErrors.filter(error => error.name.startsWith("name"))} />
+      <DescriptionInput fieldErrors={fieldErrors.filter(error => error.name.startsWith("description"))} />
+      <IngredientsInput fieldErrors={fieldErrors.filter(error => error.name.startsWith("ingredient"))} />
+      <MethodStepsInput fieldErrors={fieldErrors.filter(error => error.name.startsWith("methodStep"))} />
+      <CookingTimeInput fieldErrors={fieldErrors.filter(error => error.name.startsWith("cookingTime"))} />
+      <PortionSizeInput fieldErrors={fieldErrors.filter(error => error.name.startsWith("portionSize"))} />
       <FormButtons/>
     </form>
   );
