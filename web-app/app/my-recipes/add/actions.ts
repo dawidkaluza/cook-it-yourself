@@ -1,6 +1,6 @@
 "use server";
 
-import {Ingredient, PortionSize, Recipe, Step} from "@/app/my-recipes/add/_dtos/Recipe";
+import {Ingredient, PortionSize, Recipe, Step} from "@/app/my-recipes/add/_dtos/recipe";
 import {ApiError, fetchFromServer} from "@/app/_api/fetch";
 import {redirect} from "next/navigation";
 
@@ -117,5 +117,5 @@ export async function addRecipe(prevState: any, formData: FormData) : Promise<Fi
     throw error;
   }
 
-  throw new Error("Couldn't process the request")
+  throw new Error("Couldn't process the request");
 }
