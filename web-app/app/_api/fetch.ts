@@ -27,7 +27,7 @@ export class ApiError extends Error {
   }
 }
 
-function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : InternalApiRequest): Promise<any> {
+function fetchApi<T>({ baseUrl, endpoint, method, body, headers, ignoreAuth } : InternalApiRequest): Promise<T | null> {
   return new Promise((resolve, reject) => {
     fetch(
       baseUrl + endpoint,
@@ -82,14 +82,14 @@ function fetchApi({ baseUrl, endpoint, method, body, headers, ignoreAuth } : Int
   });
 }
 
-export async function fetchFromServer(request : ApiRequest) {
+export async function fetchFromServer<T>(request : ApiRequest) : Promise<T | null> {
   const { headers } = request;
   const baseUrl = process.env.API_GATEWAY_SERVER_URL;
   if (!baseUrl) {
     throw new Error("API_GATEWAY_SERVER_URL env var not defined");
   }
 
-  return await fetchApi({
+  return await fetchApi<T>({
     ...request,
     baseUrl,
     headers: {
@@ -99,13 +99,13 @@ export async function fetchFromServer(request : ApiRequest) {
   });
 }
 
-export async function fetchFromClient(request : ApiRequest) {
+export async function fetchFromClient<T>(request : ApiRequest) : Promise<T | null> {
   const baseUrl = process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL;
   if (!baseUrl) {
     throw new Error("NEXT_PUBLIC_API_GATEWAY_CLIENT_URL env var not defined");
   }
 
-  return await fetchApi({
+  return await fetchApi<T>({
     ...request,
     baseUrl,
   });

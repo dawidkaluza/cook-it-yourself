@@ -76,12 +76,14 @@ export async function addRecipe(prevState: any, formData: FormData) : Promise<Fi
   };
 
   try {
-    recipe = await fetchFromServer({
+    const createdRecipe = await fetchFromServer<Recipe>({
       endpoint: "/kitchen/recipe",
       method: "POST",
       body: recipe,
-    }) as Recipe;
-    redirect(`/my-recipes/${recipe.id}/`);
+    });
+    if (createdRecipe) {
+      redirect(`/my-recipes/${recipe.id}/`);
+    }
   } catch (error) {
     if (error instanceof ApiError) {
       const response = error.response;
@@ -114,4 +116,6 @@ export async function addRecipe(prevState: any, formData: FormData) : Promise<Fi
 
     throw error;
   }
+
+  throw new Error("Couldn't process the request")
 }
