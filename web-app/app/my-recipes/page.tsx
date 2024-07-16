@@ -9,7 +9,6 @@ const Page = () => {
         </div>
       </div>
     </section>
-
   );
 };
 

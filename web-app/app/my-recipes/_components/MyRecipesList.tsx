@@ -49,7 +49,7 @@ const RecipeCard = (
       <div className="card-body">
         <h5 className="card-title">{recipe.name}</h5>
         <p className="card-text">{recipe.description}</p>
-        <a href="#" className="card-link">See more</a>
+        <Link href={`/my-recipes/${recipe.id}`} className="card-link">See more</Link>
       </div>
     </div>
   );
