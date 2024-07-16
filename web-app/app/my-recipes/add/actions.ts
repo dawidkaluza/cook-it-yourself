@@ -2,7 +2,6 @@
 
 import {Ingredient, PortionSize, Recipe, Step} from "@/app/my-recipes/add/_dtos/Recipe";
 import {ApiError, fetchFromServer} from "@/app/_api/fetch";
-import {number} from "prop-types";
 import {redirect} from "next/navigation";
 
 export type FieldError = {
@@ -10,39 +9,39 @@ export type FieldError = {
   message: string;
 };
 
-export async function addRecipe(prevState: any, formData: FormData) {
-  const mapToIngredients = (formData: FormData) => {
-    const ingredientsNames = formData.getAll("ingredientName");
-    const ingredientsAmounts = formData.getAll("ingredientAmount");
-    const ingredientsUnits = formData.getAll("ingredientUnit");
-    const ingredients = [] as Ingredient[];
+export async function addRecipe(prevState: any, formData: FormData) : Promise<FieldError[]> {
+  const mapToIngredients = (formData: FormData) : Ingredient[] => {
+    const ingredientsNames  = formData.getAll("ingredientName") as string[];
+    const ingredientsAmounts = formData.getAll("ingredientAmount") as string[];
+    const ingredientsUnits = formData.getAll("ingredientUnit") as string[];
+    const ingredients : Ingredient[] = [];
     const ingredientsNum = ingredientsNames.length;
     for (let i = 0; i < ingredientsNum; i++) {
       const ingredient = {
         name: ingredientsNames[i],
         value: ingredientsAmounts[i],
         measure: ingredientsUnits[i],
-      } as Ingredient;
+      };
       ingredients.push(ingredient);
     }
     return ingredients;
   };
 
-  const mapToSteps = (formData: FormData) => {
+  const mapToSteps = (formData: FormData) : Step[] => {
     return formData.getAll("methodSteps").map(methodStep => {
       return {
-        text: methodStep,
-      } as Step;
+        text: methodStep as string,
+      };
     });
   };
 
-  const mapToPortionSize = (formData: FormData) => {
+  const mapToPortionSize = (formData: FormData) : PortionSize => {
     const portionSizeInput = formData?.get("portionSize")?.toString();
     if (!portionSizeInput) {
       return {
         value: "",
         measure: "",
-      } as PortionSize;
+      };
     }
 
     const numberIndex = portionSizeInput.search(/\d/g);
@@ -50,7 +49,7 @@ export async function addRecipe(prevState: any, formData: FormData) {
       return {
         value: "",
         measure: "",
-      } as PortionSize;
+      };
     }
 
     const nonNumberIndex = portionSizeInput.search(/\D/g);
@@ -58,23 +57,23 @@ export async function addRecipe(prevState: any, formData: FormData) {
       return {
         value: portionSizeInput.slice(numberIndex),
         measure: "",
-      } as PortionSize;
+      };
     }
 
     return {
       value: portionSizeInput.slice(numberIndex, nonNumberIndex).trim(),
       measure: portionSizeInput.slice(nonNumberIndex).trim()
-    } as PortionSize;
+    };
   }
 
-  let recipe = {
-    name: formData.get("name"),
-    description: formData.get("description"),
+  let recipe : Recipe = {
+    name: formData.get("name") as string,
+    description: formData.get("description") as string,
     ingredients: mapToIngredients(formData),
     methodSteps: mapToSteps(formData),
     cookingTime: Number(formData.get("cookingTime")),
     portionSize: mapToPortionSize(formData)
-  } as Recipe;
+  };
 
   try {
     recipe = await fetchFromServer({
@@ -90,8 +89,8 @@ export async function addRecipe(prevState: any, formData: FormData) {
       // TODO cover other possible client errors
       if (response.status === 422) {
         const body = await response.json();
-        const fields = body.fields as Array<FieldError>
-        return fields.map(field => {
+        const fields : FieldError[] = body.fields;
+        return fields.map((field) => {
           const name = field.name;
           const message = field.message;
           const indexOfDot = name.indexOf(".");
