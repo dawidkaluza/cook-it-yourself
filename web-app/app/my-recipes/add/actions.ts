@@ -1,6 +1,6 @@
 "use server";
 
-import {Ingredient, PortionSize, Recipe, Step} from "@/app/my-recipes/add/_dtos/recipe";
+import {Ingredient, PortionSize, RecipeDetails, Step} from "@/app/my-recipes/_dtos/recipe";
 import {ApiError, fetchFromServer} from "@/app/_api/fetch";
 import {redirect} from "next/navigation";
 
@@ -66,7 +66,7 @@ export async function addRecipe(prevState: any, formData: FormData) : Promise<Fi
     };
   }
 
-  let recipe : Recipe = {
+  let recipe : RecipeDetails = {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     ingredients: mapToIngredients(formData),
@@ -76,7 +76,7 @@ export async function addRecipe(prevState: any, formData: FormData) : Promise<Fi
   };
 
   try {
-    const createdRecipe = await fetchFromServer<Recipe>({
+    const createdRecipe = await fetchFromServer<RecipeDetails>({
       endpoint: "/kitchen/recipe",
       method: "POST",
       body: recipe,

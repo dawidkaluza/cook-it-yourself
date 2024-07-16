@@ -43,7 +43,7 @@ export const MyRecipesList = async () => {
 };
 
 const RecipeCard = (
-  {recipe}: { recipe: { id: number; name: string; description: string } }
+  {recipe}: { recipe: Recipe }
 ) => {
   return (
     <div className="card">
