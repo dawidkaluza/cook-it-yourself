@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ReviewRecipe component > renders given recipe 1`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row"
+    >
+      <div
+        class="col-8 offset-2"
+      >
+        <div>
+          <h1>
+            Boiled sausages
+          </h1>
+          <h6>
+            How to boil delicious sausages
+          </h6>
+          <ul
+            class="list-unstyled"
+          >
+            <li>
+              Portion size: 
+              1 plate
+            </li>
+            <li>
+              Cooking time: 
+              3
+               minutes
+            </li>
+          </ul>
+        </div>
+        <div
+          class="mt-4"
+        >
+          <h2>
+            Ingredients
+          </h2>
+          <ul>
+            <li>
+              Sausage 3 pc
+            </li>
+          </ul>
+        </div>
+        <div
+          class="mt-4"
+        >
+          <h2>
+            Method steps
+          </h2>
+          <p>
+            Boil sausages for about 3 mins
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
