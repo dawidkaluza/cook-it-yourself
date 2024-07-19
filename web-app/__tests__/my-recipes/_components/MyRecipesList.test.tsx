@@ -64,11 +64,9 @@ describe("MyRecipesList component", () => {
 
     const cardLink = screen.queryByRole("link", { name: /See more/ });
     expect(cardLink).not.toBeNull();
-    // TODO assert that href param points to review page
+    expect(cardLink?.getAttribute("href")).toBe("/my-recipes/1");
 
     expect(recipesComponent.container).toMatchSnapshot();
     recipesComponent.unmount();
   });
-
-  // TODO impl tests for pagination
 });
