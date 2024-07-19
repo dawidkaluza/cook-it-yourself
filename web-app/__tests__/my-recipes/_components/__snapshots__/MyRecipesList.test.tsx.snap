@@ -41,7 +41,7 @@ exports[`MyRecipesList component > renders with my recipes 1`] = `
             </p>
             <a
               class="card-link"
-              href="#"
+              href="/my-recipes/1"
             >
               See more
             </a>
