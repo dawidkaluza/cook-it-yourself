@@ -11,7 +11,7 @@ const PortionSizeInput = ({ fieldErrors } : Props) => {
       <div className="col-sm-10">
         <input
           name="portionSize"
-          id="portiomSize"
+          id="portionSize"
           className="form-control"
           placeholder="Amount and unit (4 plates, 800g, etc.)"
         />
