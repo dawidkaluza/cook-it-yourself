@@ -1,0 +1,462 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`IngredientsInput component > render and add new ingredient 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newIngredient"
+    >
+      Ingredients
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            name="ingredientName"
+            placeholder="Name"
+            style="min-width: 60%;"
+            value="Sausages"
+          />
+          <input
+            class="form-control"
+            name="ingredientAmount"
+            placeholder="Amount"
+            style="min-width: 20%;"
+            value="1"
+          />
+          <input
+            class="form-control"
+            name="ingredientUnit"
+            placeholder="Unit"
+            value=""
+          />
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            <svg
+              class="bi bi-dash-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            name="ingredientName"
+            placeholder="Name"
+            style="min-width: 60%;"
+            value="Pot"
+          />
+          <input
+            class="form-control"
+            name="ingredientAmount"
+            placeholder="Amount"
+            style="min-width: 20%;"
+            value="2"
+          />
+          <input
+            class="form-control"
+            name="ingredientUnit"
+            placeholder="Unit"
+            value=""
+          />
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            <svg
+              class="bi bi-dash-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            name="ingredientName"
+            placeholder="Name"
+            style="min-width: 60%;"
+            value="Water"
+          />
+          <input
+            class="form-control"
+            name="ingredientAmount"
+            placeholder="Amount"
+            style="min-width: 20%;"
+            value="500"
+          />
+          <input
+            class="form-control"
+            name="ingredientUnit"
+            placeholder="Unit"
+            value="ml"
+          />
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            <svg
+              class="bi bi-dash-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            id="newIngredient"
+            name="newIngredient"
+            placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
+            value=""
+          />
+          <button
+            class="btn btn-success"
+            type="button"
+          >
+            <svg
+              class="bi bi-plus-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`IngredientsInput component > render with errors 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newIngredient"
+    >
+      Ingredients
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            id="newIngredient"
+            name="newIngredient"
+            placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
+            value=""
+          />
+          <button
+            class="btn btn-success"
+            type="button"
+          >
+            <svg
+              class="bi bi-plus-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="invalid-feedback d-block"
+        >
+          Some ingredient error.
+        </div>
+        <div
+          class="invalid-feedback d-block"
+        >
+          Some other ingredient error.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`IngredientsInput component > render without errors 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newIngredient"
+    >
+      Ingredients
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            id="newIngredient"
+            name="newIngredient"
+            placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
+            value=""
+          />
+          <button
+            class="btn btn-success"
+            type="button"
+          >
+            <svg
+              class="bi bi-plus-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`IngredientsInput component > render, add and remove ingredients 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newIngredient"
+    >
+      Ingredients
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            name="ingredientName"
+            placeholder="Name"
+            style="min-width: 60%;"
+            value="Pot"
+          />
+          <input
+            class="form-control"
+            name="ingredientAmount"
+            placeholder="Amount"
+            style="min-width: 20%;"
+            value="2"
+          />
+          <input
+            class="form-control"
+            name="ingredientUnit"
+            placeholder="Unit"
+            value=""
+          />
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            <svg
+              class="bi bi-dash-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            name="ingredientName"
+            placeholder="Name"
+            style="min-width: 60%;"
+            value="Water"
+          />
+          <input
+            class="form-control"
+            name="ingredientAmount"
+            placeholder="Amount"
+            style="min-width: 20%;"
+            value="500"
+          />
+          <input
+            class="form-control"
+            name="ingredientUnit"
+            placeholder="Unit"
+            value="ml"
+          />
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            <svg
+              class="bi bi-dash-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <input
+            class="form-control"
+            id="newIngredient"
+            name="newIngredient"
+            placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
+            value=""
+          />
+          <button
+            class="btn btn-success"
+            type="button"
+          >
+            <svg
+              class="bi bi-plus-lg"
+              fill="currentColor"
+              height="16"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;

@@ -9,10 +9,10 @@ type MethodStep = {
 };
 
 type Props = {
-  fieldErrors: FieldError[];
+  fieldErrors?: FieldError[];
 };
 
-const MethodStepsInput = ({ fieldErrors} : Props) => {
+const MethodStepsInput = ({ fieldErrors }: Props) => {
   const [newStep, setNewStep] = useState("");
   const [steps, setSteps] = useState<MethodStep[]>([]);
 
@@ -91,7 +91,7 @@ const MethodStepsInput = ({ fieldErrors} : Props) => {
         </div>
 
         <div className="row">
-          {fieldErrors.map(fieldError => {
+          {fieldErrors && fieldErrors.map(fieldError => {
             return (
               <div key={fieldError.message} className="invalid-feedback d-block">
                 {fieldError.message}

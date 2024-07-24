@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {FieldError} from "@/app/my-recipes/add/actions";
 
 type Props = {
-  fieldErrors: FieldError[];
+  fieldErrors?: FieldError[];
 };
 
 type Ingredient = {
@@ -14,7 +14,7 @@ type Ingredient = {
   unit: string;
 };
 
-const IngredientsInput = ({ fieldErrors } : Props) => {
+const IngredientsInput = ({ fieldErrors }: Props) => {
   const [newIngredient, setNewIngredient] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
@@ -125,7 +125,7 @@ const IngredientsInput = ({ fieldErrors } : Props) => {
           </div>
         </div>
         <div className="row">
-          {fieldErrors.map(fieldError => {
+          {fieldErrors && fieldErrors.map(fieldError => {
             return (
               <div key={fieldError.message} className="invalid-feedback d-block">
                 {fieldError.message}

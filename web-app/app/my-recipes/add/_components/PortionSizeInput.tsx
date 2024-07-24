@@ -1,10 +1,10 @@
 import {FieldError} from "@/app/my-recipes/add/actions";
 
 type Props = {
-  fieldErrors: FieldError[];
+  fieldErrors?: FieldError[];
 };
 
-const PortionSizeInput = ({ fieldErrors } : Props) => {
+const PortionSizeInput = ({ fieldErrors }: Props) => {
   return (
     <div className="row mb-4">
       <label htmlFor="portionSize" className="col-sm-2 col-form-label">Portion size</label>
@@ -15,7 +15,7 @@ const PortionSizeInput = ({ fieldErrors } : Props) => {
           className="form-control"
           placeholder="Amount and unit (4 plates, 800g, etc.)"
         />
-        {fieldErrors.map(fieldError => {
+        {fieldErrors && fieldErrors.map(fieldError => {
           return (
             <div className="invalid-feedback d-block" key={fieldError.message}>
               {fieldError.message}
