@@ -1,15 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Page matches existing snapshot 1`] = `
-<div>
-  <p
-    class="text-center"
-  >
-    Welcome my cook! Use navigation above to start your cooking journey.
-  </p>
-</div>
-`;
-
 exports[`page component > render 1`] = `
 <div>
   <p
