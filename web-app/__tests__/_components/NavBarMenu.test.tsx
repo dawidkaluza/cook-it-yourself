@@ -1,4 +1,3 @@
-import {describe, expect, test} from "vitest";
 import {render, screen} from "@testing-library/react";
 import {NavBarMenu} from "@/app/_components/NavBarMenu";
 
@@ -25,6 +24,5 @@ describe("NavBarMenu component", () => {
     expect(links[1].getAttribute("href")).toBe("/cooking");
 
     expect(menu.container).toMatchSnapshot();
-    menu.unmount();
   });
 })

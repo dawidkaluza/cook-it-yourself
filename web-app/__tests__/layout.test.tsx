@@ -1,4 +1,3 @@
-import {describe, expect, test, vi} from "vitest";
 import {render, screen} from "@testing-library/react";
 import RootLayout from "@/app/layout";
 import Page from "@/app/page";
@@ -22,6 +21,5 @@ describe("layout component", () => {
     expect(main).not.toBeNull();
 
     expect(layout.container).toMatchSnapshot();
-    layout.unmount();
   });
 });

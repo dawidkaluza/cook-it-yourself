@@ -1,4 +1,4 @@
-import {describe, expect, Mock, test, vi} from 'vitest'
+import {Mock} from 'vitest'
 import {NavBar} from "@/app/_components/NavBar";
 import {render, screen} from "@testing-library/react";
 import {isSignedIn} from "@/app/_api/auth";
@@ -30,7 +30,6 @@ describe('NavBar component', () => {
     expect(navBarMenu).toBeNull();
 
     expect(navBar.container).toMatchSnapshot();
-    navBar.unmount();
   });
 
   test('render when signed in', () => {
@@ -52,6 +51,5 @@ describe('NavBar component', () => {
     expect(navBarMenu).not.toBeNull();
 
     expect(navBar.container).toMatchSnapshot();
-    navBar.unmount();
   });
 });

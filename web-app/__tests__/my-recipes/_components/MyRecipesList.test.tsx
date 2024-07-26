@@ -1,4 +1,4 @@
-import {describe, expect, Mock, test, vi} from "vitest";
+import {Mock} from "vitest";
 import {getMyRecipes} from "@/app/my-recipes/actions";
 import {Recipe} from "@/app/my-recipes/_dtos/recipe";
 import {Page} from "@/app/my-recipes/_dtos/page";
@@ -29,7 +29,6 @@ describe("MyRecipesList component", () => {
     expect(p).not.toBeNull();
 
     expect(recipesComponent.container).toMatchSnapshot();
-    recipesComponent.unmount();
   });
 
   test("renders with my recipes", async () => {
@@ -67,6 +66,5 @@ describe("MyRecipesList component", () => {
     expect(cardLink?.getAttribute("href")).toBe("/my-recipes/1");
 
     expect(recipesComponent.container).toMatchSnapshot();
-    recipesComponent.unmount();
   });
 });

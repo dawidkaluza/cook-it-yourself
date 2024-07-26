@@ -1,4 +1,3 @@
-import {describe, expect, test} from "vitest";
 import {render, screen} from "@testing-library/react";
 import {Main} from "@/app/_components/Main";
 
@@ -15,6 +14,5 @@ describe("Main component", () => {
     expect(p).not.toBeNull();
 
     expect(menu.container).toMatchSnapshot();
-    menu.unmount();
   });
 });

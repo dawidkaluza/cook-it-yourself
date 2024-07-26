@@ -1,4 +1,4 @@
-import {describe, expect, Mock, test, vi} from "vitest";
+import {Mock} from "vitest";
 import {useFormState} from "react-dom";
 import {render, screen} from "@testing-library/react";
 import {AddRecipeForm} from "@/app/my-recipes/add/_components/AddRecipeForm";
@@ -44,7 +44,6 @@ describe("AddRecipeForm component", () => {
     expect(submitButton).not.toBeNull();
 
     expect(formComponent.container).toMatchSnapshot();
-    formComponent.unmount();
   });
 
   test.each([
@@ -105,6 +104,5 @@ describe("AddRecipeForm component", () => {
       expect(errorMessage).not.toBeNull();
     }
     expect(formComponent.container).toMatchSnapshot();
-    formComponent.unmount();
   });
 });

@@ -1,4 +1,4 @@
-import {describe, expect, Mock, test, vi} from "vitest";
+import {Mock} from "vitest";
 import {reviewRecipe} from "@/app/my-recipes/[id]/actions";
 import {render, screen} from "@testing-library/react";
 import {ReviewRecipe} from "@/app/my-recipes/[id]/_components/ReviewRecipe";
@@ -69,6 +69,5 @@ describe("ReviewRecipe component", () => {
     }
 
     expect(reviewComponent.container).toMatchSnapshot();
-    reviewComponent.unmount();
   });
 });
