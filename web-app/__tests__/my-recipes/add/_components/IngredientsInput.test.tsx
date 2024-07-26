@@ -1,4 +1,3 @@
-import {describe, expect, test} from "vitest";
 import {IngredientsInput} from "@/app/my-recipes/add/_components/IngredientsInput";
 import {render, screen, within} from "@testing-library/react";
 import {FieldError} from "@/app/my-recipes/add/actions";
@@ -15,7 +14,6 @@ describe("IngredientsInput component", () => {
     expect(inputElement).not.toBeNull();
 
     expect(component.container).toMatchSnapshot();
-    component.unmount();
   });
 
   test("render with errors", () => {
@@ -44,7 +42,6 @@ describe("IngredientsInput component", () => {
     }
 
     expect(component.container).toMatchSnapshot();
-    component.unmount();
   });
 
   test("render and add new ingredient", async () => {
@@ -89,7 +86,6 @@ describe("IngredientsInput component", () => {
     }
 
     expect(component.container).toMatchSnapshot();
-    component.unmount();
   });
 
   test("render, add and modify added ingredients", async () => {
@@ -142,7 +138,6 @@ describe("IngredientsInput component", () => {
     }
 
     expect(component.container).toMatchSnapshot();
-    component.unmount();
   });
 
   test("render, add and remove ingredients", async () => {
@@ -196,6 +191,5 @@ describe("IngredientsInput component", () => {
     }
 
     expect(component.container).toMatchSnapshot();
-    component.unmount();
   });
 });
