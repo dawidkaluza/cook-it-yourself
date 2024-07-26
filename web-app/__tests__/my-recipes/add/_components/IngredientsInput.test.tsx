@@ -1,7 +1,8 @@
 import {describe, expect, test} from "vitest";
 import {IngredientsInput} from "@/app/my-recipes/add/_components/IngredientsInput";
-import {fireEvent, render, screen, within} from "@testing-library/react";
+import {render, screen, within} from "@testing-library/react";
 import {FieldError} from "@/app/my-recipes/add/actions";
+import userEvent from "@testing-library/user-event";
 
 describe("IngredientsInput component", () => {
   test("render without errors", () => {
@@ -46,7 +47,7 @@ describe("IngredientsInput component", () => {
     component.unmount();
   });
 
-  test("render and add new ingredient", () => {
+  test("render and add new ingredient", async () => {
     // Given
     const expectedInputs = [
       "Sausages",
@@ -58,23 +59,25 @@ describe("IngredientsInput component", () => {
       "ml"
     ];
 
+    const user = userEvent.setup();
     const component = render(<IngredientsInput />);
 
     // When
     const newIngredientInputEl = screen.getByLabelText("Ingredients");
     const addButtonEl = screen.getByRole("button");
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "" } });
-    fireEvent.click(addButtonEl);
+    await user.clear(newIngredientInputEl);
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Sausages" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Sausages");
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Pot 2" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Pot 2");
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Water 500ml" } });
-    fireEvent.keyDown(newIngredientInputEl, {key: 'Enter', code: 'Enter', charCode: 13});
+    await user.type(newIngredientInputEl, "Water 500ml");
+    await user.click(newIngredientInputEl);
+    await user.keyboard("{Enter}");
 
     // Then
     const allInputElements = screen.getAllByRole("textbox");
@@ -89,7 +92,7 @@ describe("IngredientsInput component", () => {
     component.unmount();
   });
 
-  test("render, add and modify added ingredients", () => {
+  test("render, add and modify added ingredients", async () => {
     // Given
     const expectedInputs = [
       "Sausage",
@@ -101,37 +104,38 @@ describe("IngredientsInput component", () => {
       "g"
     ];
 
+    const user = userEvent.setup();
     const component = render(<IngredientsInput />);
 
     const newIngredientInputEl = screen.getByLabelText("Ingredients");
     const addButtonEl = screen.getByRole("button");
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Sausages" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Sausages");
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Pot 2" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Pot 2");
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Water 500ml" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Water 500ml");
+    await user.click(addButtonEl);
 
     // When
     const sausagesIngredientEl = screen.getByDisplayValue("Sausages");
-    fireEvent.change(sausagesIngredientEl, { target: { value: "Sausage" } });
+    await user.clear(sausagesIngredientEl);
+    await user.type(sausagesIngredientEl, "Sausage");
 
     const potAmountEl = screen.getByDisplayValue("2");
-    fireEvent.change(potAmountEl, { target: { value: "3" } });
+    await user.clear(potAmountEl);
+    await user.type(potAmountEl, "3");
 
     const waterUnitEl = screen.getByDisplayValue("ml");
-    fireEvent.change(waterUnitEl, { target: { value: "g" } });
-
-    fireEvent.click(addButtonEl); // workaround to cause state update
+    await user.clear(waterUnitEl);
+    await user.type(waterUnitEl, "g");
 
     // Then
     const allInputElements = screen.getAllByRole("textbox");
 
     for (const expectedInput of expectedInputs) {
-      console.log("Input: ", expectedInput);
       expect(allInputElements.filter(
         el => el.getAttribute("value") === expectedInput
       )).toHaveLength(1);
@@ -141,7 +145,7 @@ describe("IngredientsInput component", () => {
     component.unmount();
   });
 
-  test("render, add and remove ingredients", () => {
+  test("render, add and remove ingredients", async () => {
     // Given
     const expectedInputs = [
       "Pot",
@@ -155,25 +159,26 @@ describe("IngredientsInput component", () => {
       "Sausages",
     ];
 
+    const user = userEvent.setup();
     const component = render(<IngredientsInput />);
 
     const newIngredientInputEl = screen.getByLabelText("Ingredients");
     const addButtonEl = screen.getByRole("button");
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Sausages" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Sausages");
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Pot 2" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Pot 2");
+    await user.click(addButtonEl);
 
-    fireEvent.change(newIngredientInputEl, { target: { value: "Water 500ml" } });
-    fireEvent.click(addButtonEl);
+    await user.type(newIngredientInputEl, "Water 500ml");
+    await user.click(addButtonEl);
 
     // When
     const sausagesDeleteBtnEl = within(
       screen.getByDisplayValue("Sausages").parentElement as HTMLElement
     ).getByRole("button");
-    fireEvent.click(sausagesDeleteBtnEl);
+    await user.click(sausagesDeleteBtnEl);
 
     // Then
     const allInputElements = screen.getAllByRole("textbox");

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {ChangeEvent, useState} from "react";
+import React, {useState} from "react";
 import {FieldError} from "@/app/my-recipes/add/actions";
 
 type Props = {
@@ -110,20 +110,15 @@ const IngredientsInput = ({ fieldErrors }: Props) => {
 const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void }) => {
   const { ingredient, onDelete } = props;
   const [ name, setName ] = useState(ingredient.name);
-  const [ amount, setAmount ] = useState(ingredient.amount);
+  const [ amount, setAmount ] = useState(ingredient.amount.toString());
   const [ unit, setUnit ] = useState(ingredient.unit);
-
-  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log("Change name to: " + event.target.value);
-    setName(event.target.value);
-  };
 
   return (
     <div className="input-group">
       <input
         name="ingredientName"
         value={name}
-        onChange={handleNameChange}
+        onChange={(event) => setName(event.target.value)}
         className="form-control"
         placeholder="Name" style={{minWidth: "60%"}}
       />
@@ -131,7 +126,7 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
       <input
         name="ingredientAmount"
         value={amount}
-        onChange={(event) => setAmount(Number(event.target.value))}
+        onChange={(event) => setAmount(event.target.value)}
         className="form-control"
         placeholder="Amount" style={{minWidth: "20%"}}
       />
