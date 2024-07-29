@@ -15,7 +15,6 @@ export const NavBarMenu = () => {
       <div className="collapse navbar-collapse" id="navbar-menu">
         <ul className="navbar-nav">
           <NavBarItem path="/my-recipes">My recipes</NavBarItem>
-          <NavBarItem path="/cooking">Cooking</NavBarItem>
         </ul>
       </div>
     </>

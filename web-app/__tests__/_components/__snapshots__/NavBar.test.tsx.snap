@@ -44,16 +44,6 @@ exports[`NavBar component > render when signed in 1`] = `
               My recipes
             </a>
           </li>
-          <li
-            class="nav-item"
-          >
-            <a
-              class="nav-link"
-              href="/cooking"
-            >
-              Cooking
-            </a>
-          </li>
         </ul>
       </div>
     </div>

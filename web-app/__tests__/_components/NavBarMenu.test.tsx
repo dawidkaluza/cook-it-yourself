@@ -17,11 +17,9 @@ describe("NavBarMenu component", () => {
     expect(menuContainer?.getAttribute("class")).toBe("collapse navbar-collapse");
 
     const links = menu.queryAllByRole("link");
-    expect(links.length).toBe(2);
+    expect(links).toHaveLength(1);
     expect(links[0]).not.toBeNull();
     expect(links[0].getAttribute("href")).toBe("/my-recipes");
-    expect(links[1]).not.toBeNull();
-    expect(links[1].getAttribute("href")).toBe("/cooking");
 
     expect(menu.container).toMatchSnapshot();
   });

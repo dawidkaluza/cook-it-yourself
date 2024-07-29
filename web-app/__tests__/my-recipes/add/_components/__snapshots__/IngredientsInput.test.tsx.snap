@@ -189,68 +189,6 @@ exports[`IngredientsInput component > render and add new ingredient 1`] = `
 </div>
 `;
 
-exports[`IngredientsInput component > render with errors 1`] = `
-<div>
-  <div
-    class="row mb-4"
-  >
-    <label
-      class="col-sm-2 col-form-label"
-      for="newIngredient"
-    >
-      Ingredients
-    </label>
-    <div
-      class="col-sm-10"
-    >
-      <div
-        class="row"
-      >
-        <input
-          class="form-control"
-          id="newIngredient"
-          name="newIngredient"
-          placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
-          value=""
-        />
-        <button
-          class="btn btn-success"
-          type="button"
-        >
-          <svg
-            class="bi bi-plus-lg"
-            fill="currentColor"
-            height="16"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
-              fill-rule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      <div
-        class="row"
-      >
-        <div
-          class="invalid-feedback d-block"
-        >
-          Some ingredient error.
-        </div>
-        <div
-          class="invalid-feedback d-block"
-        >
-          Some other ingredient error.
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
 exports[`IngredientsInput component > render with validation errors 1`] = `
 <div>
   <div
@@ -308,57 +246,6 @@ exports[`IngredientsInput component > render with validation errors 1`] = `
           Some other ingredient error.
         </div>
       </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`IngredientsInput component > render without errors 1`] = `
-<div>
-  <div
-    class="row mb-4"
-  >
-    <label
-      class="col-sm-2 col-form-label"
-      for="newIngredient"
-    >
-      Ingredients
-    </label>
-    <div
-      class="col-sm-10"
-    >
-      <div
-        class="row"
-      >
-        <input
-          class="form-control"
-          id="newIngredient"
-          name="newIngredient"
-          placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
-          value=""
-        />
-        <button
-          class="btn btn-success"
-          type="button"
-        >
-          <svg
-            class="bi bi-plus-lg"
-            fill="currentColor"
-            height="16"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
-              fill-rule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      <div
-        class="row"
-      />
     </div>
   </div>
 </div>
