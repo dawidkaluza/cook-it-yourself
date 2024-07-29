@@ -4,7 +4,7 @@ import {FieldError} from "@/app/my-recipes/add/actions";
 import userEvent from "@testing-library/user-event";
 
 describe("IngredientsInput component", () => {
-  test("render without errors", () => {
+  test("render without validation errors", () => {
     // Given
     // When
     const component = render(<IngredientsInput />);
@@ -16,7 +16,7 @@ describe("IngredientsInput component", () => {
     expect(component.container).toMatchSnapshot();
   });
 
-  test("render with errors", () => {
+  test("render with validation errors", () => {
     // Given
     const fieldErrors: FieldError[] = [
       {
