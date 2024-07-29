@@ -1,18 +1,45 @@
 # Cook it yourself
-Simple app aiming to make cooking easier.
+Simple app to put some Java & Javascript programming skills into practice.
 
 # Overview
 
-The plan is to create application based on microservices to get some practise in it.
+The goal was to create application based on microservice architecture.
 
-At the beginning, to keep things simple, the app will look like this:
+The app is separated into front-end web application and back-end services, as depicted on the image below.
 
 ![High level architecture](./images/high-level-architecture.jpg)
 
-- Web app on front-end side will communicate with back-end services via REST API.
-- Services on back-end side will communicate with each other via RabbitMQ asynchronously, to keep them independent of each other.
+- Every app is containerized via Docker, so it can be simply started independently.
+- Back-end services and their dependencies are configured to work out-of-the box on local Kubernetes cluster so running all services correctly is as easy as never.
 
-More details later.
+## Web app
+
+- web application based on Next.js with Client & Server Rendering 
+- communicates with back-end through REST API via API Gateway
+
+## API Gateway
+
+- secures access to back-end services via OAuth 2 (Confidential client)
+- forwards incoming requests to proper services, returns their responses back to the client
+
+## User service
+
+- enables signing up, authentication and authorization
+- acts as Authorization server in OAuth 2 dance
+
+# Kitchen service
+
+- service where cook (aka user) can manage its recipes
+- acts as Resource server in OAuth 2 dance
+
+Each app has its own README file containing more details about itself.
+
+# Security
+
+Services are secured thanks to OAuth 2 protocol.
+
+![Security](./images/security.jpg)
+
 
 
 
