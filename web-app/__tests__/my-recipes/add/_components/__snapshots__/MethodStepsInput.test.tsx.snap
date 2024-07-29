@@ -1,0 +1,611 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MethodStepsInput component > render and add new step 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newMethodStep"
+    >
+      Method steps
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Add some sugar
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Mix everything
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Pour water into the pot
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            id="newMethodStep"
+            name="newMethodStep"
+            placeholder="Instructions step-by-step to cook your recipe"
+            style="height: 100px;"
+          />
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-success"
+              type="button"
+            >
+              <svg
+                class="bi bi-plus-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MethodStepsInput component > render with validation errors 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newMethodStep"
+    >
+      Method steps
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            id="newMethodStep"
+            name="newMethodStep"
+            placeholder="Instructions step-by-step to cook your recipe"
+            style="height: 100px;"
+          />
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-success"
+              type="button"
+            >
+              <svg
+                class="bi bi-plus-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="invalid-feedback d-block"
+        >
+          Some text error.
+        </div>
+        <div
+          class="invalid-feedback d-block"
+        >
+          Some other text error.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MethodStepsInput component > render without validation errors 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newMethodStep"
+    >
+      Method steps
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            id="newMethodStep"
+            name="newMethodStep"
+            placeholder="Instructions step-by-step to cook your recipe"
+            style="height: 100px;"
+          />
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-success"
+              type="button"
+            >
+              <svg
+                class="bi bi-plus-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MethodStepsInput component > render, add and modify added steps 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newMethodStep"
+    >
+      Method steps
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Add some salt
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Mix everything
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Add some oil
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            id="newMethodStep"
+            name="newMethodStep"
+            placeholder="Instructions step-by-step to cook your recipe"
+            style="height: 100px;"
+          />
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-success"
+              type="button"
+            >
+              <svg
+                class="bi bi-plus-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MethodStepsInput component > render, add and remove steps 1`] = `
+<div>
+  <div
+    class="row mb-4"
+  >
+    <label
+      class="col-sm-2 col-form-label"
+      for="newMethodStep"
+    >
+      Method steps
+    </label>
+    <div
+      class="col-sm-10"
+    >
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Add some sugar
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            name="methodSteps"
+            placeholder="Method step"
+            style="height: 100px;"
+          >
+            Pour water into the pot
+          </textarea>
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-outline-danger"
+              type="button"
+            >
+              <svg
+                class="bi bi-dash-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div
+          class="input-group"
+        >
+          <textarea
+            class="form-control"
+            id="newMethodStep"
+            name="newMethodStep"
+            placeholder="Instructions step-by-step to cook your recipe"
+            style="height: 100px;"
+          />
+          <div
+            class="input-group-text"
+          >
+            <button
+              class="btn btn-sm btn-success"
+              type="button"
+            >
+              <svg
+                class="bi bi-plus-lg"
+                fill="currentColor"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+      />
+    </div>
+  </div>
+</div>
+`;
