@@ -7,7 +7,7 @@ describe("NavBarMenu component", () => {
     const menu = render(<NavBarMenu />);
 
     // Then
-    const button = screen.queryByRole("button");
+    const button = screen.getByRole("button");
     expect(button).not.toBeNull();
     expect(button?.getAttribute("data-bs-toggle")).toBe("collapse");
     expect(button?.getAttribute("data-bs-target")).toBe("#navbar-menu");

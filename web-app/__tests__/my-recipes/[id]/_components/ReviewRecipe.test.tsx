@@ -43,20 +43,20 @@ describe("ReviewRecipe component", () => {
     const reviewComponent = render(await ReviewRecipe({ id: 1 }));
 
     // Then
-    const nameHeader = screen.queryByRole("heading", { name: /Boiled sausages/ });
+    const nameHeader = screen.getByRole("heading", { name: /Boiled sausages/ });
     expect(nameHeader).not.toBeNull();
 
-    const descHeader = screen.queryByRole("heading", { name: /How to boil delicious sausages/ });
+    const descHeader = screen.getByRole("heading", { name: /How to boil delicious sausages/ });
     expect(descHeader).not.toBeNull();
 
-    const portionSizeElement = screen.queryByText("Portion size: " + Number(recipe.portionSize.value) + " " + recipe.portionSize.measure);
+    const portionSizeElement = screen.getByText("Portion size: " + Number(recipe.portionSize.value) + " " + recipe.portionSize.measure);
     expect(portionSizeElement).not.toBeNull();
 
-    const cookingTimeElement = screen.queryByText("Cooking time: " + recipe.cookingTime + " minutes");
+    const cookingTimeElement = screen.getByText("Cooking time: " + recipe.cookingTime + " minutes");
     expect(cookingTimeElement).not.toBeNull();
 
     for(const ingredient of recipe.ingredients) {
-      const ingredientElement = screen.queryByText(
+      const ingredientElement = screen.getByText(
         ingredient.name + " " + Number(ingredient.value) + " " + ingredient.measure
       );
 
@@ -64,7 +64,7 @@ describe("ReviewRecipe component", () => {
     }
 
     for(const step of recipe.methodSteps) {
-      const stepElement = screen.queryByText(step.text);
+      const stepElement = screen.getByText(step.text);
       expect(stepElement).not.toBeNull();
     }
 

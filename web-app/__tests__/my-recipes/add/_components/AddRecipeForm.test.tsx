@@ -22,25 +22,25 @@ describe("AddRecipeForm component", () => {
     const formComponent = render(<AddRecipeForm />);
 
     // Then
-    const nameInput = screen.queryByLabelText("Name");
+    const nameInput = screen.getByLabelText("Name");
     expect(nameInput).not.toBeNull();
 
-    const descriptionInput = screen.queryByLabelText("Description");
+    const descriptionInput = screen.getByLabelText("Description");
     expect(descriptionInput).not.toBeNull();
 
-    const ingredientsInput = screen.queryByLabelText("Ingredients");
+    const ingredientsInput = screen.getByLabelText("Ingredients");
     expect(ingredientsInput).not.toBeNull();
 
-    const stepsInput = screen.queryByLabelText("Method steps");
+    const stepsInput = screen.getByLabelText("Method steps");
     expect(stepsInput).not.toBeNull();
 
-    const cookingTimeInput = screen.queryByLabelText("Cooking time");
+    const cookingTimeInput = screen.getByLabelText("Cooking time");
     expect(cookingTimeInput).not.toBeNull();
 
-    const portionSizeInput = screen.queryByLabelText("Portion size");
+    const portionSizeInput = screen.getByLabelText("Portion size");
     expect(portionSizeInput).not.toBeNull();
 
-    const submitButton = screen.queryByRole("button", { name: "Submit" });
+    const submitButton = screen.getByRole("button", { name: "Submit" });
     expect(submitButton).not.toBeNull();
 
     expect(formComponent.container).toMatchSnapshot();
@@ -100,7 +100,7 @@ describe("AddRecipeForm component", () => {
 
     // Then
     for (const fieldError of fieldErrors) {
-      const errorMessage = screen.queryByText(fieldError.message);
+      const errorMessage = screen.getByText(fieldError.message);
       expect(errorMessage).not.toBeNull();
     }
     expect(formComponent.container).toMatchSnapshot();

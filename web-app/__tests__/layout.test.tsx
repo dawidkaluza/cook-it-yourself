@@ -14,10 +14,10 @@ describe("layout component", () => {
     const layout = render(<RootLayout><Page /></RootLayout>);
 
     // Then
-    const navBar = screen.queryByRole("navigation");
+    const navBar = screen.getByRole("navigation");
     expect(navBar).not.toBeNull();
 
-    const main = screen.queryByRole("main");
+    const main = screen.getByRole("main");
     expect(main).not.toBeNull();
 
     expect(layout.container).toMatchSnapshot();

@@ -7,10 +7,10 @@ describe("Main component", () => {
     const menu = render(<Main><p>Main page</p></Main>);
 
     // Then
-    const main = screen.queryByRole("main");
+    const main = screen.getByRole("main");
     expect(main).not.toBeNull();
 
-    const p = screen.queryByText(/Main page/);
+    const p = screen.getByText(/Main page/);
     expect(p).not.toBeNull();
 
     expect(menu.container).toMatchSnapshot();

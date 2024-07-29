@@ -25,7 +25,7 @@ describe("MyRecipesList component", () => {
     const recipesComponent = render(await MyRecipesList());
 
     // Then
-    const p = screen.queryByText(/No recipes found/);
+    const p = screen.getByText(/No recipes found/);
     expect(p).not.toBeNull();
 
     expect(recipesComponent.container).toMatchSnapshot();
@@ -53,15 +53,15 @@ describe("MyRecipesList component", () => {
     const noRecipesText = screen.queryByText(/No recipes found/);
     expect(noRecipesText).toBeNull();
 
-    const cardTitle = screen.queryByRole("heading", { name: /Boiled sausages/ });
+    const cardTitle = screen.getByRole("heading", { name: /Boiled sausages/ });
     expect(cardTitle).not.toBeNull();
     expect(cardTitle?.getAttribute("class")).toBe("card-title");
 
-    const cardText = screen.queryByText(/How to boil delicious sausages/);
+    const cardText = screen.getByText(/How to boil delicious sausages/);
     expect(cardText).not.toBeNull();
     expect(cardText?.getAttribute("class")).toBe("card-text");
 
-    const cardLink = screen.queryByRole("link", { name: /See more/ });
+    const cardLink = screen.getByRole("link", { name: /See more/ });
     expect(cardLink).not.toBeNull();
     expect(cardLink?.getAttribute("href")).toBe("/my-recipes/1");
 

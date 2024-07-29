@@ -7,7 +7,7 @@ describe("page component", () => {
     const page = render(<Page />);
 
     // Then
-    const welcomeText = screen.queryByText(/Welcome my cook/);
+    const welcomeText = screen.getByText(/Welcome my cook/);
     expect(welcomeText).not.toBeNull();
     expect(page.container).toMatchSnapshot();
   })

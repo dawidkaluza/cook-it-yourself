@@ -18,11 +18,11 @@ describe('NavBar component', () => {
     const navBar = render(<NavBar />);
 
     // Then
-    const indexLink = screen.queryByRole("link", { name: "Cook it yourself" });
+    const indexLink = screen.getByRole("link", { name: "Cook it yourself" });
     expect(indexLink).not.toBeNull();
     expect(indexLink?.getAttribute("href")).toBe("/");
 
-    const signInLink = screen.queryByRole("link", { name: "Sign in"});
+    const signInLink = screen.getByRole("link", { name: "Sign in"});
     expect(signInLink).not.toBeNull();
     expect(signInLink?.getAttribute("href")).toBe("/sign-in");
 
@@ -40,14 +40,14 @@ describe('NavBar component', () => {
     const navBar = render(<NavBar />);
 
     // Then
-    const indexLink = screen.queryByRole("link", { name: "Cook it yourself" });
+    const indexLink = screen.getByRole("link", { name: "Cook it yourself" });
     expect(indexLink).not.toBeNull();
     expect(indexLink?.getAttribute("href")).toBe("/");
 
     const signInLink = screen.queryByRole("link", { name: "Sign in"});
     expect(signInLink).toBeNull();
 
-    const navBarMenu = screen.queryByRole('list');
+    const navBarMenu = screen.getByRole('list');
     expect(navBarMenu).not.toBeNull();
 
     expect(navBar.container).toMatchSnapshot();
