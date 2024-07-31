@@ -17,7 +17,8 @@ The app is separated into front-end web application and back-end services, as de
 
 ![High level architecture](./images/high-level-architecture.jpg)
 
-- Every app is containerized via Docker, so it can be started and tested independently.
+- Every app is containerized via Docker, so it can be started and tested independently on local environment.
+- Additionally, the apps have CI processes configured, so that new version of each app is automatically built, tested and containerized if everything works as expected.
 - Back-end services and their dependencies are configured to work out-of-the box on local Kubernetes cluster so running all services requires only running the cluster and applying prepared config, without any long manual setup.
 
 # Applications
@@ -42,11 +43,9 @@ The app is separated into front-end web application and back-end services, as de
 - service where cook (aka user) can manage its recipes
 - acts as Resource server in OAuth 2 dance
 
-Each app has its own README file containing more details about itself.
-
 # Security
 
-Services are secured thanks to OAuth 2 protocol.
+Services are secured via OAuth 2 protocol.
 
 ![Security](./images/security.png)
 
