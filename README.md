@@ -7,11 +7,11 @@ Simple app to put some software development skills into practice.
 ## Functionality
 
 From functional point of view, the purpose was to create application that would help in all cooking activities like choosing what to cook for dinner today, check off ingredients required to cook given dish during shopping and so on. 
-However, for now, to keep things simple, all you can do is simply manage your recipes in the app.
+However, for now, to keep things simple, all you can do is simply manage your recipes.
 
 ## Technical details
 
-From technical point of view, the goal was to create application based on microservice architecture with different dependencies as database, asynchronous and synchronous messaging, cache, distributed authentication and authorization and so on, so that it would show how the real application based on microservice architecture could look like.
+From technical point of view, the goal was to create application based on microservice architecture with different dependencies as database, asynchronous and synchronous messaging service, cache, distributed authentication and authorization and so on, so that it would show how the real application based on microservice architecture could look like.
 
 The app is separated into front-end web application and back-end services, as depicted on the image below.
 
@@ -19,7 +19,7 @@ The app is separated into front-end web application and back-end services, as de
 
 - Every app is containerized via Docker, so it can be started and tested independently on local environment.
 - Additionally, the apps have CI processes configured, so that new version of each app is automatically built, tested and containerized if everything works as expected.
-- Back-end services and their dependencies are configured to work out-of-the box on local Kubernetes cluster so running all services requires only running the cluster and applying prepared config, without any long manual setup.
+- Back-end services and their dependencies are configured to work out-of-the box on local Kubernetes cluster so starting all services together only requires launching K8s cluster and applying prepared configs, without any long manual OS-dependent setup.
 
 # Applications
 
