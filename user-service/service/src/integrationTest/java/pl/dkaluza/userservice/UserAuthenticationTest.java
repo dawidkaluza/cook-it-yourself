@@ -103,7 +103,7 @@ class UserAuthenticationTest {
     @Test
     void signIn_redirectedToSignIn_authenticateAndRedirectBack() {
         // Given
-        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=ciy-web&state=1234xyz&code_challenge=MMRGwBwWyq4DLBuYbwPHRF6HGyVnN_UAUDnQ8GVGjn8&code_challenge_method=S256";
+        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway";
         var oauthAuthorizeResponse = given()
             .redirects().follow(false)
             .get(oauthAuthorizeUrl);
