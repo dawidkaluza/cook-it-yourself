@@ -26,11 +26,14 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: ./web-app/package-lock.json
 
       - name: Download packages
+        working-directory: ./web-app
         run: npm ci
 
       - name: Run tests
+        working-directory: ./web-app
         run: npm test
 
       - name: Log into GitHub Container Registry
