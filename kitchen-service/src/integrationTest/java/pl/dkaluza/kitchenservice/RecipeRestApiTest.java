@@ -66,7 +66,7 @@ class RecipeRestApiTest {
         .when()
             .post("/recipe")
         .then()
-            .statusCode(403);
+            .statusCode(401);
 
         assertThatPersistenceIsEmpty();
     }
@@ -200,7 +200,7 @@ class RecipeRestApiTest {
         .when()
             .get("/recipe")
         .then()
-            .statusCode(403);
+            .statusCode(401);
     }
 
     @Test
@@ -355,7 +355,7 @@ class RecipeRestApiTest {
         .when()
             .get("/recipe/1")
         .then()
-            .statusCode(403);
+            .statusCode(401);
     }
 
     @Test
