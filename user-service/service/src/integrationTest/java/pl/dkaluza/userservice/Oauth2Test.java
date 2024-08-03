@@ -15,31 +15,34 @@ import static pl.dkaluza.userservice.RestAssuredUtils.signUp;
 @EnableTestcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class Oauth2Test {
+    private final String redirectUrl = "http://api-gateway/login/oauth2/code/ciy";
+    private String baseUrl;
 
     @LocalServerPort
     private Integer port;
 
     @BeforeEach
     void beforeEach() {
-        RestAssured.baseURI = "http://localhost:" + port;
+        baseUrl = "http://localhost:" + port;
+        RestAssured.baseURI = baseUrl;
     }
 
     @Test
     void authCode_unauthenticated_redirectToSignIn() {
-        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=ciy-web&state=1234xyz&code_challenge=MMRGwBwWyq4DLBuYbwPHRF6HGyVnN_UAUDnQ8GVGjn8&code_challenge_method=S256";
+        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway";
         given()
             .redirects().follow(false)
         .when()
             .get(oauthAuthorizeUrl)
         .then()
             .statusCode(302)
-            .header("Location", endsWith("/web/sign-in"));
+            .header("Location", equalTo(baseUrl + "/web/sign-in"));
     }
 
     @Test
-    void authCode_invalidWebClientRequest_redirectBackWithErrors() {
+    void authCode_invalidRequestParams_redirectBackWithErrors() {
         // Given
-        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=ciy-web&state=1234xyz";
+        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway&scope=root";
 
         // When
         var authCodeResponse = given()
@@ -48,16 +51,31 @@ class Oauth2Test {
 
         authCodeResponse.then()
             .statusCode(302)
-            .header("Location", startsWith("http://webapp/sign-in"))
-            .header("Location", matchesPattern(".*error=invalid_request.*"));
+            .header("Location", startsWith(redirectUrl))
+            .header("Location", matchesPattern(".*error=invalid_scope.*"));
     }
 
     @Test
-    void authCode_authenticated_redirectWithCode() {
+    void authCode_possiblyMaliciousRequest_redirectToSignIn() {
+        // Given
+        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway&redirect_uri=http%3A%2F%2Fwebapp%2Flogin";
+
+        // When
+        var authCodeResponse = given()
+            .redirects().follow(false)
+            .get(oauthAuthorizeUrl);
+
+        authCodeResponse.then()
+            .statusCode(302)
+            .header("Location", equalTo(baseUrl + "/web/sign-in"));
+    }
+
+    @Test
+    void authCode_authenticatedAndValidRequest_redirectWithCode() {
         signUp("dawid@d.c", "password", "Dawid");
         var signInResponse = signIn("dawid@d.c", "password");
 
-        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=ciy-web&state=1234xyz&code_challenge=MMRGwBwWyq4DLBuYbwPHRF6HGyVnN_UAUDnQ8GVGjn8&code_challenge_method=S256";
+        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway";
         given()
             .redirects().follow(false)
             .cookies(signInResponse.getDetailedCookies())
@@ -65,6 +83,6 @@ class Oauth2Test {
             .get(oauthAuthorizeUrl)
         .then()
             .statusCode(302)
-            .header("Location", startsWith("http://webapp/sign-in?code"));
+            .header("Location", startsWith(redirectUrl + "?code"));
     }
 }
