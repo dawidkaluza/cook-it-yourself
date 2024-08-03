@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: web-app-config
 data:
-  API_GATEWAY_SERVER_URL: "http://api-gateway:8080/api"
+  API_GATEWAY_SERVER_URL: "http://api-gateway:8080"
