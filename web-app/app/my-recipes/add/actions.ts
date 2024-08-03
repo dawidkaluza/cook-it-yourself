@@ -82,7 +82,7 @@ export async function addRecipe(prevState: any, formData: FormData) : Promise<Fi
       body: recipe,
     });
     if (createdRecipe) {
-      redirect(`/my-recipes/${recipe.id}/`);
+      redirect(`/my-recipes/${createdRecipe.id}/`);
     }
   } catch (error) {
     if (error instanceof ApiError) {
