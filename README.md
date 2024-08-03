@@ -25,20 +25,28 @@ The app is separated into front-end web application and back-end services, as de
 
 ## Web app
 
+![Web app CI](https://github.com/dawidkaluza/cook-it-yourself/actions/workflows/web-app-ci.yml/badge.svg)
+
 - web application based on Next.js with Client & Server Rendering 
 - communicates with back-end through REST API via API Gateway
 
 ## API Gateway
+
+![API Gateway CI](https://github.com/dawidkaluza/cook-it-yourself/actions/workflows/api-gateway-ci.yml/badge.svg)
 
 - secures access to back-end services via OAuth 2 (Confidential client)
 - forwards incoming requests to proper services, returns their responses back to the client
 
 ## User service
 
+![User service CI](https://github.com/dawidkaluza/cook-it-yourself/actions/workflows/user-service-ci.yml/badge.svg)
+
 - enables signing up, authentication and authorization
 - acts as Authorization server in OAuth 2 dance
 
 ## Kitchen service
+
+![Kitchen service CI](https://github.com/dawidkaluza/cook-it-yourself/actions/workflows/kitchen-service-ci.yml/badge.svg)
 
 - service where cook (aka user) can manage its recipes
 - acts as Resource server in OAuth 2 dance
