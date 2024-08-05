@@ -17,9 +17,12 @@ The app is separated into front-end web application and back-end services, as de
 
 ![High level architecture](./images/high-level-architecture.jpg)
 
-- Every app is containerized via Docker, so it can be started and tested independently on local environment.
-- Additionally, the apps have CI processes configured, so that new version of each app is automatically built, tested and containerized if everything works as expected.
-- Back-end services and their dependencies are configured to work out-of-the box on local Kubernetes cluster so starting all services together only requires launching K8s cluster and applying prepared configs, without any long manual OS-dependent setup.
+- Web app implemented with Javascript, Typescript, React, Next.js and Bootstrap.
+- Backend services implemented with Java, Spring Boot, Spring Security, Spring Cloud, PostgresSQL, Redis and RabbitMQ.
+- Every app is containerized via Docker, so it can be started and tested independently on local environment without any manual setup. Besides that, they all can work together in Kubernetes by applying prepared config files.
+- The apps have automated CI processes configured with GitHub Actions, so that a new version of each app is automatically built, tested and containerized.
+- Web app and services communicate with each other synchronously via REST API or asynchronously via AMQP API.
+- Back-end services are secured by OAuth 2 protocol.
 
 # Applications
 
