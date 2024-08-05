@@ -57,6 +57,51 @@ Services are secured via OAuth 2 protocol.
 
 ![Security](./images/security.png)
 
+# Run locally on Kubernetes
+
+As mentioned, you can run the apps locally on Kubernetes, by going through the following steps:
+
+1. Configure your local environment to map _auth.ciy.localhost_ and _ciy.localhost_ hostnames to _127.0.0.1_ address. This is required to avoid cookies conflict in your browser. The easiest way to accomplish that is by modifying hosts file and adding the following entries into it:
+    ```
+    127.0.0.1   auth.ciy.localhost
+    127.0.0.1   ciy.localhost
+    ```
+    [How to Edit Hosts File in Windows, macOS, and Linux](https://www.liquidweb.com/blog/edit-hosts-file-macos-windows-linux/)
+
+2. Create a local Kubernetes cluster. I personally use [kind](https://kind.sigs.k8s.io/) but anything should be working.
+3. Install and deploy NGINX Gateway Fabric. It's implementation of [Gateway API](https://kubernetes.io/docs/concepts/services-networking/gateway/) that would make services available for external connections. [Click here to go to the installation guide](https://docs.nginx.com/nginx-gateway-fabric/installation/installing-ngf/manifests/).
+4. Deploy apps and its dependencies. There is a main k8s config directory and every app has its own config directory as well. Start from applying the root config and after that go through config of each app in the following order: user-service, kitchen-service, api-gateway, web-app.
+    ```
+    kubectl apply -f ./k8s
+    kubectl apply -f ./user-service/k8s
+    kubectl apply -f ./kitchen-service/k8s
+    kubectl apply -f ./api-gateway/k8s
+    kubectl apply -f ./web-app/k8s
+    ``` 
+    Confirm that the apps are deployed correctly by checking pods status.
+    ```
+   kubectl get pods
+   
+   > NAME                                        READY   STATUS    RESTARTS      AGE
+   > api-gateway-7697dbdb4-s5zqp                 1/1     Running   0             82s
+   > kitchen-service-686966bdd9-wdcm7            1/1     Running   1 (69s ago)   91s
+   > kitchen-service-postgres-6546844979-pn92x   1/1     Running   0             91s
+   > rabbitmq-75c4b46bff-6lr54                   1/1     Running   0             2m9s
+   > user-service-6f545c4946-r9rww               1/1     Running   2 (53s ago)   98s
+   > user-service-postgres-67c7df67b8-cv6f9      1/1     Running   0             98s
+   > user-service-redis-6c64b4ffdf-n756l         1/1     Running   0             98s
+   > web-app-86bf4b6cdd-wkm8r                    1/1     Running   0             76s
+    ```
+5. Open port forwarding between local environment and an nginx pod as explained [here](https://docs.nginx.com/nginx-gateway-fabric/installation/running-on-kind/). To make it easy to switch between deployed and developed web-app application open local ports _3000_ and _8080_ to pod's port _80_.
+    ```
+    kubectl -n nginx-gateway get pods
+   
+    > NAME                             READY   STATUS    RESTARTS   AGE
+    > nginx-gateway-5d49f68457-zc9vg   2/2     Running   0          9m39s
+   
+    kubectl -n nginx-gateway port-forward pod/nginx-gateway-5d49f68457-zc9vg 3000:80 8080:80
+    ```
+6. Open the browser and go to ciy.localhost:3000 site.
 
 
 
