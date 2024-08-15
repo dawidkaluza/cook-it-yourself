@@ -1,9 +1,9 @@
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
 import './index.css'
 import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
-import {SignUp} from "./pages/SignUp.tsx";
-import {SignIn} from "./pages/SignIn.tsx";
+import {SignUpPage} from "./pages/sign-up/SignUpPage.tsx";
+import {SignInPage} from "./pages/sign-in/SignInPage.tsx";
+import {ConsentPage} from "./pages/consent/ConsentPage.tsx";
 
 const router = createBrowserRouter(
   [
@@ -13,15 +13,15 @@ const router = createBrowserRouter(
     },
     {
       path: "/sign-up",
-      element: <SignUp />
+      element: <SignUpPage />
     },
     {
       path: "/sign-in",
-      element: <SignIn />
+      element: <SignInPage />
     },
     {
       path: "/consent",
-      element: <App />
+      element: <ConsentPage />
     },
   ],
   {

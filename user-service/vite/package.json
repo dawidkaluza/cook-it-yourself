@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build --base=/web/",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview --base=/web/"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.3.1",
