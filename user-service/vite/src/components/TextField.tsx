@@ -16,6 +16,7 @@ export const TextField = (props: {
         id={props.name}
         name={props.name}
         placeholder={props.placeholder}
+        type={props.type}
         className="w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400"
       />
     </div>
