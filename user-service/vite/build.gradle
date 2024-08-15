@@ -14,8 +14,8 @@ tasks.register('npmCi', NpmTask) {
     outputs.dir('node_modules')
 }
 
-tasks.register('npmStart', NpmTask) {
-    args = [ 'start' ]
+tasks.register('npmDev', NpmTask) {
+    args = [ 'run', 'dev' ]
     mustRunAfter('npmCi')
 }
 
