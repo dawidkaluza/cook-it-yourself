@@ -1,4 +1,5 @@
 rootProject.name = 'user-service'
 include ':web'
+include ':vite'
 include ':service'
 
