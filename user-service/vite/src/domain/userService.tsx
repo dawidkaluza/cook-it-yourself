@@ -2,7 +2,7 @@ import {settings} from "../settings/settings.ts";
 import {fetchApi} from "../api/fetch.ts";
 import {ApiError} from "../api/ApiError.ts";
 import {RedirectResponse, SignInRequest, SignInResponse} from "./dtos/user.ts";
-import {InvalidCredentialsError} from "./errors/InvalidCredentialsError.tsx";
+import {InvalidCredentialsError} from "./errors/user.tsx";
 
 const authorize = async (redirectUrl: string): Promise<RedirectResponse> => {
   return await fetchApi({

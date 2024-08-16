@@ -1,7 +1,7 @@
 import {useCallback, useState} from "react";
 import {userService} from "../domain/userService.tsx";
 import {useNavigate} from "react-router-dom";
-import {InvalidCredentialsError} from "../domain/errors/InvalidCredentialsError.tsx";
+import {InvalidCredentialsError} from "../domain/errors/user.tsx";
 import {SignInRequest} from "../domain/dtos/user.ts";
 
 export const useSignIn = () => {
