@@ -1,3 +1,4 @@
+import {settings} from "../settings/settings.ts";
 
 type SignInRequest = {
   email: string;
@@ -5,13 +6,13 @@ type SignInRequest = {
   csrfToken: string;
 };
 
-type SignInApiResponse = {
-  redirectUrl?: string;
-};
-
 type SignInResponse = {
   redirectUrl: string;
   external: boolean;
+};
+
+type ApiRedirectResponse = {
+  redirectUrl?: string;
 };
 
 class InvalidCredentialsError extends Error {
@@ -21,38 +22,56 @@ class InvalidCredentialsError extends Error {
   }
 }
 
-const authorize = (redirectUrl: string): Promise<SignInApiResponse> => {
-  // TODO implement
-  throw new Error("Not implemented.");
+class ApiError extends Error {
+  private _response: Response;
+
+  constructor(response: Response) {
+    super("API error, http status " + response.status);
+    this.name = "ApiError";
+    this._response = response;
+  }
+
+  get response(): Response {
+    return this._response;
+  }
+
+  set response(value: Response) {
+    this._response = value;
+  }
+}
+
+const authorize = async (redirectUrl: string): Promise<ApiRedirectResponse> => {
+  const response = await fetch(redirectUrl);
+
+  if (!response.ok) {
+    throw new ApiError(response);
+  }
+
+  return await response.json();
 };
 
 
-// TODO should return type be wrapped as a Promise when its async already?
 const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => {
   if (!redirectUrl) {
-    return Promise.resolve({
+    return {
       redirectUrl: "",
       external: false,
-    });
+    }
   }
 
   const appUrl = import.meta.env.BASE_URL;
   if (redirectUrl.startsWith(appUrl)) {
-    return Promise.resolve({
+    return {
       redirectUrl,
       external: false,
-    });
+    }
   }
 
 
-  let userServiceUrl: string | undefined = import.meta.env.VITE_USER_SERVICE_URL;
+  let userServiceUrl = settings.userServiceUrl;
   if (!userServiceUrl) {
-    const publicPath: string | undefined = import.meta.env.VITE_PUBLIC_PATH;
-    if (publicPath) {
-      userServiceUrl = appUrl.slice(0, appUrl.length - publicPath.length); // TODO this might be failing then public path has slash at the begiining and/or and
-    } else {
-      userServiceUrl = appUrl;
-    }
+    const publicPath = settings.publicPath;
+    userServiceUrl = publicPath ? new URL(appUrl).href : appUrl;
   }
 
   if (redirectUrl.startsWith(userServiceUrl)) {
@@ -60,10 +79,10 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
     return handleRedirect(authResponse.redirectUrl);
   }
 
-  return Promise.resolve({
+  return {
     redirectUrl: redirectUrl,
     external: true,
-  });
+  }
 };
 
 export const signIn = async (request: SignInRequest) => {
@@ -79,8 +98,7 @@ export const signIn = async (request: SignInRequest) => {
   requestData.append("username", request.email);
   requestData.append("password", request.password);
 
-  const userServiceUrl = import.meta.env.VITE_USER_SERVICE_URL ?? "";
-  const response = await fetch(userServiceUrl + "/sign-in", {
+  const response = await fetch(settings.userServiceUrl + "/sign-in", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -97,11 +115,11 @@ export const signIn = async (request: SignInRequest) => {
       }
 
       default: {
-        throw new Error("Unexpected error");
+        throw new ApiError(response);
       }
     }
   }
 
-  const body: SignInApiResponse = await response.json();
+  const body: ApiRedirectResponse = await response.json();
   return handleRedirect(body.redirectUrl);
 };
