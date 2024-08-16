@@ -4,6 +4,7 @@ import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import {SignUpPage} from "./pages/sign-up/SignUpPage.tsx";
 import {SignInPage} from "./pages/sign-in/SignInPage.tsx";
 import {ConsentPage} from "./pages/consent/ConsentPage.tsx";
+import {CookiesProvider} from "react-cookie";
 
 const router = createBrowserRouter(
   [
@@ -30,5 +31,7 @@ const router = createBrowserRouter(
 );
 
 createRoot(document.getElementById('root')!).render(
-  <RouterProvider router={router} />,
+  <CookiesProvider>
+    <RouterProvider router={router} />
+  </CookiesProvider>,
 );
