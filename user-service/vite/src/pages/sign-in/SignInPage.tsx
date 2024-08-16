@@ -2,7 +2,8 @@ import {ChangeEvent, FormEvent, useState} from "react";
 import {TextField} from "../../components/TextField.tsx";
 import {SubmitButton} from "../../components/SubmitButton.tsx";
 import {Link} from "../../components/Link.tsx";
-import {SignInRequest, useSignIn} from "../../hooks/useSignIn.ts";
+import {useSignIn} from "../../hooks/useSignIn.ts";
+import {SignInRequest} from "../../domain/dtos/user.ts";
 
 export const SignInPage = () => {
   const [fields, setFields] = useState<SignInRequest>({ email: "", password: "" });
@@ -34,19 +35,19 @@ export const SignInPage = () => {
 
       <TextField
         name="email"
+        label="E-mail"
         value={fields.email}
         onChange={onFieldChange}
-        label="E-mail"
         fullWidth
         style="mb-3"
       />
 
       <TextField
         name="password"
+        label="Password"
         type="password"
         value={fields.password}
         onChange={onFieldChange}
-        label="Password"
         fullWidth
         style="mb-3"
       />

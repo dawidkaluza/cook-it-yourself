@@ -1,23 +1,24 @@
-import {ChangeEventHandler} from "react";
+import {ChangeEventHandler, useId} from "react";
 
 export const TextField = (props: {
   name: string;
+  label: string;
   type?: "text" | "password";
   value?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
-  label?: string;
   placeholder?: string;
   fullWidth?: boolean;
   style?: string;
 }) => {
+  const id = useId();
   const style: string = (props.style ?? "") + (props.fullWidth ? " w-full" : "");
   return (
     <div className={style}>
-      <label htmlFor="email" className="block mb-1 font-medium">
+      <label htmlFor={props.name + "_" + id} className="block mb-1 font-medium">
         {props.label}
       </label>
       <input
-        id={props.name}
+        id={props.name + "_" + id}
         name={props.name}
         type={props.type}
         value={props.value}
