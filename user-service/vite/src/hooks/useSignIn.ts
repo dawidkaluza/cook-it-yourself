@@ -1,18 +1,13 @@
 import {useCallback, useState} from "react";
-import {InvalidCredentialsError, userService} from "../services/userService.tsx";
-import {useCookies} from "react-cookie";
+import {userService} from "../domain/userService.tsx";
 import {useNavigate} from "react-router-dom";
-
-export type SignInRequest = {
-  email: string;
-  password: string;
-}
+import {InvalidCredentialsError} from "../domain/errors/InvalidCredentialsError.tsx";
+import {SignInRequest} from "../domain/dtos/user.ts";
 
 export const useSignIn = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [cookies] = useCookies(['XSRF-TOKEN']);
   const navigate = useNavigate();
 
   const signIn = useCallback(
@@ -21,11 +16,7 @@ export const useSignIn = () => {
       setSuccess("");
       setError("");
 
-      userService.signIn({
-        email: signInReq.email,
-        password: signInReq.password,
-        csrfToken: cookies["XSRF-TOKEN"] ?? ""
-      })
+      userService.signIn(signInReq)
         .then(response => {
           setSuccess("Signing in proceeded successfully.");
 
@@ -51,7 +42,7 @@ export const useSignIn = () => {
           setLoading(false)
         });
 
-    }, [setLoading, setSuccess, setError, cookies, userService, navigate, setTimeout, window.location.assign]
+    }, [setLoading, setSuccess, setError, userService, setTimeout, window.location.assign, navigate]
   )
 
   return {
