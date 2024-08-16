@@ -1,28 +1,28 @@
 import {settings} from "../settings/settings.ts";
 
-type SignInRequest = {
+export type SignInRequest = {
   email: string;
   password: string;
   csrfToken: string;
 };
 
-type SignInResponse = {
+export type SignInResponse = {
   redirectUrl: string;
   external: boolean;
 };
 
-type ApiRedirectResponse = {
+export type ApiRedirectResponse = {
   redirectUrl?: string;
 };
 
-class InvalidCredentialsError extends Error {
+export class InvalidCredentialsError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "InvalidCredentialsError";
   }
 }
 
-class ApiError extends Error {
+export class ApiError extends Error {
   private _response: Response;
 
   constructor(response: Response) {
@@ -85,7 +85,7 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
   }
 };
 
-export const signIn = async (request: SignInRequest) => {
+const signIn = async (request: SignInRequest) => {
   if (!request.email || !request.password) {
     throw new InvalidCredentialsError("Invalid username or password");
   }
@@ -123,3 +123,5 @@ export const signIn = async (request: SignInRequest) => {
   const body: ApiRedirectResponse = await response.json();
   return handleRedirect(body.redirectUrl);
 };
+
+export const userService = { signIn };
