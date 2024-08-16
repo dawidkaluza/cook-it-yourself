@@ -5,7 +5,7 @@ import Cookies from "universal-cookie";
 type ApiRequest = {
   url: string,
   method?: string;
-  body?: any;
+  body?: BodyInit;
   headers?: HeadersInit;
 }
 
@@ -13,7 +13,7 @@ export const fetchApi = async <T>(request: ApiRequest): Promise<T> => {
   const fullUrl = request.url.startsWith("/") ? (settings.userServiceUrl + request.url) : request.url;
   const response = await fetch(fullUrl, {
     method: request.method,
-    body: request.body ? JSON.stringify(request.body) : undefined,
+    body: request.body,
     credentials: settings.userServiceUrl ? "include" : "same-origin",
     headers: {
       "Content-Type": "application/json",

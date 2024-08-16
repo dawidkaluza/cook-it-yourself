@@ -57,10 +57,11 @@ const signIn = async (request: SignInRequest) => {
   try {
     const body = await fetchApi<RedirectResponse>({
       url: "/sign-in",
+      method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: requestData.toString()
+      body: requestData
     });
     return handleRedirect(body.redirectUrl);
   } catch (error) {
