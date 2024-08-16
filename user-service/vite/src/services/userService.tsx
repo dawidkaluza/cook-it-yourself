@@ -41,7 +41,12 @@ export class ApiError extends Error {
 }
 
 const authorize = async (redirectUrl: string): Promise<ApiRedirectResponse> => {
-  const response = await fetch(redirectUrl);
+  const response = await fetch(redirectUrl, {
+    headers: {
+      "Accept": "application/json",
+    },
+    credentials: "include"
+  });
 
   if (!response.ok) {
     throw new ApiError(response);
@@ -102,9 +107,11 @@ const signIn = async (request: SignInRequest) => {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
+      "Accept": "application/json",
       "X-XSRF-TOKEN": request.csrfToken
     },
     body: requestData,
+    credentials: "include",
   });
 
   if (!response.ok) {
