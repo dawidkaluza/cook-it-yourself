@@ -1,15 +1,24 @@
-import {FormEvent} from "react";
+import {ChangeEvent, FormEvent, useState} from "react";
 import {TextField} from "../../components/TextField.tsx";
 import {SubmitButton} from "../../components/SubmitButton.tsx";
 import {Link} from "../../components/Link.tsx";
-import {useSignIn} from "../../hooks/useSignIn.ts";
+import {SignInRequest, useSignIn} from "../../hooks/useSignIn.ts";
 
 export const SignInPage = () => {
+  const [fields, setFields] = useState<SignInRequest>({ email: "", password: "" });
   const { signIn, loading, success, error} = useSignIn();
+
+  const onFieldChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const target = event.target;
+    setFields({
+      ...fields,
+      [target.name]: target.value
+    });
+  }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    signIn();
+    signIn(fields);
   };
 
   return (
@@ -23,8 +32,24 @@ export const SignInPage = () => {
         Sign in
       </h1>
 
-      <TextField name="email" label="E-mail" fullWidth style="mb-3" />
-      <TextField name="password" type="password" label="Password" fullWidth style="mb-3" />
+      <TextField
+        name="email"
+        value={fields.email}
+        onChange={onFieldChange}
+        label="E-mail"
+        fullWidth
+        style="mb-3"
+      />
+
+      <TextField
+        name="password"
+        type="password"
+        value={fields.password}
+        onChange={onFieldChange}
+        label="Password"
+        fullWidth
+        style="mb-3"
+      />
 
       <SubmitButton loading={loading} style="mb-5">Sign in</SubmitButton>
 
@@ -37,13 +62,13 @@ export const SignInPage = () => {
 
       {error &&
         <p className="text-red-600">
-          Invalid e-mail or password.
+          {error}
         </p>
       }
 
       {success &&
         <p className="text-green-600">
-          Signed in successfully.
+          {success}
         </p>
       }
     </form>
