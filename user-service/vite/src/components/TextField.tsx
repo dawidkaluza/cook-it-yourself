@@ -7,13 +7,11 @@ export const TextField = (props: {
   value?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   placeholder?: string;
-  fullWidth?: boolean;
   style?: string;
 }) => {
   const id = useId();
-  const style: string = (props.style ?? "") + (props.fullWidth ? " w-full" : "");
   return (
-    <div className={style}>
+    <div className={props.style}>
       <label htmlFor={props.name + "_" + id} className="block mb-1 font-medium">
         {props.label}
       </label>
