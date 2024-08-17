@@ -3,15 +3,14 @@ import {ApiError} from "./ApiError.ts";
 import Cookies from "universal-cookie";
 
 type ApiRequest = {
-  url: string,
+  endpoint: string,
   method?: string;
   body?: BodyInit;
   headers?: HeadersInit;
 }
 
 export const fetchApi = async <T>(request: ApiRequest): Promise<T> => {
-  const fullUrl = request.url.startsWith("/") ? (settings.userServiceUrl + request.url) : request.url;
-  const response = await fetch(fullUrl, {
+  const response = await fetch(settings.userServiceUrl + request.endpoint, {
     method: request.method,
     body: request.body,
     credentials: settings.userServiceUrl ? "include" : "same-origin",

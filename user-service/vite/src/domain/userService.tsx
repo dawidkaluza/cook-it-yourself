@@ -6,7 +6,7 @@ import {InvalidCredentialsError} from "./errors/user.tsx";
 
 const authorize = async (redirectUrl: string): Promise<RedirectResponse> => {
   return await fetchApi({
-    url: redirectUrl,
+    endpoint: redirectUrl,
   });
 };
 
@@ -27,7 +27,6 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
     }
   }
 
-
   let userServiceUrl = settings.userServiceUrl;
   if (!userServiceUrl) {
     const publicPath = settings.publicPath;
@@ -35,7 +34,8 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
   }
 
   if (redirectUrl.startsWith(userServiceUrl)) {
-    const authResponse = await authorize(redirectUrl);
+    const redirectEndpoint = redirectUrl.slice(userServiceUrl.length);
+    const authResponse = await authorize(redirectEndpoint);
     return handleRedirect(authResponse.redirectUrl);
   }
 
@@ -56,7 +56,7 @@ const signIn = async (request: SignInRequest) => {
 
   try {
     const body = await fetchApi<RedirectResponse>({
-      url: "/sign-in",
+      endpoint: "/sign-in",
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
