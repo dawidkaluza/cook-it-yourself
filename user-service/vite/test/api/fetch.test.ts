@@ -1,6 +1,7 @@
 import {fetchApi} from "../../src/api/fetch.ts";
 import {afterAll, afterEach, beforeAll, expect, Mock} from "vitest";
 import {settings} from "../../src/settings/settings.ts";
+import Cookies from "universal-cookie";
 
 beforeAll(() => {
   vi.stubGlobal("fetch", vi.fn());
@@ -29,7 +30,6 @@ describe("fetchApi function", () => {
     await expect(() => fetchApi({ endpoint: "/invalid-path" }))
       .rejects.toThrowError("API error, http status 404");
   });
-
   test.each([
     [ "", "same-origin" ],
     [ "http://localhost:8008", "include" ],
@@ -69,4 +69,31 @@ describe("fetchApi function", () => {
       }
     });
   });
+
+  test("fetch with xsrf token", async () => {
+    // Given
+    const cookies = new Cookies();
+    cookies.set("XSRF-TOKEN", "123xyz");
+
+    const givenResponse = {
+      ok: true,
+      json: () => Promise.resolve({ id: 1 }),
+    };
+    const fetchMock = (fetch as Mock);
+    fetchMock.mockResolvedValue(givenResponse);
+
+    // When
+    const response: { id: number } = await fetchApi({ endpoint: "/user/1" });
+
+    // Then
+    expect(response).toBeDefined();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "X-XSRF-TOKEN": "123xyz"
+        })
+      })
+    );
+  })
 })
