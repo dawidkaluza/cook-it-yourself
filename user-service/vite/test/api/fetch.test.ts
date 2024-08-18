@@ -1,20 +1,17 @@
 import {fetchApi} from "../../src/api/fetch.ts";
-import {afterEach, expect} from "vitest";
+import {afterAll, afterEach, beforeAll, expect, Mock} from "vitest";
+import {settings} from "../../src/settings/settings.ts";
 
-const fetchMock = vi.fn();
-globalThis.fetch = fetchMock;
-
-const userServiceUrlMock = vi.fn();
-vi.mock("../../src/settings/settings.ts", () => {
-  return {
-    publicPath: "",
-    userServiceUrl: userServiceUrlMock,
-  };
+beforeAll(() => {
+  vi.stubGlobal("fetch", vi.fn());
 });
 
 afterEach(() => {
-  fetchMock.mockClear();
-  userServiceUrlMock.mockClear();
+  (fetch as Mock).mockClear();
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
 });
 
 describe("fetchApi function", () => {
@@ -26,7 +23,7 @@ describe("fetchApi function", () => {
       statusText: "Not Found",
     };
 
-    fetchMock.mockResolvedValue(givenResponse);
+    (fetch as Mock).mockResolvedValue(givenResponse);
 
     // When, then
     await expect(() => fetchApi({ endpoint: "/invalid-path" }))
@@ -38,12 +35,13 @@ describe("fetchApi function", () => {
     [ "http://localhost:8008", "include" ],
   ])("fetch when userServiceUrl=%s, return the response", async (userServiceUrl, expectedCredentials) => {
     // Given
-    userServiceUrlMock.mockReturnValue(userServiceUrl);
+    vi.spyOn(settings, "userServiceUrl", "get").mockReturnValue(userServiceUrl);
 
     const givenResponse = {
       ok: true,
       json: () => Promise.resolve({ id: 1 }),
     };
+    const fetchMock = (fetch as Mock);
     fetchMock.mockResolvedValue(givenResponse);
 
     // When
