@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Link component > render 1`] = `
+<div>
+  <a
+    class="font-bold text-blue-500 hover:text-blue-700"
+    href="/about-me"
+  >
+    About me
+  </a>
+</div>
+`;
