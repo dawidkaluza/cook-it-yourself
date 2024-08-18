@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SubmitButton component > render 1`] = `
+<div>
+  <button
+    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded w-full"
+    type="submit"
+  >
+    Submit form
+  </button>
+</div>
+`;
