@@ -10,14 +10,21 @@ type ApiRequest = {
 }
 
 export const fetchApi = async <T>(request: ApiRequest): Promise<T> => {
+  const apiHeaders: HeadersInit = {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  };
+  const xsrfToken = new Cookies().get("XSRF-TOKEN");
+  if (xsrfToken) {
+    apiHeaders["X-XSRF-TOKEN"] = xsrfToken;
+  }
+
   const response = await fetch(settings.userServiceUrl + request.endpoint, {
     method: request.method,
     body: request.body,
     credentials: settings.userServiceUrl ? "include" : "same-origin",
     headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "X-XSRF-TOKEN": new Cookies().get("XSRF-TOKEN"),
+      ...apiHeaders,
       ...request.headers
     }
   });

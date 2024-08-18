@@ -1,15 +1,21 @@
 import {fetchApi} from "../../src/api/fetch.ts";
+import {afterEach, expect} from "vitest";
 
 const fetchMock = vi.fn();
 globalThis.fetch = fetchMock;
 
 const userServiceUrlMock = vi.fn();
-vi.mock("../settings/settings.ts", () => {
+vi.mock("../../src/settings/settings.ts", () => {
   return {
     publicPath: "",
     userServiceUrl: userServiceUrlMock,
   };
-})
+});
+
+afterEach(() => {
+  fetchMock.mockClear();
+  userServiceUrlMock.mockClear();
+});
 
 describe("fetchApi function", () => {
   test("fetch error response, throw error", async () => {
@@ -28,9 +34,9 @@ describe("fetchApi function", () => {
   });
 
   test.each([
-    [ "" ],
-    [ "http://localhost:8008" ],
-  ])("fetch when userServiceUrl=%s, return the response", async (userServiceUrl) => {
+    [ "", "same-origin" ],
+    [ "http://localhost:8008", "include" ],
+  ])("fetch when userServiceUrl=%s, return the response", async (userServiceUrl, expectedCredentials) => {
     // Given
     userServiceUrlMock.mockReturnValue(userServiceUrl);
 
@@ -41,7 +47,7 @@ describe("fetchApi function", () => {
     fetchMock.mockResolvedValue(givenResponse);
 
     // When
-    const response = await fetchApi({
+    const response: { id: number } = await fetchApi({
       endpoint: "/sign-up",
       method: "POST",
       body: JSON.stringify({ name: "Dawid" }),
@@ -52,6 +58,17 @@ describe("fetchApi function", () => {
 
     // Then
     expect(response).toBeDefined();
-    // TODO write more assertions here
+    expect(response.id).toBe(1);
+
+    expect(fetchMock).toHaveBeenCalledWith(userServiceUrl + "/sign-up", {
+      method: "POST",
+      body: JSON.stringify({ name: "Dawid" }),
+      credentials: expectedCredentials,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Custom-Header": "Custom-Header-Value",
+      }
+    });
   });
 })
