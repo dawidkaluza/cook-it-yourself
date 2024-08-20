@@ -32,7 +32,7 @@ export const useSignIn = () => {
         })
         .catch(error => {
           if (error instanceof InvalidCredentialsError) {
-            setError("Invalid username or password.");
+            setError("Invalid email or password.");
           } else {
             setError("Unable to process the request. Try again later.");
             console.error("Unable to process the request.", error);

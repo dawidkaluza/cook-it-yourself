@@ -106,7 +106,7 @@ describe("signIn function", () => {
       }
     },
   ])(
-    "signIn succeeded with userServiceUrl=$userServiceUrl, " +
+    "signIn succeeds with userServiceUrl=$userServiceUrl, " +
     "redirectUrl=$redirectUrl, authorizeRedirectUrl=$authorizeRedirectUrl, return $expectedResponse",
     async (
       {userServiceUrl, redirectUrl, authorizeRedirectUrl, expectedResponse}
