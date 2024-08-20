@@ -27,12 +27,7 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
     }
   }
 
-  let userServiceUrl = settings.userServiceUrl;
-  if (!userServiceUrl) {
-    const publicPath = settings.publicPath;
-    userServiceUrl = publicPath ? new URL(appUrl).href : appUrl;
-  }
-
+  let userServiceUrl = settings.userServiceUrl || new URL(appUrl).origin;
   if (redirectUrl.startsWith(userServiceUrl)) {
     const redirectEndpoint = redirectUrl.slice(userServiceUrl.length);
     const authResponse = await authorize(redirectEndpoint);
@@ -47,7 +42,7 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
 
 const signIn = async (request: SignInRequest) => {
   if (!request.email || !request.password) {
-    throw new InvalidCredentialsError("Invalid username or password.");
+    throw new InvalidCredentialsError("Invalid email or password.");
   }
 
   const requestData = new URLSearchParams();
@@ -70,7 +65,7 @@ const signIn = async (request: SignInRequest) => {
       switch (response.status) {
         case 401:
         case 403: {
-          throw new InvalidCredentialsError("Invalid username or password.");
+          throw new InvalidCredentialsError("Invalid email or password.");
         }
       }
     }

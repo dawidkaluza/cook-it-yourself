@@ -2,7 +2,7 @@ import {settings} from "../settings/settings.ts";
 import {ApiError} from "./ApiError.ts";
 import Cookies from "universal-cookie";
 
-type ApiRequest = {
+export type ApiRequest = {
   endpoint: string,
   method?: string;
   body?: BodyInit;
