@@ -30,7 +30,7 @@ export const fetchApi = async <T>(request: ApiRequest): Promise<T> => {
   });
 
   if (!response.ok) {
-    throw new ApiError(response);
+    throw new ApiError(response.status, await response.json());
   }
 
   return await response.json();

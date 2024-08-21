@@ -1,7 +1,7 @@
 import {settings} from "../settings/settings.ts";
 import {fetchApi} from "../api/fetch.ts";
 import {ApiError} from "../api/ApiError.ts";
-import {RedirectResponse, SignInRequest, SignInResponse} from "./dtos/user.ts";
+import {RedirectResponse, SignInRequest, SignInResponse, SignUpRequest} from "./dtos/user.ts";
 import {InvalidCredentialsError} from "./errors/user.tsx";
 
 const authorize = async (redirectUrl: string): Promise<RedirectResponse> => {
@@ -9,7 +9,6 @@ const authorize = async (redirectUrl: string): Promise<RedirectResponse> => {
     endpoint: redirectUrl,
   });
 };
-
 
 const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => {
   if (!redirectUrl) {
@@ -61,8 +60,7 @@ const signIn = async (request: SignInRequest) => {
     return handleRedirect(body.redirectUrl);
   } catch (error) {
     if (error instanceof ApiError) {
-      const response = error.response;
-      switch (response.status) {
+      switch (error.status) {
         case 401:
         case 403: {
           throw new InvalidCredentialsError("Invalid email or password.");
@@ -73,5 +71,9 @@ const signIn = async (request: SignInRequest) => {
     throw error;
   }
 };
+
+const signUp = async (request: SignUpRequest) => {
+
+}
 
 export const userService = { signIn };

@@ -2,6 +2,7 @@ import {fetchApi} from "../../src/api/fetch.ts";
 import {afterAll, afterEach, beforeAll, expect, Mock} from "vitest";
 import {settings} from "../../src/settings/settings.ts";
 import Cookies from "universal-cookie";
+import {ApiError} from "../../src/api/ApiError.ts";
 
 beforeAll(() => {
   vi.stubGlobal("fetch", vi.fn());
@@ -22,14 +23,28 @@ describe("fetchApi function", () => {
       ok: false,
       status: 404,
       statusText: "Not Found",
+      json: async () => { return { message: "Path not found" } },
     };
 
     (fetch as Mock).mockResolvedValue(givenResponse);
 
-    // When, then
-    await expect(() => fetchApi({ endpoint: "/invalid-path" }))
-      .rejects.toThrowError("API error, http status 404");
+    // When
+    let caughtError;
+    try {
+      await fetchApi({ endpoint: "/invalid-path" });
+    } catch (error) {
+      caughtError = error;
+    }
+
+    // Then
+    expect(caughtError).toBeDefined();
+    expect(caughtError).toBeInstanceOf(ApiError);
+
+    const apiError = caughtError as ApiError<any>;
+    expect(apiError.status).toBe(404);
+    expect(apiError.body).toEqual({ message: "Path not found" });
   });
+
   test.each([
     [ "", "same-origin" ],
     [ "http://localhost:8008", "include" ],

@@ -24,11 +24,7 @@ describe("signIn function", () => {
   ])("signIn with invalid credentials (email=%s, password=%s), throw error", async (email, password, statusCode) => {
     // Given
     (fetchApi as Mock).mockImplementation(async () => {
-      const response = {
-        ok: false,
-        status: statusCode,
-      } as Response;
-      throw new ApiError(response);
+      throw new ApiError(statusCode, {});
     });
     
     // When, then
@@ -39,10 +35,8 @@ describe("signIn function", () => {
   test.each([
     [
       new ApiError(
-        {
-          ok: false,
-          status: 500
-        } as Response
+        500,
+        {}
       ),
     ],
     [
@@ -55,17 +49,20 @@ describe("signIn function", () => {
     });
 
     // When
+    let caughtError;
     try {
       await userService.signIn({
         email: "dawid@mail.com",
         password: "passwd"
       });
     } catch (error) {
-      // Then
-      expect(error).instanceOf(Error);
-      expect(error).not.instanceOf(InvalidCredentialsError);
-      expect((error as Error).message).not.match(/Invalid email or password/i);
+      caughtError = error;
     }
+
+    // Then
+    expect(caughtError).instanceOf(Error);
+    expect(caughtError).not.instanceOf(InvalidCredentialsError);
+    expect((caughtError as Error).message).not.match(/Invalid email or password/i);
   });
 
   test.each([

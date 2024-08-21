@@ -1,19 +1,21 @@
 
 
-export class ApiError extends Error {
-  private _response: Response;
+export class ApiError<T> extends Error {
+  private readonly _status: number;
+  private readonly _body: T;
 
-  constructor(response: Response) {
-    super("API error, http status " + response.status);
+  constructor(status: number, body: T) {
+    super("API error, http status " + status);
     this.name = "ApiError";
-    this._response = response;
+    this._status = status;
+    this._body = body;
   }
 
-  get response(): Response {
-    return this._response;
+  get status(): number {
+    return this._status;
   }
 
-  set response(value: Response) {
-    this._response = value;
+  get body(): T {
+    return this._body;
   }
 }
