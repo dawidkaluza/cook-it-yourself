@@ -3,7 +3,8 @@ import {afterEach, expect, Mock} from "vitest";
 import {ApiError} from "../../src/api/ApiError.ts";
 import {userService} from "../../src/domain/userService.ts";
 import {settings} from "../../src/settings/settings.ts";
-import {InvalidCredentialsError} from "../../src/domain/errors/user.tsx";
+import {InvalidCredentialsError, InvalidFieldsError} from "../../src/domain/errors/user.tsx";
+import {SignUpRequest} from "../../src/domain/dtos/user.ts";
 
 vi.mock("../../src/api/fetch.ts", () => {
   return {
@@ -134,4 +135,105 @@ describe("signIn function", () => {
       expect(response).toEqual(expectedResponse);
     }
   );
+});
+
+describe("signUp function", () => {
+  test.each([
+    {
+      email: "",
+      name: "",
+      password: "",
+      status: 200,
+      body: {},
+      expectedErrorFields: [ "email", "name", "password" ],
+    },
+    {
+      email: "dawid@mail.com",
+      name: "Dawid",
+      password: "passwd",
+      status: 409,
+      body: {
+        error: "E-mail already exists"
+      },
+      expectedErrorFields: [ "email" ],
+    },
+    {
+      email: "dawid@mail.com",
+      name: "D",
+      password: "pwd",
+      status: 422,
+      body: {
+        fields: [
+          {
+            name: "name",
+            message: "Name must have from 3 to 256 chars."
+          },
+          {
+            name: "password",
+            message: "Password must have from 3 to 32 chars."
+          },
+        ]
+      },
+      expectedErrorFields: [ "name", "password" ],
+    },
+  ])("signUp with invalid fields (email=$email, name=$name, password=$password), throw error", async ({ email, name, password, status, body, expectedErrorFields}) => {
+    // Given
+    (fetchApi as Mock).mockRejectedValue(new ApiError(status, body));
+
+    // When
+    let caughtError;
+    try {
+      await userService.signUp({ email, name, password });
+    } catch (error) {
+      caughtError = error;
+    }
+
+    // Then
+    expect(caughtError).toBeDefined();
+    expect(caughtError).toBeInstanceOf(InvalidFieldsError);
+    const errorFieldsNames = Object.keys((caughtError as InvalidFieldsError).fields);
+    expect(errorFieldsNames).toEqual(expectedErrorFields);
+  });
+
+  test.each([
+    [new Error("Network error."), "Network error."],
+    [new ApiError(500, {}), "API error, http status 500"],
+  ])("signUp throws unexpected error, throw it further", async (error, expectedMessage) => {
+    // Given
+    (fetchApi as Mock).mockRejectedValue(error);
+
+    // When, then
+    await expect(() => userService.signUp({
+      email: "dawid@mail.com",
+      name: "Dawid",
+      password: "password"
+    })).rejects.toThrowError(expectedMessage);
+  });
+
+  test("signUp succeeds, return new user", async () => {
+    // Given
+    (fetchApi as Mock).mockImplementation(async (request: { body: string }) => {
+      const body: SignUpRequest = JSON.parse(request.body)
+      return {
+        id: 1,
+        email: body.email,
+        name: body.name,
+      }
+    });
+
+    const request: SignUpRequest = {
+      email: "dawid@mail.com",
+      name: "Dawid",
+      password: "passwd"
+    };
+
+    // When
+    const newUser = await userService.signUp(request);
+
+    // Then
+    expect(newUser).toBeDefined();
+    expect(newUser.id).toBeDefined();
+    expect(newUser.email).toBe(request.email);
+    expect(newUser.name).toBe(request.name);
+  });
 });

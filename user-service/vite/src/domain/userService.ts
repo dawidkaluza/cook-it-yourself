@@ -1,8 +1,22 @@
 import {settings} from "../settings/settings.ts";
 import {fetchApi} from "../api/fetch.ts";
 import {ApiError} from "../api/ApiError.ts";
-import {RedirectResponse, SignInRequest, SignInResponse, SignUpRequest} from "./dtos/user.ts";
-import {InvalidCredentialsError} from "./errors/user.tsx";
+import {RedirectResponse, SignInRequest, SignInResponse, SignUpRequest, SignUpResponse} from "./dtos/user.ts";
+import {InvalidCredentialsError, InvalidFieldsError} from "./errors/user.tsx";
+
+const validate = (request: Record<string, any>) => {
+  const errorFields: Record<string, string> = {};
+  for (const key in request) {
+    if (!request[key]) {
+      errorFields[key] = "Field must not be empty.";
+    }
+  }
+  return errorFields;
+}
+
+const isEmpty = (record: Record<string, string>) => {
+  return !Object.keys(record).length;
+}
 
 const authorize = async (redirectUrl: string): Promise<RedirectResponse> => {
   return await fetchApi({
@@ -40,7 +54,8 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
 };
 
 const signIn = async (request: SignInRequest) => {
-  if (!request.email || !request.password) {
+  const errorFields = validate(request);
+  if (!isEmpty(errorFields)) {
     throw new InvalidCredentialsError("Invalid email or password.");
   }
 
@@ -73,7 +88,42 @@ const signIn = async (request: SignInRequest) => {
 };
 
 const signUp = async (request: SignUpRequest) => {
+  const errorFields = validate(request);
+  if (!isEmpty(errorFields)) {
+    throw new InvalidFieldsError(errorFields);
+  }
 
-}
+  try {
+    return await fetchApi<SignUpResponse>({
+      endpoint: "/user/sign-up",
+      method: "POST",
+      body: JSON.stringify(request)
+    });
+  } catch(error) {
+    if (error instanceof ApiError) {
+      switch(error.status) {
+        case 409: {
+          throw new InvalidFieldsError({
+            email: "Email already exists"
+          });
+        }
 
-export const userService = { signIn };
+        case 422: {
+          const errorFields: Record<string, string> = {};
+          const response: { fields: Array<{ name: string, message: string}> } = error.body;
+          for (const field of response.fields) {
+            errorFields[field.name] = field.message;
+          }
+
+          if (!isEmpty(errorFields)) {
+            throw new InvalidFieldsError(errorFields);
+          }
+        }
+      }
+    }
+
+    throw error;
+  }
+};
+
+export const userService = { signIn, signUp };
