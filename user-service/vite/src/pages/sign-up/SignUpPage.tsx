@@ -43,7 +43,7 @@ export const SignUpPage = () => {
 
       <TextField
         name="name"
-        label="Dawid"
+        label="Name"
         value={fields.name}
         error={fieldsErrors.name}
         onChange={onFieldChange}
