@@ -4,7 +4,7 @@ import {userService} from "../domain/userService.ts";
 import {SignUpRequest} from "../domain/dtos/user.ts";
 import {InvalidFieldsError} from "../domain/errors/user.tsx";
 
-export const useSignUp = () => {
+export const  useSignUp = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");

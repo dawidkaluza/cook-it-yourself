@@ -9,7 +9,7 @@ export class InvalidFieldsError extends Error {
   private readonly _fields: Record<string, string>;
 
   constructor(fields: Record<string, string>) {
-    super("Invalid fields: " + fields);
+    super("Invalid fields.");
     this.name = "InvalidFieldsError";
     this._fields = fields;
   }
