@@ -44,7 +44,7 @@ exports[`SignInPage component > render 1`] = `
       />
     </div>
     <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded mb-5"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded disabled:opacity-75 disabled:hover:bg-blue-500 mb-5"
       type="submit"
     >
       Sign in
@@ -107,7 +107,7 @@ exports[`SignInPage component > submit with valid username and password, redirec
       />
     </div>
     <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded mb-5"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded disabled:opacity-75 disabled:hover:bg-blue-500 mb-5"
       type="submit"
     >
       Sign in
@@ -175,7 +175,7 @@ exports[`SignInPage component > submit with valid username and password, redirec
       />
     </div>
     <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded mb-5"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded disabled:opacity-75 disabled:hover:bg-blue-500 mb-5"
       type="submit"
     >
       Sign in
@@ -243,7 +243,7 @@ exports[`SignInPage component > submit, 'Invalid email or password.' error throw
       />
     </div>
     <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded mb-5"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded disabled:opacity-75 disabled:hover:bg-blue-500 mb-5"
       type="submit"
     >
       Sign in
@@ -311,7 +311,7 @@ exports[`SignInPage component > submit, 'Network error.' error thrown, message m
       />
     </div>
     <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded mb-5"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded disabled:opacity-75 disabled:hover:bg-blue-500 mb-5"
       type="submit"
     >
       Sign in
@@ -379,7 +379,7 @@ exports[`SignInPage component > type email and password, inputs change 1`] = `
       />
     </div>
     <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded mb-5"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded disabled:opacity-75 disabled:hover:bg-blue-500 mb-5"
       type="submit"
     >
       Sign in

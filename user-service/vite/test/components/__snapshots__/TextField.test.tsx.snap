@@ -130,7 +130,7 @@ exports[`TextField component > render with type password and all other props 1`]
       value="Dawid"
     />
     <span
-      class="block text-xs text-red-600 "
+      class="block text-xs text-red-600"
     >
       Invalid value
     </span>
@@ -158,7 +158,7 @@ exports[`TextField component > render with type text and all other props 1`] = `
       value="Dawid"
     />
     <span
-      class="block text-xs text-red-600 "
+      class="block text-xs text-red-600"
     >
       Invalid value
     </span>
