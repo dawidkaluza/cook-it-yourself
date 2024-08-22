@@ -3,7 +3,6 @@ import './index.css'
 import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import {SignUpPage} from "./pages/sign-up/SignUpPage.tsx";
 import {SignInPage} from "./pages/sign-in/SignInPage.tsx";
-import {ConsentPage} from "./pages/consent/ConsentPage.tsx";
 
 const router = createBrowserRouter(
   [
@@ -18,10 +17,6 @@ const router = createBrowserRouter(
     {
       path: "/sign-in",
       element: <SignInPage />
-    },
-    {
-      path: "/consent",
-      element: <ConsentPage />
     },
   ],
   {
