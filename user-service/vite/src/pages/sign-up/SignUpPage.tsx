@@ -6,6 +6,7 @@ import {ChangeEvent, FormEvent, useState} from "react";
 
 export const SignUpPage = () => {
   const [ fields, setFields ] = useState({ email: "", name: "", password: "" });
+  const [ changedFields, setChangedFields ] = useState(new Set<string>());
   const { signUp, loading, error, fieldsErrors, success } = useSignUp();
 
   const onFieldChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -14,11 +15,15 @@ export const SignUpPage = () => {
       ...fields,
       [target.name]: target.value
     });
+    const newChangedFields = new Set<string>(changedFields);
+    newChangedFields.add(target.name);
+    setChangedFields(newChangedFields);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     signUp(fields);
+    setChangedFields(new Set<string>());
   };
 
   return (
@@ -36,7 +41,7 @@ export const SignUpPage = () => {
         name="email"
         label="E-mail"
         value={fields.email}
-        error={fieldsErrors.email}
+        error={changedFields.has("email") ? undefined : fieldsErrors.email}
         onChange={onFieldChange}
         style="w-full mb-3"
       />
@@ -45,7 +50,7 @@ export const SignUpPage = () => {
         name="name"
         label="Name"
         value={fields.name}
-        error={fieldsErrors.name}
+        error={changedFields.has("name") ? undefined : fieldsErrors.name}
         onChange={onFieldChange}
         style="w-full mb-3"
       />
@@ -55,7 +60,7 @@ export const SignUpPage = () => {
         label="Password"
         type="password"
         value={fields.password}
-        error={fieldsErrors.email}
+        error={changedFields.has("password") ? undefined : fieldsErrors.password}
         onChange={onFieldChange}
         style="w-full mb-3"
       />

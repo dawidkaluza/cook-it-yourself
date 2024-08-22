@@ -50,9 +50,9 @@ describe("TextField component", () => {
       <TextField
         name="name" label="Name"
         type={type as "password" | "text"} value="Dawid"
+        error="Invalid value"
         onChange={() => {}}
-        placeholder="Dawid"
-        style="w-full"
+        placeholder="Dawid" style="w-full"
       />
     );
 
@@ -63,6 +63,9 @@ describe("TextField component", () => {
     expect(inputEl.getAttribute("type")).toBe(type);
     expect(inputEl.getAttribute("value")).toBe("Dawid");
     expect(inputEl.getAttribute("placeholder")).toBe("Dawid");
+
+    const errorEl = screen.getByText("Invalid value");
+    expect(errorEl).toBeDefined();
 
     const containerEl = inputEl.closest("div") as HTMLDivElement;
     expect(containerEl).not.toBeNull();

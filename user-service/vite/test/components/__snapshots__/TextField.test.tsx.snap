@@ -122,13 +122,18 @@ exports[`TextField component > render with type password and all other props 1`]
       Name
     </label>
     <input
-      class="w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400"
+      class="w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400 border-red-600"
       id="name_1234"
       name="name"
       placeholder="Dawid"
       type="password"
       value="Dawid"
     />
+    <span
+      class="block text-xs text-red-600 "
+    >
+      Invalid value
+    </span>
   </div>
 </div>
 `;
@@ -145,13 +150,18 @@ exports[`TextField component > render with type text and all other props 1`] = `
       Name
     </label>
     <input
-      class="w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400"
+      class="w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400 border-red-600"
       id="name_1234"
       name="name"
       placeholder="Dawid"
       type="text"
       value="Dawid"
     />
+    <span
+      class="block text-xs text-red-600 "
+    >
+      Invalid value
+    </span>
   </div>
 </div>
 `;

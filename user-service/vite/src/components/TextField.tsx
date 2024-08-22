@@ -5,6 +5,7 @@ export const TextField = (props: {
   label: string;
   type?: "text" | "password";
   value?: string;
+  error?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   placeholder?: string;
   style?: string;
@@ -22,8 +23,12 @@ export const TextField = (props: {
         value={props.value}
         onChange={props.onChange}
         placeholder={props.placeholder}
-        className="w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400"
+        className={
+          "w-full py-2 px-3 rounded border shadow text-gray-700 outline-none focus:border-blue-400"
+          + (props.error ? " border-red-600" : "")
+        }
       />
+      {props.error && <span className="block text-xs text-red-600">{props.error}</span>}
     </div>
   );
 };
