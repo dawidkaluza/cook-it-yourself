@@ -33,10 +33,7 @@ export const  useSignUp = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [
-    userService.signUp, setSuccess, setTimeout, navigate,
-    setFieldsErrors, setError, console.error, setLoading
-  ]);
+  }, [setSuccess, setError, setLoading, setFieldsErrors, navigate]);
 
   return {
     signUp,

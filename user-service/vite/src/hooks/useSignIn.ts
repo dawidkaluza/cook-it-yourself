@@ -42,7 +42,7 @@ export const useSignIn = () => {
           setLoading(false)
         });
 
-    }, [setLoading, setSuccess, setError, userService, setTimeout, window.location.assign, navigate]
+    }, [setLoading, setSuccess, setError, navigate]
   )
 
   return {

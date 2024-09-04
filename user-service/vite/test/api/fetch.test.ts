@@ -40,7 +40,7 @@ describe("fetchApi function", () => {
     expect(caughtError).toBeDefined();
     expect(caughtError).toBeInstanceOf(ApiError);
 
-    const apiError = caughtError as ApiError<any>;
+    const apiError = caughtError as ApiError<object>;
     expect(apiError.status).toBe(404);
     expect(apiError.body).toEqual({ message: "Path not found" });
   });

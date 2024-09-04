@@ -4,7 +4,8 @@ import {ApiError} from "../api/ApiError.ts";
 import {RedirectResponse, SignInRequest, SignInResponse, SignUpRequest, SignUpResponse} from "./dtos/user.ts";
 import {InvalidCredentialsError, InvalidFieldsError} from "./errors/user.tsx";
 
-const validate = (request: Record<string, any>) => {
+type JSONValue = string | number | boolean | null | { [x: string]: JSONValue } | Array<JSONValue>;
+const validate = (request: Record<string, JSONValue>) => {
   const errorFields: Record<string, string> = {};
   for (const key in request) {
     if (!request[key]) {
@@ -40,7 +41,7 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
     }
   }
 
-  let userServiceUrl = settings.userServiceUrl || new URL(appUrl).origin;
+  const userServiceUrl = settings.userServiceUrl || new URL(appUrl).origin;
   if (redirectUrl.startsWith(userServiceUrl)) {
     const redirectEndpoint = redirectUrl.slice(userServiceUrl.length);
     const authResponse = await authorize(redirectEndpoint);
