@@ -21,6 +21,8 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       globals: true,
+      reporters: ['junit', 'default'],
+      outputFile: './test-results/junit-report.xml'
     },
   };
 })

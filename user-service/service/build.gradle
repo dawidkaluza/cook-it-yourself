@@ -117,6 +117,7 @@ tasks.register('embedWebApp', Copy) {
     into "$buildDir/resources/main/static/web/."
 
     dependsOn(':web:npmCi')
+    dependsOn(':web:npmTest')
     dependsOn(':web:npmBuild')
 }
 

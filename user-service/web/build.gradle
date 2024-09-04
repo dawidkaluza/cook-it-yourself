@@ -19,6 +19,11 @@ tasks.register('npmDev', NpmTask) {
     mustRunAfter('npmCi')
 }
 
+tasks.register('npmTest', NpmTask) {
+    args = [ 'run', 'test' ]
+    mustRunAfter('npmCi')
+}
+
 tasks.register('npmBuild', NpmTask) {
     args = [ 'run', 'build' ]
 
@@ -26,4 +31,5 @@ tasks.register('npmBuild', NpmTask) {
     outputs.dir('dist')
 
     mustRunAfter('npmCi')
+    mustRunAfter('npmTest')
 }

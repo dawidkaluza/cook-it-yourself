@@ -42,13 +42,14 @@ jobs:
           path: |
             user-service/service/build/test-results/
             user-service/service/build/reports/
+            user-service/web/test-results/
 
       - name: Report test results
         if: ${{ success() || failure() }}
         uses: dorny/test-reporter@v1
         with:
           name: Test reports
-          path: 'user-service/service/build/test-results/**/*.xml'
+          path: 'user-service/service/build/test-results/**/*.xml,user-service/web/test-results/junit-report.xml'
           reporter: java-junit
 
       - name: Log into GitHub Container Registry
