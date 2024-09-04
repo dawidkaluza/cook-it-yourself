@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e
+FROM eclipse-temurin:17.0.11_9-jdk
 
 ARG UNAME=developer
 ARG UID=1000
@@ -25,6 +25,8 @@ RUN --mount=type=cache,target=/home/${UNAME}/.gradle,uid=${UID},gid=${GID} \
 RUN mv ~/.gradle_temp ~/.gradle
 RUN mv ~/app/web/.gradle_temp ~/app/web/.gradle
 RUN mv ~/app/web/node_modules_temp ~/app/web/node_modules
-COPY --chown=${UNAME} web/.env.dev web/.env web/webpack.config.js web/tsconfig.json ./web/
+COPY --chown=${UNAME} web/.env web/.env.production web/index.html ./web/
+COPY --chown=${UNAME} web/eslint.config.js web/postcss.config.js web/tailwind.config.js web/vite.config.ts ./web/
+COPY --chown=${UNAME} web/tsconfig.json web/tsconfig.app.json web/tsconfig.node.json ./web/
 
-CMD ./gradlew :web:npmStart --no-daemon
+CMD ./gradlew :web:npmDev --no-daemon

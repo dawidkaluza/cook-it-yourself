@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e
+FROM eclipse-temurin:17.0.11_9-jdk
 
 ARG UNAME=developer
 ARG UID=1000
