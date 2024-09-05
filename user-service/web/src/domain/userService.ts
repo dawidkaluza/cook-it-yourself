@@ -33,7 +33,7 @@ const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => 
     }
   }
 
-  const appUrl = import.meta.env.BASE_URL;
+  const appUrl = window.location.origin + settings.publicPath;
   if (redirectUrl.startsWith(appUrl)) {
     return {
       redirectUrl,

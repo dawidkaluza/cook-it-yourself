@@ -110,8 +110,9 @@ describe("signIn function", () => {
       {userServiceUrl, redirectUrl, authorizeRedirectUrl, expectedResponse}
     ) => {
       // Given
-      vi.stubEnv("BASE_URL", "http://user-service/web")
+      vi.spyOn(settings, "publicPath", "get").mockReturnValue("/web");
       vi.spyOn(settings, "userServiceUrl", "get").mockReturnValue(userServiceUrl);
+      vi.spyOn(window, "location", "get").mockReturnValue({ origin: "http://user-service" } as Location);
 
       (fetchApi as Mock).mockImplementation(async (request: ApiRequest) => {
         switch (request.endpoint) {
