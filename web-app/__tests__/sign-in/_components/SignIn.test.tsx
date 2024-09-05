@@ -84,7 +84,7 @@ describe("SignIn component", () => {
     expect(pushMock).toHaveBeenCalledWith("/")
   });
 
-  test("redirects when no params", () => {
+  test("no redirect when no params", () => {
     // Given
     hasMock.mockImplementation(() => false);
 
@@ -94,6 +94,6 @@ describe("SignIn component", () => {
     // Then
     expect(signInMock).not.toHaveBeenCalled();
     expect(signOutMock).not.toHaveBeenCalled();
-    expect(pushMock).toHaveBeenCalledWith(process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL + "/oauth2/authorization/ciy");
+    expect(pushMock).not.toHaveBeenCalled();
   });
 })
