@@ -16,8 +16,6 @@ export const SignIn = () => {
     } else if (searchParams.has("sign-out") || searchParams.has("error")) {
       signOut();
       router.push("/");
-    } else {
-      router.push(process.env.NEXT_PUBLIC_API_GATEWAY_CLIENT_URL + "/oauth2/authorization/ciy");
     }
   }, []);
 
