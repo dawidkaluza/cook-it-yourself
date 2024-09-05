@@ -19,12 +19,12 @@ const NavBar = () => {
 const SignInButton = () => {
   // noinspection HtmlUnknownTarget
   return (
-    <Link
+    <a
       href="/sign-in"
       className="btn btn-primary btn-sm"
     >
       Sign in
-    </Link>
+    </a>
   );
 };
 
