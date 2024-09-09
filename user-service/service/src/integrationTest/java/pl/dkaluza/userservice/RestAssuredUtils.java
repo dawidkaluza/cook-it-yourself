@@ -8,8 +8,17 @@ import io.restassured.http.Cookies;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.springframework.security.web.util.UrlUtils;
+import org.springframework.web.util.UriUtils;
 
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -65,6 +74,46 @@ public final class RestAssuredUtils {
         }
 
         return response;
+    }
+
+    public static String authorize(Response signInResponse) {
+        return authorize(signInResponse, Collections.emptySet());
+    }
+
+    public static String authorize(Response signInResponse, String scope) {
+        return authorize(signInResponse, Collections.singleton(scope));
+    }
+
+    public static String authorize(Response signInResponse, Collection<String> scopes) {
+        var oauthAuthorizeUrl = "/oauth2/authorize" +
+            "?response_type=code&client_id=api-gateway" +
+            "&redirect_uri=http%3A%2F%2F127.0.0.1%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy" +
+            "&scope=" + String.join("%20", scopes);
+
+        var response = given()
+            .redirects().follow(false)
+            .cookies(signInResponse.getDetailedCookies())
+            .when()
+            .get(oauthAuthorizeUrl);
+
+        if (response.statusCode() != 302) {
+            throw new IllegalStateException("Authorize request failed.\n > Status code: " + response.statusCode() + "\n > Body: " + response.body().asPrettyString());
+        }
+
+        var location = response.getHeader("Location");
+        if (location == null) {
+            throw new IllegalStateException("Authorize request failed.\n > Location is null");
+        }
+
+        try {
+            return new URIBuilder(location)
+                .getQueryParams().stream()
+                .filter(param -> param.getName().equals("code"))
+                .findFirst().orElseThrow(() -> new IllegalStateException("Authorize request failed.\n > No code param."))
+                .getValue();
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Authorize request failed.", e);
+        }
     }
 
     public static Filter csrfCookieFilter(String path) {
