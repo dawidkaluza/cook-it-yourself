@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -40,6 +42,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.dkaluza.userservice.ports.in.UserService;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Configuration
@@ -233,14 +237,38 @@ class WebSecurityConfig {
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
         return context -> {
-            if (!context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
-                return;
+            if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
+                var userDetails = (DefaultUserDetails) context.getPrincipal().getPrincipal();
+
+                context.getClaims()
+                    .subject(userDetails.getId().toString());
+            } else if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
+                var userDetails = (DefaultUserDetails) context.getPrincipal().getPrincipal();
+                var newClaims = new HashMap<String, Object>();
+
+                if (context.getAuthorizedScopes().contains(OidcScopes.PROFILE)) {
+                    newClaims.putAll(
+                        OidcUserInfo.builder()
+                            .nickname(userDetails.getName())
+                            .build()
+                            .getClaims()
+                    );
+                }
+
+                if (context.getAuthorizedScopes().contains(OidcScopes.EMAIL)) {
+                    newClaims.putAll(
+                        OidcUserInfo.builder()
+                            .email(userDetails.getUsername())
+                            .emailVerified(true)
+                            .build()
+                            .getClaims()
+                    );
+                }
+
+                for (var newClaim : newClaims.entrySet()) {
+                    context.getClaims().claim(newClaim.getKey(), newClaim.getValue());
+                }
             }
-
-            var userDetails = (DefaultUserDetails) context.getPrincipal().getPrincipal();
-
-            context.getClaims()
-                .subject(userDetails.getId().toString());
         };
     }
 }

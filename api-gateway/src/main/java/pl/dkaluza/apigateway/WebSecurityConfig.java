@@ -55,7 +55,7 @@ class WebSecurityConfig {
                 .clientName("API Gateway")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.OPENID, OidcScopes.PROFILE)
                 .issuerUri(webSettings.getUserServiceServerUrl())
                 .authorizationUri(webSettings.getUserServiceClientUrl() + "/oauth2/authorize")
                 .tokenUri(webSettings.getUserServiceServerUrl() + "/oauth2/token")
