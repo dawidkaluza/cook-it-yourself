@@ -2,6 +2,8 @@ package pl.dkaluza.userservice;
 
 import com.nimbusds.jose.JWSObject;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,9 +11,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import pl.dkaluza.userservice.config.EnableTestcontainers;
+import pl.dkaluza.userservice.config.JdbiFacade;
 
 import java.text.ParseException;
-import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +24,8 @@ import static pl.dkaluza.userservice.RestAssuredUtils.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class Oauth2Test {
     private final String redirectUrl = "http://api-gateway/login/oauth2/code/ciy";
+
+    private JdbiFacade jdbiFacade;
     private String baseUrl;
 
     @LocalServerPort
@@ -29,8 +33,20 @@ class Oauth2Test {
 
     @BeforeEach
     void beforeEach() {
+        jdbiFacade = new JdbiFacade();
+        jdbiFacade.start();
+
         baseUrl = "http://localhost:" + port;
         RestAssured.baseURI = baseUrl;
+
+        var handle = jdbiFacade.getHandle();
+        handle.execute("DELETE FROM users");
+        signUp("dawid@d.c", "password", "Dawid");
+    }
+
+    @AfterEach
+    void afterAll() {
+        jdbiFacade.stop();
     }
 
     @Test
@@ -64,7 +80,7 @@ class Oauth2Test {
     @Test
     void authorizationRequest_possiblyMaliciousRequest_redirectToSignIn() {
         // Given
-        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway&redirect_uri=http%3A%2F%2Fwebapp%2Flogin";
+        var oauthAuthorizeUrl = "/oauth2/authorize?response_type=code&client_id=api-gateway&redirect_uri=http://webapp/login";
 
         // When
         var authCodeResponse = given()
@@ -79,10 +95,9 @@ class Oauth2Test {
     @ParameterizedTest
     @CsvSource(value = {
         "'/oauth2/authorize?response_type=code&client_id=api-gateway', NULL",
-        "'/oauth2/authorize?response_type=code&client_id=api-gateway&redirect_uri=http%3A%2F%2F127.0.0.1%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy&scope=openid&state=123xyz', 123xyz"
+        "'/oauth2/authorize?response_type=code&client_id=api-gateway&redirect_uri=http://api-gateway/login/oauth2/code/ciy&scope=openid&state=123xyz', 123xyz"
     }, nullValues = "NULL")
     void authorizationRequest_authenticatedAndValidRequest_redirectWithCode(String oauthAuthorizeUrl, String expectedStateValue) {
-        signUp("dawid@d.c", "password", "Dawid");
         var signInResponse = signIn("dawid@d.c", "password");
 
         var response = given()
@@ -95,80 +110,79 @@ class Oauth2Test {
         response
             .statusCode(302)
             .header("Location", startsWith(redirectUrl))
-            .header("Location", contains("code="));
+            .header("Location", containsString("code="));
 
         if (expectedStateValue != null) {
-            response.header("Location", contains("state=" + expectedStateValue));
+            response.header("Location", containsString("state=" + expectedStateValue));
         }
     }
 
     @Test
     void tokenRequest_unauthenticatedClient_returnError() {
-        signUp("dawid@d.c", "password", "Dawid");
         var signInResponse = signIn("dawid@d.c", "password");
         var code = authorize(signInResponse);
 
         given()
+            .accept(ContentType.JSON)
             .param("grant_type", "authorization_code")
             .param("client_id", "api-gateway")
             .param("code", code)
-            .param("redirect_uri", "http%3A%2F%2F127.0.0.1%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy")
+            .param("redirect_uri", redirectUrl)
         .when()
             .post("/oauth2/token")
         .then()
-            .statusCode(403);
+            .statusCode(401);
     }
 
     @Test
     void tokenRequest_invalidRedirectUri_returnError() {
-        signUp("dawid@d.c", "password", "Dawid");
         var signInResponse = signIn("dawid@d.c", "password");
         var code = authorize(signInResponse);
 
         given()
-            .auth()
-            .preemptive().basic("api-gateway", "crm")
+            .accept(ContentType.JSON)
+            .auth().preemptive().basic("api-gateway", "crm")
             .param("grant_type", "authorization_code")
             .param("client_id", "api-gateway")
             .param("code", code)
-            .param("redirect_uri", "http%3A%2F%2Fwebapp%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy")
+            .param("redirect_uri", "http://webapp/login")
         .when()
             .post("/oauth2/token")
         .then()
-            .statusCode(403);
+            .statusCode(400);
     }
 
     @Test
     void tokenRequest_invalidCode_returnError() {
         given()
-            .auth()
-            .preemptive().basic("api-gateway", "crm")
+            .accept(ContentType.JSON)
+            .auth().preemptive().basic("api-gateway", "crm")
             .param("grant_type", "authorization_code")
             .param("client_id", "api-gateway")
-            .param("code", "myCustomCode")
-            .param("redirect_uri", "http%3A%2F%2F127.0.0.1%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy")
+            .param("code", "cooode")
+            .param("redirect_uri", redirectUrl)
         .when()
             .post("/oauth2/token")
         .then()
-            .statusCode(403);
+            .statusCode(400);
     }
 
     @ParameterizedTest
     @CsvSource(value = {
         "'', NULL",
-        "'openid, profile', Dawid"
-    }, nullValues = "NULLL")
-    void tokenRequest_authenticatedAndValidRequest_returnTokens(Set<String> scopes, String expectedNickname) throws ParseException {
-        signUp("dawid@d.c", "password", "Dawid");
+        "'openid profile', Dawid"
+    }, nullValues = "NULL")
+    void tokenRequest_authenticatedAndValidRequest_returnTokens(String scopes, String expectedNickname) throws ParseException {
         var signInResponse = signIn("dawid@d.c", "password");
         var code = authorize(signInResponse, scopes);
 
         var response = given()
+            .accept(ContentType.JSON)
             .auth().preemptive().basic("api-gateway", "crm")
             .param("grant_type", "authorization_code")
             .param("client_id", "api-gateway")
             .param("code", code)
-            .param("redirect_uri", "http%3A%2F%2F127.0.0.1%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy")
+            .param("redirect_uri", redirectUrl)
         .when()
             .post("/oauth2/token");
 

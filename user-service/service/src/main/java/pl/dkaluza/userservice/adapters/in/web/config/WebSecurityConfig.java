@@ -243,30 +243,16 @@ class WebSecurityConfig {
                 context.getClaims()
                     .subject(userDetails.getId().toString());
             } else if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
-                var userDetails = (DefaultUserDetails) context.getPrincipal().getPrincipal();
-                var newClaims = new HashMap<String, Object>();
-
                 if (context.getAuthorizedScopes().contains(OidcScopes.PROFILE)) {
-                    newClaims.putAll(
-                        OidcUserInfo.builder()
-                            .nickname(userDetails.getName())
-                            .build()
-                            .getClaims()
-                    );
-                }
+                    var userDetails = (DefaultUserDetails) context.getPrincipal().getPrincipal();
+                    var newClaims = OidcUserInfo.builder()
+                        .nickname(userDetails.getName())
+                        .build()
+                        .getClaims();
 
-                if (context.getAuthorizedScopes().contains(OidcScopes.EMAIL)) {
-                    newClaims.putAll(
-                        OidcUserInfo.builder()
-                            .email(userDetails.getUsername())
-                            .emailVerified(true)
-                            .build()
-                            .getClaims()
-                    );
-                }
-
-                for (var newClaim : newClaims.entrySet()) {
-                    context.getClaims().claim(newClaim.getKey(), newClaim.getValue());
+                    for (var newClaim : newClaims.entrySet()) {
+                        context.getClaims().claim(newClaim.getKey(), newClaim.getValue());
+                    }
                 }
             }
         };

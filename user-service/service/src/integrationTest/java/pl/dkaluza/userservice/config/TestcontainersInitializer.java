@@ -48,7 +48,8 @@ class TestcontainersInitializer implements ApplicationContextInitializer<Configu
             "spring.rabbitmq.password=developer",
             "spring.data.redis.host=" + redisHost,
             "spring.data.redis.port=" + redisPort,
-            "spring.data.redis.password=developer"
+            "spring.data.redis.password=developer",
+            "ciy.oauth2.client-secret={bcrypt}$2a$10$ZZm4Y9GL8/Q1YJMwSlKiD.RaFAPtBFXP2lIBXhg1jOfPNwXJGKbWe"
         ).applyTo(ctx.getEnvironment());
     }
 }

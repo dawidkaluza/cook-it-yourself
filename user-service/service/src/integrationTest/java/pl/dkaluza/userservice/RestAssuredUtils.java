@@ -77,24 +77,30 @@ public final class RestAssuredUtils {
     }
 
     public static String authorize(Response signInResponse) {
-        return authorize(signInResponse, Collections.emptySet());
+        return authorize(signInResponse, "");
     }
 
-    public static String authorize(Response signInResponse, String scope) {
-        return authorize(signInResponse, Collections.singleton(scope));
-    }
-
-    public static String authorize(Response signInResponse, Collection<String> scopes) {
+    public static String authorize(Response signInResponse, String scopes) {
         var oauthAuthorizeUrl = "/oauth2/authorize" +
             "?response_type=code&client_id=api-gateway" +
-            "&redirect_uri=http%3A%2F%2F127.0.0.1%3A8888%2Flogin%2Foauth2%2Fcode%2Fciy" +
-            "&scope=" + String.join("%20", scopes);
+            "&redirect_uri=http://api-gateway/login/oauth2/code/ciy";
 
-        var response = given()
+        if (!scopes.isBlank()) {
+            oauthAuthorizeUrl += "&scope=" + scopes;
+        }
+
+        var request = given()
             .redirects().follow(false)
             .cookies(signInResponse.getDetailedCookies())
-            .when()
-            .get(oauthAuthorizeUrl);
+            .param("response_type", "code")
+            .param("client_id", "api-gateway")
+            .param("redirect_uri", "http://api-gateway/login/oauth2/code/ciy");
+
+        if (!scopes.isBlank()) {
+            request.param("scope", scopes);
+        }
+
+        var response = request.get(oauthAuthorizeUrl);
 
         if (response.statusCode() != 302) {
             throw new IllegalStateException("Authorize request failed.\n > Status code: " + response.statusCode() + "\n > Body: " + response.body().asPrettyString());
