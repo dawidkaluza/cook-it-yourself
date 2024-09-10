@@ -3,6 +3,7 @@ package pl.dkaluza.userservice;
 import com.nimbusds.jose.JWSObject;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ class Oauth2Test {
 
     private JdbiFacade jdbiFacade;
     private String baseUrl;
+    private Response signUpResponse;
 
     @LocalServerPort
     private Integer port;
@@ -41,7 +43,7 @@ class Oauth2Test {
 
         var handle = jdbiFacade.getHandle();
         handle.execute("DELETE FROM users");
-        signUp("dawid@d.c", "password", "Dawid");
+        signUpResponse = signUp("dawid@d.c", "password", "Dawid");
     }
 
     @AfterEach
@@ -189,6 +191,12 @@ class Oauth2Test {
             .statusCode(200)
             .body("access_token", notNullValue())
             .body("refresh_token", notNullValue());
+
+        var actualUserId = signUpResponse.body().jsonPath().getString("id");
+        var accessToken = response.body().jsonPath().getString("access_token");
+        var expectedUserId = JWSObject.parse(accessToken).getPayload().toJSONObject().get("sub");
+        assertThat(actualUserId)
+            .isEqualTo(expectedUserId);
 
         if (!expectedNickname.isBlank()) {
             var idToken = response.body().jsonPath().getString("id_token");
