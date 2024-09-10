@@ -27,10 +27,7 @@ const authorize = async (redirectUrl: string): Promise<RedirectResponse> => {
 
 const handleRedirect = async (redirectUrl?: string): Promise<SignInResponse> => {
   if (!redirectUrl) {
-    return {
-      redirectUrl: "",
-      external: false,
-    }
+    throw new Error("Redirect url is empty.");
   }
 
   const appUrl = window.location.origin + settings.publicPath;

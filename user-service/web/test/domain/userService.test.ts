@@ -66,16 +66,31 @@ describe("signIn function", () => {
     expect((caughtError as Error).message).not.match(/Invalid email or password/i);
   });
 
-  test.each([
-    {
-      userServiceUrl: "http://user-service",
-      redirectUrl: "",
-      authorizeRedirectUrl: "",
-      expectedResponse: {
+  test("signIn returns empty redirectUrl, throw error", async () => {
+    // Given
+    (fetchApi as Mock).mockImplementation(async () => {
+      return {
         redirectUrl: "",
-        external: false,
-      }
-    },
+      };
+    });
+
+    // When
+    let caughtError;
+    try {
+      await userService.signIn({
+        email: "dawid@mail.com",
+        password: "passwd"
+      });
+    } catch (error) {
+      caughtError = error;
+    }
+
+    // Then
+    expect(caughtError).instanceOf(Error);
+    expect((caughtError as Error).message).match(/Redirect url is empty/i);
+  });
+
+  test.each([
     {
       userServiceUrl: "http://user-service",
       redirectUrl: "http://user-service/web/consent",
