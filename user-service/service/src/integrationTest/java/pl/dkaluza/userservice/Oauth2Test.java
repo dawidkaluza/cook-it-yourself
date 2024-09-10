@@ -169,9 +169,9 @@ class Oauth2Test {
 
     @ParameterizedTest
     @CsvSource(value = {
-        "'', NULL",
+        "'', ''",
         "'openid profile', Dawid"
-    }, nullValues = "NULL")
+    })
     void tokenRequest_authenticatedAndValidRequest_returnTokens(String scopes, String expectedNickname) throws ParseException {
         var signInResponse = signIn("dawid@d.c", "password");
         var code = authorize(signInResponse, scopes);
@@ -183,7 +183,6 @@ class Oauth2Test {
             .param("client_id", "api-gateway")
             .param("code", code)
             .param("redirect_uri", redirectUrl)
-        .when()
             .post("/oauth2/token");
 
         response.then()
@@ -191,7 +190,7 @@ class Oauth2Test {
             .body("access_token", notNullValue())
             .body("refresh_token", notNullValue());
 
-        if (expectedNickname != null) {
+        if (!expectedNickname.isBlank()) {
             var idToken = response.body().jsonPath().getString("id_token");
             var actualNickname = JWSObject.parse(idToken)
                 .getPayload().toJSONObject()

@@ -81,14 +81,6 @@ public final class RestAssuredUtils {
     }
 
     public static String authorize(Response signInResponse, String scopes) {
-        var oauthAuthorizeUrl = "/oauth2/authorize" +
-            "?response_type=code&client_id=api-gateway" +
-            "&redirect_uri=http://api-gateway/login/oauth2/code/ciy";
-
-        if (!scopes.isBlank()) {
-            oauthAuthorizeUrl += "&scope=" + scopes;
-        }
-
         var request = given()
             .redirects().follow(false)
             .cookies(signInResponse.getDetailedCookies())
@@ -100,7 +92,7 @@ public final class RestAssuredUtils {
             request.param("scope", scopes);
         }
 
-        var response = request.get(oauthAuthorizeUrl);
+        var response = request.get("/oauth2/authorize");
 
         if (response.statusCode() != 302) {
             throw new IllegalStateException("Authorize request failed.\n > Status code: " + response.statusCode() + "\n > Body: " + response.body().asPrettyString());
