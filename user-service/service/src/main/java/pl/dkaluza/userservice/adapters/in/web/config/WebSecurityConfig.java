@@ -42,8 +42,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.dkaluza.userservice.ports.in.UserService;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Configuration
