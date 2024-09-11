@@ -24,7 +24,7 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: api-gateway-secrets
+                  name: gtwy-secrets
                   key: REDIS_PASSWORD
           ports:
             - containerPort: 6379
