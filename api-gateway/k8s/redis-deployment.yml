@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-redis
+  labels:
+    app: api-gateway-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: api-gateway-redis
+    spec:
+      containers:
+        - image: redis:7.2.4-alpine
+          name: redis
+          command: [ "redis-server", "--requirepass $(REDIS_PASSWORD)" ]
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: api-gateway-secrets
+                  key: REDIS_PASSWORD
+          ports:
+            - containerPort: 6379

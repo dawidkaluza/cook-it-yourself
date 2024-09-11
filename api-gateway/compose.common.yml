@@ -1,0 +1,9 @@
+services:
+  redis:
+    image: redis:7.2.4-alpine
+    healthcheck:
+      test: redis-cli ping
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    command: redis-server --requirepass developer

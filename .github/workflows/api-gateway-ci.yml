@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and test
         working-directory: ./api-gateway
-        run: ./gradlew build
+        run: ./gradlew integrationTest build
 
       - name: Store test results
         if: ${{ success() || failure() }}

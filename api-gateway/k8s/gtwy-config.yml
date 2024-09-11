@@ -8,3 +8,5 @@ data:
   USER_SERVICE_CLIENT_URL: "http://auth.ciy.localhost:8080"
   KITCHEN_SERVICE_URL: "http://kitchen-service:8080"
   WEB_APP_URL: "http://ciy.localhost:8080"
+  REDIS_HOST: "api-gateway-redis"
+  REDIS_PORT: "6379"
