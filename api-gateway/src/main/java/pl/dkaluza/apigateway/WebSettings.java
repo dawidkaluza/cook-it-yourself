@@ -22,6 +22,8 @@ class WebSettings {
 
     private String webAppSignInPage;
 
+    private String webAppSignOutPage;
+
     private List<String> corsAllowedOrigins;
 
     public String getApiGatewayUrl() {
@@ -82,6 +84,18 @@ class WebSettings {
 
     public void setWebAppSignInPage(String webAppSignInPage) {
         this.webAppSignInPage = webAppSignInPage;
+    }
+
+    public String getWebAppSignOutPage() {
+        return webAppSignOutPage;
+    }
+
+    public String getWebAppSignOutUrl() {
+        return webAppUrl + webAppSignOutPage;
+    }
+
+    public void setWebAppSignOutPage(String webAppSignOutPage) {
+        this.webAppSignOutPage = webAppSignOutPage;
     }
 
     public List<String> getCorsAllowedOrigins() {
