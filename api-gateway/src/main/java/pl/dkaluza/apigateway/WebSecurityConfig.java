@@ -14,9 +14,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -82,7 +80,7 @@ class WebSecurityConfig {
                 .tokenUri(webSettings.getUserServiceServerUrl() + "/oauth2/token")
                 .jwkSetUri(webSettings.getUserServiceServerUrl() + "/oauth2/jwks")
                 .userInfoUri(webSettings.getUserServiceServerUrl() + "/userinfo")
-                .userNameAttributeName("nickname")
+                .userNameAttributeName(IdTokenClaimNames.SUB)
                 .redirectUri(webSettings.getApiGatewayUrl() + "/login/oauth2/code/{registrationId}")
                 .providerConfigurationMetadata(Map.of(
                     "end_session_endpoint", webSettings.getUserServiceClientUrl() + "/connect/logout"
