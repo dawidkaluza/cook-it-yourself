@@ -13,8 +13,9 @@ import org.springframework.security.jackson2.SecurityJackson2Modules;
 class WebSessionConfig implements BeanClassLoaderAware {
     private ClassLoader loader;
 
+    // NOTE! Dont change the name of the method! It will break JSON serialization in Spring Session.
     @Bean
-    public RedisSerializer<Object> redisSerializer() {
+    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         var mapper = new ObjectMapper();
         mapper.registerModules(SecurityJackson2Modules.getModules(this.loader));
         var module = new SimpleModule();
