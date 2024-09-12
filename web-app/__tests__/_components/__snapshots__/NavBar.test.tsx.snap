@@ -46,6 +46,12 @@ exports[`NavBar component > render when signed in 1`] = `
           </li>
         </ul>
       </div>
+      <a
+        class="btn btn-primary btn-sm"
+        href="/sign-out"
+      >
+        Sign out
+      </a>
     </div>
   </nav>
 </div>

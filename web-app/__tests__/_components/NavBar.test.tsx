@@ -29,6 +29,9 @@ describe('NavBar component', () => {
     const navBarMenu = screen.queryByRole('list');
     expect(navBarMenu).toBeNull();
 
+    const signOutLink = screen.queryByRole("link", { name: "Sign out"});
+    expect(signOutLink).toBeNull();
+
     expect(navBar.container).toMatchSnapshot();
   });
 
@@ -44,11 +47,15 @@ describe('NavBar component', () => {
     expect(indexLink).not.toBeNull();
     expect(indexLink?.getAttribute("href")).toBe("/");
 
+    const navBarMenu = screen.getByRole('list');
+    expect(navBarMenu).not.toBeNull();
+
     const signInLink = screen.queryByRole("link", { name: "Sign in"});
     expect(signInLink).toBeNull();
 
-    const navBarMenu = screen.getByRole('list');
-    expect(navBarMenu).not.toBeNull();
+    const signOutLink = screen.getByRole("link", { name: "Sign out"});
+    expect(signOutLink).not.toBeNull();
+    expect(signOutLink?.getAttribute("href")).toBe("/sign-out");
 
     expect(navBar.container).toMatchSnapshot();
   });

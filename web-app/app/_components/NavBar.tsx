@@ -10,7 +10,13 @@ const NavBar = () => {
     <nav className="navbar navbar-expand bg-body-tertiary">
       <div className="container-fluid text-center">
         <Link href="/" className="navbar-brand">Cook it yourself</Link>
-        {signedIn ? <NavBarMenu /> : <SignInButton />}
+        {signedIn ?
+          <>
+            <NavBarMenu />
+            <SignOutButton />
+          </>
+          : <SignInButton />
+        }
       </div>
     </nav>
   );
@@ -24,6 +30,19 @@ const SignInButton = () => {
       className="btn btn-primary btn-sm"
     >
       Sign in
+    </a>
+  );
+};
+
+
+const SignOutButton = () => {
+  // noinspection HtmlUnknownTarget
+  return (
+    <a
+      href="/sign-out"
+      className="btn btn-primary btn-sm"
+    >
+      Sign out
     </a>
   );
 };
