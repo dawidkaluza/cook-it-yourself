@@ -18,6 +18,7 @@ vi.mock("@/app/_api/hooks", () => {
 });
 
 let hasMock: Mock;
+let getMock: Mock;
 let pushMock: Mock;
 let signInMock: Mock;
 let signOutMock: Mock;
@@ -25,13 +26,15 @@ let signOutMock: Mock;
 describe("SignIn component", () => {
   beforeEach(() => {
     hasMock = vi.fn();
+    getMock = vi.fn();
     pushMock = vi.fn();
     signInMock = vi.fn();
     signOutMock = vi.fn();
 
     (useSearchParams as Mock).mockImplementation(() => {
       return {
-        has: hasMock
+        has: hasMock,
+        get: getMock,
       };
     });
     (useRouter as Mock).mockImplementation(() => {
@@ -51,17 +54,22 @@ describe("SignIn component", () => {
     };
   });
 
-  test("redirects on success", () => {
+  test.each([
+    [ null, undefined ],
+    [ "Dawid", "Dawid" ]
+  ])("redirects on success when nickname=$s", (givenNickname, usedNickname) => {
     // Given
     hasMock.mockImplementation((name : string ) => {
       return name === "success";
     });
 
+    getMock.mockReturnValue(givenNickname);
+
     // When
     render(<SignIn />);
 
     // Then
-    expect(signInMock).toHaveBeenCalled();
+    expect(signInMock).toHaveBeenCalledWith(usedNickname);
     expect(signOutMock).not.toHaveBeenCalled();
     expect(pushMock).toHaveBeenCalledWith("/");
   });

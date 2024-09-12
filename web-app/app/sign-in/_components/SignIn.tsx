@@ -11,7 +11,8 @@ export const SignIn = () => {
 
   useEffect(() => {
     if (searchParams.has('success')) {
-      signIn();
+      const name = searchParams.get("nickname") ?? undefined;
+      signIn(name);
       router.push("/");
     } else if (searchParams.has("sign-out") || searchParams.has("error")) {
       signOut();
