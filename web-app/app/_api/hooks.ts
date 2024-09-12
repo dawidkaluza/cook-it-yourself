@@ -6,7 +6,7 @@ export const useAuth = (isAlreadySignedIn?: boolean) => {
 
   useEffect(() => {
     if (!isAlreadySignedIn) {
-      const name = sessionStorage.getItem("name");
+      const name = localStorage.getItem("name");
       setSignedIn(name !== null);
       setName(name ?? undefined);
     }
@@ -15,11 +15,11 @@ export const useAuth = (isAlreadySignedIn?: boolean) => {
   const signIn = useCallback((name?: string) => {
     setSignedIn(true);
     setName(name);
-    sessionStorage.setItem("name", name ?? "");
+    localStorage.setItem("name", name ?? "");
   }, []);
 
   const signOut = useCallback(() => {
-    sessionStorage.removeItem("name");
+    localStorage.removeItem("name");
     setSignedIn(false);
     setName(undefined);
   }, []);
