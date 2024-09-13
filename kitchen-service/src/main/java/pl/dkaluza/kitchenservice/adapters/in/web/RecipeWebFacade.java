@@ -17,7 +17,6 @@ import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -70,7 +69,7 @@ class RecipeWebFacade {
 
     ResponseEntity<?> browseRecipes(Authentication auth, int page, int pageSize, String name) {
         try {
-            var cookId = recipeWebMapper.toRequiredCookId(auth);
+            var cookId = recipeWebMapper.toCookId(auth);
             var filters = RecipeFilters.of(name, cookId);
             var pageReq = PageRequest.of(page, pageSize).produce();
             var recipesPage = kitchenService.browseRecipes(filters, pageReq);
@@ -102,10 +101,43 @@ class RecipeWebFacade {
     ResponseEntity<?> viewRecipe(Authentication auth, Long id) {
         try {
             var recipeId = RecipeId.of(id).produce();
-            var cookId = recipeWebMapper.toRequiredCookId(auth);
+            var cookId = recipeWebMapper.toCookId(auth);
             var recipe = kitchenService.viewRecipe(recipeId, cookId);
             var respBody = recipeWebMapper.toResponse(recipe);
             return ResponseEntity.ok(respBody);
+        } catch (ValidationException e) {
+            var errors = e.getErrors().stream()
+                .map(error -> new ErrorResponse.Field(error.name(), error.message()))
+                .toList();
+
+            return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(
+                    new ErrorResponse(
+                        "Invalid fields values", ZonedDateTime.now(ZoneOffset.UTC), errors
+                    )
+                );
+        } catch (RecipeNotFoundException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    new ErrorResponse(
+                        "Recipe with given id could not be found", ZonedDateTime.now(ZoneOffset.UTC)
+                    )
+                );
+        } catch (RecipeNotOwnedException e) {
+            return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .build();
+        }
+    }
+
+    ResponseEntity<?> deleteRecipe(Authentication auth, Long id) {
+        try {
+            var recipeId = RecipeId.of(id).produce();
+            var cookId = recipeWebMapper.toCookId(auth);
+            kitchenService.deleteRecipe(recipeId, cookId);
+            return ResponseEntity.noContent().build();
         } catch (ValidationException e) {
             var errors = e.getErrors().stream()
                 .map(error -> new ErrorResponse.Field(error.name(), error.message()))

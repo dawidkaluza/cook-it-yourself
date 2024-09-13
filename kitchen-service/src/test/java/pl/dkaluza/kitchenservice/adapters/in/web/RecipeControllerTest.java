@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -483,6 +484,113 @@ class RecipeControllerTest {
             .isNotNull()
             .extracting(RecipeResponse::id, RecipeResponse::name, RecipeResponse::description)
             .containsExactly(mockRecipe.getId().getId(), mockRecipe.getName(), mockRecipe.getDescription());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { -1L, 0L })
+    void deleteRecipe_invalidId_returnError(Long id) {
+        // Given
+        var auth = authentication(1L);
+
+        // When
+        var resp = recipeController.deleteRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+
+        assertThat(respBody.fields())
+            .isNotNull()
+            .extracting(ErrorResponse.Field::name)
+            .contains("id");
+    }
+
+    @Test
+    void deleteRecipe_recipeNotFound_returnError() {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+
+        doThrow(new RecipeNotFoundException("Recipe not found"))
+            .when(kitchenService).deleteRecipe(any(), any());
+
+        // When
+        var resp = recipeController.deleteRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.NOT_FOUND);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+    }
+
+    @Test
+    void deleteRecipe_recipeNotOwned_returnError() {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+
+        doThrow(new RecipeNotOwnedException("Recipe not owned"))
+            .when(kitchenService).deleteRecipe(any(), any());
+
+        // When
+        var resp = recipeController.deleteRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void deleteRecipe_validRequest_returnSuccess() {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+
+        // When
+        var resp = recipeController.deleteRecipe(auth, id);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     private static Authentication authentication(Long id) {

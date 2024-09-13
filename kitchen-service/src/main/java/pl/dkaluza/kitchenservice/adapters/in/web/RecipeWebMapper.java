@@ -42,7 +42,7 @@ abstract class RecipeWebMapper {
             builder.portionSize(reqBody.portionSize().value(), reqBody.portionSize().measure());
         }
 
-        builder.cookId(toCookId(auth));
+        builder.cookId(toCookIdValue(auth));
 
         return builder.build().produce();
     }
@@ -72,18 +72,9 @@ abstract class RecipeWebMapper {
     @Mapping(target = "id", source = "recipe.id.id")
     abstract ShortRecipeResponse toShortResponse(Recipe recipe);
 
-    Long toCookId(Authentication auth) {
-        if (auth == null) {
-            return null;
-        }
-
-        var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("sub");
-        return Long.valueOf(userId);
-    }
-
-    CookId toRequiredCookId(Authentication auth) {
+    CookId toCookId(Authentication auth) {
         try {
-            return CookId.of(toCookId(auth)).produce();
+            return CookId.of(toCookIdValue(auth)).produce();
         } catch (ValidationException e) {
             throw new IllegalStateException(
                 "Couldn't acquire required cookId from authentication object." +
@@ -91,5 +82,14 @@ abstract class RecipeWebMapper {
                 e
             );
         }
+    }
+
+    private Long toCookIdValue(Authentication auth) {
+        if (auth == null) {
+            return null;
+        }
+
+        var userId = ((Jwt) auth.getPrincipal()).getClaimAsString("sub");
+        return Long.valueOf(userId);
     }
 }
