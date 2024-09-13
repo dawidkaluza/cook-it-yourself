@@ -6,6 +6,7 @@ import pl.dkaluza.domaincore.Assertions;
 import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
+import pl.dkaluza.domaincore.exceptions.ObjectNotPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.RecipeFilters;
@@ -56,8 +57,6 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         for (int i = 0; i < ingredientsSize; i++) {
             var ingredient = ingredients.get(i);
 
-            ObjectAlreadyPersistedException.throwIfPersisted(ingredient);
-
             var ingredientEntity = ingredientMapper.toEntity(ingredient, i + 1, recipeEntity.id());
             ingredientEntity = ingredientRepository.save(ingredientEntity);
             ingredientEntities.add(ingredientEntity);
@@ -68,8 +67,6 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         var stepEntities = new ArrayList<StepEntity>();
         for (int i = 0; i < stepsSize; i++) {
             var step = steps.get(i);
-
-            ObjectAlreadyPersistedException.throwIfPersisted(step);
 
             var stepEntity = stepMapper.toEntity(step, i + 1, recipeEntity.id());
             stepEntity = stepRepository.save(stepEntity);
@@ -118,6 +115,24 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         var totalRecipes = recipeRepository.countByFilters(filters.getName(), cookId);
         var totalPages = totalRecipes > 0 ? (int) Math.ceil((double) totalRecipes / pageSize) : 1;
         return toPage(recipes, pageNo, totalPages);
+    }
+
+    @Override
+    public void deleteRecipe(Recipe recipe) {
+        Assertions.assertArgument(recipe != null, "recipe is null");
+        ObjectNotPersistedException.throwIfNotPersisted(recipe);
+
+        var ingredients = recipe.getIngredients();
+        for (var ingredient : ingredients) {
+            ingredientRepository.deleteById(ingredient.getId().getId());
+        }
+
+        var steps = recipe.getMethodSteps();
+        for (var step : steps) {
+            stepRepository.deleteById(step.getId().getId());
+        }
+
+        recipeRepository.deleteById(recipe.getId().getId());
     }
 
     private Recipe fetchAndMap(RecipeEntity recipeEntity) {

@@ -54,6 +54,21 @@ class DefaultKitchenService implements KitchenService {
     }
 
     @Override
+    public void deleteRecipe(RecipeId recipeId, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException {
+        Assertions.assertArgument(recipeId != null, "recipeId is null");
+        Assertions.assertArgument(cookId != null, "cookId is null");
+
+        var recipe = recipeRepository.findRecipeById(recipeId)
+            .orElseThrow(() -> new RecipeNotFoundException("Recipe with id = " + recipeId + " could not be found"));
+
+        if (!recipe.isOwnedBy(cookId)) {
+            throw new RecipeNotOwnedException("Recipe with id = " + recipeId + " is not owned by " + cookId);
+        }
+
+        recipeRepository.deleteRecipe(recipe);
+    }
+
+    @Override
     public Cook registerCook(Cook cook) throws ObjectAlreadyPersistedException {
         Assertions.assertArgument(cook != null, "cook is null");
         ObjectAlreadyPersistedException.throwIfPersisted(cook);

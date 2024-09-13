@@ -37,6 +37,15 @@ public interface KitchenService {
     Recipe viewRecipe(RecipeId recipeId, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException;
 
     /**
+     * Deletes recipe by id.
+     * @param recipeId id of recipe to be deleted
+     * @param cookId id of cook wha want to delete the recipe.
+     * @throws RecipeNotFoundException if the recipe can't be found.
+     * @throws RecipeNotOwnedException if the recipe does not belong to given cook.
+     */
+    void deleteRecipe(RecipeId recipeId, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException;
+
+    /**
      * Registers a new cook in the application.
      * To does not matter whether cook is already saved in persistence layer - as long as object is created via
      * "newCook" static method, it can be registered in the system whether it has already been there or not.

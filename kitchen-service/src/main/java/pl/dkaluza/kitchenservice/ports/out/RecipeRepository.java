@@ -18,4 +18,6 @@ public interface RecipeRepository {
     Page<Recipe> findAllRecipes(PageRequest pageReq);
 
     Page<Recipe> findRecipes(RecipeFilters filters, PageRequest pageReq);
+
+    void deleteRecipe(Recipe recipe);
 }
