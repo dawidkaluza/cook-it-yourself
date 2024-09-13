@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import pl.dkaluza.domaincore.PageRequest;
@@ -12,6 +13,7 @@ import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryCookPersistenc
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryRecipePersistenceAdapter;
 import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
 import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
+import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -21,11 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DefaultKitchenServiceTest {
+    private RecipeRepository recipeRepository;
     private DefaultKitchenService kitchenService;
 
     @BeforeEach
     void beforeEach() {
-        var recipeRepository = new InMemoryRecipePersistenceAdapter();
+        recipeRepository = new InMemoryRecipePersistenceAdapter();
         var cookRepository = new InMemoryCookPersistenceAdapter();
         kitchenService = new DefaultKitchenService(recipeRepository, cookRepository);
     }
@@ -71,71 +74,6 @@ class DefaultKitchenServiceTest {
             assertThat(step.isPersisted())
                 .isTrue();
         }
-    }
-
-    @Test
-    void viewRecipe_nullParams_throwException() {
-        assertThatThrownBy(
-            () -> kitchenService.viewRecipe(null, null)
-        ).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void viewRecipe_recipeNotFound_throwException() {
-        // Given
-        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
-
-        // When, then
-        assertThatThrownBy(
-            () -> kitchenService.viewRecipe(RecipeId.of(1L).produce(), cook.getId())
-        ).isInstanceOf(RecipeNotFoundException.class);
-    }
-
-    @Test
-    void viewRecipe_recipeNotOwned_throwException() {
-        // Given
-        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
-        var secondCook = kitchenService.registerCook(Cook.newCook(2L).produce());
-        var recipe = kitchenService.addRecipe(
-            Recipe.newRecipeBuilder()
-                .name("Boiled sausages")
-                .description("")
-                .ingredient("sausage", new BigDecimal(3), "pc")
-                .methodStep("Diy")
-                .cookingTime(Duration.ofMinutes(3))
-                .portionSize(new BigDecimal(3), "pc")
-                .cookId(firstCook.getId().getId())
-                .build().produce()
-        );
-
-        // When, then
-        assertThatThrownBy(
-            () -> kitchenService.viewRecipe(recipe.getId(), secondCook.getId())
-        ).isInstanceOf(RecipeNotOwnedException.class);
-    }
-
-    @Test
-    void viewRecipe_validParams_returnRecipe() {
-        // Given
-        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
-        var recipe = kitchenService.addRecipe(
-            Recipe.newRecipeBuilder()
-                .name("Boiled sausages")
-                .description("")
-                .ingredient("sausage", new BigDecimal(3), "pc")
-                .methodStep("Diy")
-                .cookingTime(Duration.ofMinutes(3))
-                .portionSize(new BigDecimal(3), "pc")
-                .cookId(firstCook.getId().getId())
-                .build().produce()
-        );
-
-        // When
-        var viewedRecipe = kitchenService.viewRecipe(recipe.getId(), firstCook.getId());
-
-        // Then
-        assertThat(viewedRecipe)
-            .isEqualTo(recipe);
     }
 
     @Test
@@ -233,6 +171,146 @@ class DefaultKitchenServiceTest {
                 1
             )
         );
+    }
+
+    @Test
+    void viewRecipe_nullParams_throwException() {
+        assertThatThrownBy(
+            () -> kitchenService.viewRecipe(null, null)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void viewRecipe_recipeNotFound_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+
+        // When, then
+        assertThatThrownBy(
+            () -> kitchenService.viewRecipe(RecipeId.of(1L).produce(), cook.getId())
+        ).isInstanceOf(RecipeNotFoundException.class);
+    }
+
+    @Test
+    void viewRecipe_recipeNotOwned_throwException() {
+        // Given
+        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var secondCook = kitchenService.registerCook(Cook.newCook(2L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(firstCook.getId().getId())
+                .build().produce()
+        );
+
+        // When, then
+        assertThatThrownBy(
+            () -> kitchenService.viewRecipe(recipe.getId(), secondCook.getId())
+        ).isInstanceOf(RecipeNotOwnedException.class);
+    }
+
+    @Test
+    void viewRecipe_validParams_returnRecipe() {
+        // Given
+        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(firstCook.getId().getId())
+                .build().produce()
+        );
+
+        // When
+        var viewedRecipe = kitchenService.viewRecipe(recipe.getId(), firstCook.getId());
+
+        // Then
+        assertThat(viewedRecipe)
+            .isEqualTo(recipe);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "NULL, NULL",
+        "1, NULL",
+        "NULL, 1",
+    }, nullValues = "NULL")
+    void deleteRecipe_nullParams_throwException(Long recipeId, Long cookId) {
+        assertThatThrownBy(
+            () -> kitchenService.deleteRecipe(
+                recipeId == null ? null : RecipeId.of(recipeId).produce(),
+                cookId == null ? null : CookId.of(cookId).produce()
+            )
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void deleteRecipe_recipeNotFound_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipeId = RecipeId.of(1L).produce();
+
+        // When, then
+        assertThatThrownBy(
+            () -> kitchenService.deleteRecipe(recipeId, cook.getId())
+        ).isInstanceOf(RecipeNotFoundException.class);
+    }
+
+    @Test
+    void deleteRecipe_recipeNotOwned_throwException() {
+        // Given
+        var firstCook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var secondCook = kitchenService.registerCook(Cook.newCook(2L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(firstCook.getId().getId())
+                .build().produce()
+        );
+
+        // When, then
+        assertThatThrownBy(
+            () -> kitchenService.deleteRecipe(recipe.getId(), secondCook.getId())
+        ).isInstanceOf(RecipeNotOwnedException.class);
+    }
+
+    @Test
+    void deleteRecipe_validParams_recipeProperlyDeleted() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(cook.getId().getId())
+                .build().produce()
+        );
+
+        // When
+        kitchenService.deleteRecipe(recipe.getId(), cook.getId());
+
+        // Then
+        var optionalRecipe = recipeRepository.findRecipeById(recipe.getId());
+        assertThat(optionalRecipe)
+            .isEmpty();
     }
 
     @Test
