@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
+import pl.dkaluza.domaincore.exceptions.ObjectNotPersistedException;
 import pl.dkaluza.kitchenservice.domain.*;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 
@@ -20,11 +21,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RecipePersistenceAdapterTest {
     private InMemoryRecipePersistenceAdapter recipePersistenceAdapter;
     private InMemoryCookPersistenceAdapter cookPersistenceAdapter;
+    private InMemoryRecipeEntityRepository recipeEntityRepository;
+    private InMemoryIngredientEntityRepository ingredientEntityRepository;
+    private InMemoryStepEntityRepository stepEntityRepository;
 
     @BeforeEach
     void beforeEach() {
         recipePersistenceAdapter = new InMemoryRecipePersistenceAdapter();
         cookPersistenceAdapter = new InMemoryCookPersistenceAdapter();
+        recipeEntityRepository = new InMemoryRecipeEntityRepository();
+        ingredientEntityRepository = new InMemoryIngredientEntityRepository();
+        stepEntityRepository = new InMemoryStepEntityRepository();
     }
 
     @Test
@@ -432,5 +439,96 @@ class RecipePersistenceAdapterTest {
             )
             // TODO test scenario when no recipes matches given filters AND returned page is empty
         );
+    }
+
+    @Test
+    void deleteRecipe_nullParams_throwException() {
+        assertThatThrownBy(
+            () -> recipePersistenceAdapter.deleteRecipe(null)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void deleteRecipe_notPersistedRecipe_throwException() {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+
+        var recipe = Recipe.newRecipeBuilder()
+            .name("Boiled sausages")
+            .description("")
+            .ingredient("sausage", new BigDecimal(2), "pc")
+            .methodStep("Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
+            .build().produce();
+
+        // When, then
+        assertThatThrownBy(
+            () -> recipePersistenceAdapter.deleteRecipe(recipe)
+        ).isInstanceOf(ObjectNotPersistedException.class);
+    }
+
+    @Test
+    void deleteRecipe_persistedButAlreadyDeletedRecipe_recipeProperlyDeleted() {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("xyz")
+            .description("")
+            .ingredient(1L, "sausage", new BigDecimal(2), "pc")
+            .methodStep(1L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
+            .build().produce();
+
+        // When
+        recipePersistenceAdapter.deleteRecipe(recipe);
+
+        // Then
+        assertThatDeleted(recipe);
+    }
+
+    @Test
+    void deleteRecipe_persistedRecipe_recipeProperlyDeleted() {
+        // Given
+        cookPersistenceAdapter.saveCook(Cook.newCook(1L).produce());
+        var recipe = Recipe.newRecipeBuilder()
+            .name("Boiled sausages")
+            .description("")
+            .ingredient("sausage", new BigDecimal(2), "pc")
+            .methodStep("Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(1L)
+            .build().produce();
+
+        recipe = recipePersistenceAdapter.insertRecipe(recipe);
+
+        // When
+        recipePersistenceAdapter.deleteRecipe(recipe);
+
+        // Then
+        assertThatDeleted(recipe);
+    }
+
+    private void assertThatDeleted(Recipe recipe) {
+        var recipeId = recipe.getId().getId();
+        assertThat(recipeEntityRepository.existsById(recipeId))
+            .isFalse();
+
+        for (var ingredient : recipe.getIngredients()) {
+            var ingredientId = ingredient.getId().getId();
+            assertThat(ingredientEntityRepository.existsById(ingredientId))
+                .isFalse();
+        }
+
+        for (var step : recipe.getMethodSteps()) {
+            var stepId = step.getId().getId();
+            assertThat(stepEntityRepository.existsById(stepId))
+                .isFalse();
+        }
     }
 }
