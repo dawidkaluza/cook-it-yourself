@@ -25,23 +25,17 @@ import java.util.List;
  * @param <T> type of domain object
  */
 public abstract class Factory<T> {
-    private final Assembler<T> assembler;
-
     private List<FieldError> errors;
     private boolean isReviewed;
 
-    public Factory(Assembler<T> assembler) {
-        this.assembler = assembler;
-
+    public Factory() {
         errors = Collections.emptyList();
         isReviewed = false;
     }
 
     protected abstract List<FieldError> validate();
 
-    protected T assemble() {
-        return assembler.assemble();
-    }
+    protected abstract T assemble();
 
     public List<FieldError> review() {
         if (isReviewed) {
