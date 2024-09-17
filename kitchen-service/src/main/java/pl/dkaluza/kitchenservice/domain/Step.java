@@ -2,6 +2,10 @@ package pl.dkaluza.kitchenservice.domain;
 
 import pl.dkaluza.domaincore.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 import static pl.dkaluza.domaincore.Validator.validator;
 import static pl.dkaluza.kitchenservice.domain.StepId.StepIdFactory;
 
@@ -24,6 +28,8 @@ public class Step extends AbstractPersistable<StepId> {
     public String getText() {
         return text;
     }
+    
+    record FactoryDto(Long id, String text) {}
 
     static class StepFactory extends FactoriesComposite<Step> {
         private StepFactory(Assembler<Step> assembler, Factory<?>... factories) {
@@ -76,6 +82,58 @@ public class Step extends AbstractPersistable<StepId> {
 
         @Override
         protected Step assemble() {
+            return super.assemble();
+        }
+    }
+
+    static class StepsFactory extends FactoriesComposite<List<Step>> {
+        private StepsFactory(Assembler<List<Step>> assembler, List<? extends Factory<?>> factories) {
+            super(assembler, factories);
+        }
+
+        private static List<Step> assemble(List<StepFactory> ingredients) {
+            return ingredients.stream()
+                .map(StepFactory::assemble)
+                .toList();
+        }
+
+        private static StepsFactory of(List<FactoryDto> steps, Function<FactoryDto, StepFactory> mapper, boolean allowEmpty, String fieldName) {
+            var stepsFactories = steps.stream()
+                .map(mapper)
+                .toList();
+
+            var allFactories = new ArrayList<Factory<?>>(stepsFactories);
+            if (!allowEmpty) {
+                var listFactory = DefaultFactory.newWithObject(
+                    ValidationExecutor.of(validator(!steps.isEmpty(), fieldName, "Steps must not be empty.")),
+                    steps
+                );
+                allFactories.add(listFactory);
+            }
+
+            return new StepsFactory(() -> assemble(stepsFactories), allFactories);
+        }
+
+        public static StepsFactory newSteps(List<FactoryDto> steps, boolean allowEmpty, String fieldName) {
+            return of(
+                steps,
+                step -> StepFactory.newStep(step.text(), fieldName + "."),
+                allowEmpty,
+                fieldName
+            );
+        }
+
+        public static StepsFactory fromPersistence(List<FactoryDto> steps, boolean allowEmpty, String fieldName) {
+            return of(
+                steps,
+                step -> StepFactory.fromPersistence(step.id(), step.text(), fieldName + "."),
+                allowEmpty,
+                fieldName
+            );
+        }
+
+        @Override
+        protected List<Step> assemble() {
             return super.assemble();
         }
     }

@@ -3,6 +3,9 @@ package pl.dkaluza.kitchenservice.domain;
 import pl.dkaluza.domaincore.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 import static pl.dkaluza.domaincore.Validator.validator;
 import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
@@ -33,6 +36,8 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
     public Amount getAmount() {
         return amount;
     }
+
+    record FactoryDto(Long id, String name, BigDecimal value, String measure) {}
 
     static class IngredientFactory extends FactoriesComposite<Ingredient> {
         private IngredientFactory(Assembler<Ingredient> assembler, Factory<?>... factories) {
@@ -101,4 +106,56 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             return super.assemble();
         }
     }
+    
+    static class IngredientsFactory extends FactoriesComposite<List<Ingredient>> {
+        private IngredientsFactory(Assembler<List<Ingredient>> assembler, List<Factory<?>> allFactories) {
+            super(assembler, allFactories);
+        }
+
+        private static List<Ingredient> assemble(List<IngredientFactory> ingredients) {
+            return ingredients.stream()
+                .map(IngredientFactory::assemble)
+                .toList();
+        }
+
+        private static IngredientsFactory of(List<FactoryDto> ingredients, Function<FactoryDto, IngredientFactory> mapper, boolean allowEmpty, String fieldName) {
+            var ingredientsFactories = ingredients.stream()
+                .map(mapper)
+                .toList();
+
+            var allFactories = new ArrayList<Factory<?>>(ingredientsFactories);
+            if (!allowEmpty) {
+                var listFactory = DefaultFactory.newWithObject(
+                    ValidationExecutor.of(validator(!ingredients.isEmpty(), fieldName, "Ingredients must not be empty.")),
+                    ingredients
+                );
+                allFactories.add(listFactory);
+            }
+
+            return new IngredientsFactory(() -> assemble(ingredientsFactories), allFactories);
+        }
+
+        static IngredientsFactory newIngredients(List<FactoryDto> ingredients, boolean allowEmpty, String fieldName) {
+            return of(
+                ingredients,
+                ingredient -> IngredientFactory.newIngredient(ingredient.name(), ingredient.value(), ingredient.measure(), fieldName + "."),
+                allowEmpty,
+                fieldName
+            );
+        }
+
+        static IngredientsFactory fromPersistence(List<FactoryDto> ingredients, boolean allowEmpty, String fieldName) {
+            return of(
+                ingredients,
+                ingredient -> IngredientFactory.fromPersistence(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure(), fieldName + "."),
+                allowEmpty,
+                fieldName
+            );
+        }
+
+        @Override
+        protected List<Ingredient> assemble() {
+            return super.assemble();
+        }
+    } 
 }

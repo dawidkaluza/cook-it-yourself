@@ -6,13 +6,11 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import static pl.dkaluza.domaincore.Validator.validator;
 import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
-import static pl.dkaluza.kitchenservice.domain.Ingredient.IngredientFactory;
+import static pl.dkaluza.kitchenservice.domain.CookId.CookIdFactory;
 import static pl.dkaluza.kitchenservice.domain.RecipeId.RecipeIdFactory;
-import static pl.dkaluza.kitchenservice.domain.Step.StepFactory;
 
 public class Recipe extends AbstractPersistable<RecipeId> {
     private final String name;
@@ -138,35 +136,14 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             return cookId;
         }
 
-        static DefaultFactory<Duration> newCookingTimeFactory(Duration cookingTime) {
-            return DefaultFactory.newWithObject(
-                ValidationExecutor.of(
-                    validator(
-                        !(cookingTime == null || cookingTime.isZero() || cookingTime.isNegative() || cookingTime.getNano() != 0),
-                        "cookingTime", "Cooking time must be a positive number with resolution to a second"
-                    )
-                ),
-                cookingTime
-            );
-        }
-
-        static AmountFactory newPortionSizeFactory(BigDecimal value, String measure) {
-            final var prefix = "portionSize.";
-            return new AmountFactory(
-                value, measure,
-                prefix,
-                Validator.validator(value != null && value.signum() > 0, prefix + "value", "Value must be a positive number")
-            );
-        }
-
         static CookId.CookIdFactory newCookIdFactory(Long id) {
             return new CookId.CookIdFactory(id, "cookId");
         }
     }
 
     public final static class NewRecipeBuilder extends RecipeBuilder<NewRecipeBuilder> {
-        private final List<IngredientBuilderDto> ingredients;
-        private final List<MethodStepBuilderDto> methodSteps;
+        private final List<Ingredient.FactoryDto> ingredients;
+        private final List<Step.FactoryDto> methodSteps;
 
         private NewRecipeBuilder() {
             ingredients = new ArrayList<>();
@@ -179,12 +156,12 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
 
         public NewRecipeBuilder ingredient(String name, BigDecimal value, String measure) {
-            ingredients.add(new IngredientBuilderDto(null, name, value, measure));
+            ingredients.add(new Ingredient.FactoryDto(null, name, value, measure));
             return this;
         }
 
         public NewRecipeBuilder methodStep(String text) {
-            methodSteps.add(new MethodStepBuilderDto(null, text));
+            methodSteps.add(new Step.FactoryDto(null, text));
             return this;
         }
 
@@ -192,10 +169,11 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         public Factory<Recipe> build() {
             var nameFactory = new NameFactory(name());
             var descriptionFactory = new DescriptionFactory(description());
-            var ingredientsFactory = IngredientsFactory.newIngredients(ingredients);
-            var methodStepsFactory = StepsFactory.newSteps(methodSteps);
-            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
-            var cookIdFactory = newCookIdFactory(cookId());
+            var ingredientsFactory = Ingredient.IngredientsFactory.newIngredients(ingredients, false, "ingredients");
+            var methodStepsFactory = Step.StepsFactory.newSteps(methodSteps, false, "methodSteps");
+            var cookingTimeFactory = new CookingTimeFactory(cookingTime());
+            var portionSizeFactory = new PortionSizeFactory(portionSizeValue(), portionSizeMeasure(), "portionSize.");
+            var cookIdFactory = new CookIdFactory(cookId(), "cookId");
 
             return new FactoriesComposite<>(
                 () -> new Recipe(
@@ -203,13 +181,13 @@ public class Recipe extends AbstractPersistable<RecipeId> {
                     nameFactory.assemble(), descriptionFactory.assemble(),
                     ingredientsFactory.assemble(),
                     methodStepsFactory.assemble(),
-                    cookingTime(),
+                    cookingTimeFactory.assemble(),
                     portionSizeFactory.assemble(),
                     cookIdFactory.assemble()
                 ),
                 nameFactory, descriptionFactory,
                 ingredientsFactory, methodStepsFactory,
-                newCookingTimeFactory(cookingTime()),
+                cookingTimeFactory,
                 portionSizeFactory,
                 cookIdFactory
             );
@@ -218,8 +196,8 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
     public final static class FromPersistenceRecipeBuilder extends RecipeBuilder<FromPersistenceRecipeBuilder> {
         private Long id;
-        private final List<IngredientBuilderDto> ingredients;
-        private final List<MethodStepBuilderDto> methodSteps;
+        private final List<Ingredient.FactoryDto> ingredients;
+        private final List<Step.FactoryDto> methodSteps;
 
         private FromPersistenceRecipeBuilder() {
             ingredients = new ArrayList<>();
@@ -237,12 +215,12 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
 
         public FromPersistenceRecipeBuilder ingredient(Long id, String name, BigDecimal value, String measure) {
-            ingredients.add(new IngredientBuilderDto(id, name, value, measure));
+            ingredients.add(new Ingredient.FactoryDto(id, name, value, measure));
             return this;
         }
 
         public FromPersistenceRecipeBuilder methodStep(Long id, String text) {
-            methodSteps.add(new MethodStepBuilderDto(id, text));
+            methodSteps.add(new Step.FactoryDto(id, text));
             return this;
         }
 
@@ -251,9 +229,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             var idFactory = new RecipeIdFactory(id);
             var nameFactory = new NameFactory(name());
             var descriptionFactory = new DescriptionFactory(description());
-            var ingredientsFactory = IngredientsFactory.fromPersistence(ingredients);
-            var methodStepsFactory = StepsFactory.fromPersistence(methodSteps);
-            var portionSizeFactory = newPortionSizeFactory(portionSizeValue(), portionSizeMeasure());
+            var ingredientsFactory = Ingredient.IngredientsFactory.fromPersistence(ingredients, false, "ingredients");
+            var methodStepsFactory = Step.StepsFactory.fromPersistence(methodSteps, false, "methodSteps");
+            var cookingTimeFactory = new CookingTimeFactory(cookingTime());
+            var portionSizeFactory = new PortionSizeFactory(portionSizeValue(), portionSizeMeasure(), "portionSize.");
             var cookIdFactory = newCookIdFactory(cookId());
 
             return new FactoriesComposite<>(
@@ -262,20 +241,20 @@ public class Recipe extends AbstractPersistable<RecipeId> {
                     nameFactory.assemble(), descriptionFactory.assemble(),
                     ingredientsFactory.assemble(),
                     methodStepsFactory.assemble(),
-                    cookingTime(),
+                    cookingTimeFactory.assemble(),
                     portionSizeFactory.assemble(),
                     cookIdFactory.assemble()
                 ),
                 idFactory, nameFactory, descriptionFactory,
                 ingredientsFactory, methodStepsFactory,
-                newCookingTimeFactory(cookingTime()),
+                cookingTimeFactory,
                 portionSizeFactory,
                 cookIdFactory
             );
         }
     }
 
-    private static class NameFactory extends DefaultFactory<String> {
+    static class NameFactory extends DefaultFactory<String> {
         NameFactory(String name) {
             super(
                 ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
@@ -298,8 +277,8 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
     }
 
-    private static class DescriptionFactory extends DefaultFactory<String> {
-        protected DescriptionFactory(String description) {
+    static class DescriptionFactory extends DefaultFactory<String> {
+        DescriptionFactory(String description) {
             super(
                 ValidationExecutor.of(validator(isDescriptionValid(description), "description", "Description must have 16384 chars at most")),
                 () -> description.trim()
@@ -320,101 +299,44 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
     }
 
-
-    private record IngredientBuilderDto(Long id, String name, BigDecimal value, String measure) {}
-
-    private static class IngredientsFactory extends FactoriesComposite<List<Ingredient>> {
-        private IngredientsFactory(Assembler<List<Ingredient>> assembler, List<Factory<?>> allFactories) {
-            super(assembler, allFactories);
+    static class CookingTimeFactory extends DefaultFactory<Duration> {
+        CookingTimeFactory(Duration cookingTime) {
+            this(cookingTime, "");
         }
 
-        private static List<Ingredient> assemble(List<IngredientFactory> ingredients) {
-            return ingredients.stream()
-                .map(IngredientFactory::assemble)
-                .toList();
-        }
-
-        private static IngredientsFactory of(List<IngredientBuilderDto> ingredients, Function<IngredientBuilderDto, IngredientFactory> mapper) {
-            var factories = ingredients.stream()
-                .map(mapper)
-                .toList();
-
-            var listFactory = DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(!ingredients.isEmpty(), "ingredients", "Ingredients must not be empty.")),
-                ingredients
-            );
-
-            var factoriesMerged = new ArrayList<Factory<?>>(factories);
-            factoriesMerged.add(listFactory);
-
-            return new IngredientsFactory(() -> assemble(factories), factoriesMerged);
-        }
-
-        public static IngredientsFactory newIngredients(List<IngredientBuilderDto> ingredients) {
-            return of(
-                ingredients,
-                ingredient -> IngredientFactory.newIngredient(ingredient.name(), ingredient.value(), ingredient.measure(), "ingredients.")
-            );
-        }
-
-        public static IngredientsFactory fromPersistence(List<IngredientBuilderDto> ingredients) {
-            return of(
-                ingredients,
-                ingredient -> IngredientFactory.fromPersistence(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure(), "ingredients.")
+        CookingTimeFactory(Duration cookingTime, String prefix) {
+            super(
+                ValidationExecutor.of(
+                    validator(
+                        !(cookingTime == null || cookingTime.isZero() || cookingTime.isNegative() || cookingTime.getNano() != 0),
+                        prefix + "cookingTime", "Cooking time must be a positive number with an accuracy of one second"
+                    )
+                ),
+                () -> cookingTime
             );
         }
 
         @Override
-        protected List<Ingredient> assemble() {
+        protected Duration assemble() {
             return super.assemble();
         }
     }
 
-    private record MethodStepBuilderDto(Long id, String text) {}
-
-    private static class StepsFactory extends FactoriesComposite<List<Step>> {
-        public StepsFactory(Assembler<List<Step>> assembler, List<? extends Factory<?>> factories) {
-            super(assembler, factories);
+    static class PortionSizeFactory extends AmountFactory {
+        PortionSizeFactory(BigDecimal value, String measure) {
+            this(value, measure, "");
         }
 
-        private static List<Step> assemble(List<StepFactory> ingredients) {
-            return ingredients.stream()
-                .map(StepFactory::assemble)
-                .toList();
-        }
-
-        private static StepsFactory of(List<MethodStepBuilderDto> steps, Function<MethodStepBuilderDto, StepFactory> mapper) {
-            var factories = steps.stream()
-                .map(mapper)
-                .toList();
-
-            var listFactory = DefaultFactory.newWithObject(
-                ValidationExecutor.of(validator(!steps.isEmpty(), "methodSteps", "Steps must not be empty.")),
-                steps
-            );
-
-            var factoriesMerged = new ArrayList<Factory<?>>(factories);
-            factoriesMerged.add(listFactory);
-
-            return new StepsFactory(() -> assemble(factories), factoriesMerged);
-        }
-
-        public static StepsFactory newSteps(List<MethodStepBuilderDto> steps) {
-            return of(
-                steps,
-                step -> StepFactory.newStep(step.text(), "methodSteps.")
-            );
-        }
-
-        public static StepsFactory fromPersistence(List<MethodStepBuilderDto> steps) {
-            return of(
-                steps,
-                step -> StepFactory.fromPersistence(step.id(), step.text(), "methodSteps.")
+        PortionSizeFactory(BigDecimal value, String measure, String prefix) {
+            super(
+                value, measure,
+                prefix,
+                Validator.validator(value != null && value.signum() > 0, prefix + "value", "Value must be a positive number")
             );
         }
 
         @Override
-        protected List<Step> assemble() {
+        protected Amount assemble() {
             return super.assemble();
         }
     }
