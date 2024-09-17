@@ -256,8 +256,12 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
     static class NameFactory extends DefaultFactory<String> {
         NameFactory(String name) {
+            this(name, "");
+        }
+
+        NameFactory(String name, String prefix) {
             super(
-                ValidationExecutor.of(validator(isNameValid(name), "name", "Name must have from 3 to 256 chars")),
+                ValidationExecutor.of(validator(isNameValid(name), prefix + "name", "Name must have from 3 to 256 chars")),
                 () -> name.trim()
             );
         }
@@ -279,8 +283,12 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
     static class DescriptionFactory extends DefaultFactory<String> {
         DescriptionFactory(String description) {
+            this(description, "");
+        }
+
+        DescriptionFactory(String description, String prefix) {
             super(
-                ValidationExecutor.of(validator(isDescriptionValid(description), "description", "Description must have 16384 chars at most")),
+                ValidationExecutor.of(validator(isDescriptionValid(description), prefix + "description", "Description must have 16384 chars at most")),
                 () -> description.trim()
             );
         }
