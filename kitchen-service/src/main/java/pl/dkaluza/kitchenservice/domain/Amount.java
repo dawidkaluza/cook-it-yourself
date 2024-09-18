@@ -1,7 +1,6 @@
 package pl.dkaluza.kitchenservice.domain;
 
 import pl.dkaluza.domaincore.DefaultFactory;
-import pl.dkaluza.domaincore.Factory;
 import pl.dkaluza.domaincore.ValidationExecutor;
 import pl.dkaluza.domaincore.Validator;
 
@@ -24,8 +23,8 @@ public class Amount {
         return ZERO;
     }
 
-    public static Factory<Amount> of(BigDecimal value, String measure) {
-        return new AmountFactory(value, measure);
+    public static pl.dkaluza.domaincore.Factory<Amount> of(BigDecimal value, String measure) {
+        return new Factory(value, measure);
     }
 
     public BigDecimal getValue() {
@@ -54,20 +53,20 @@ public class Amount {
         return value.hashCode();
     }
 
-    static class AmountFactory extends DefaultFactory<Amount> {
-        AmountFactory(BigDecimal value, String measure) {
+    static class Factory extends DefaultFactory<Amount> {
+        Factory(BigDecimal value, String measure) {
             this(value, measure, "", new Validator[0]);
         }
 
-        AmountFactory(BigDecimal value, String measure, String prefix) {
+        Factory(BigDecimal value, String measure, String prefix) {
             this(value, measure, prefix, new Validator[0]);
         }
 
-        AmountFactory(BigDecimal value, String measure, Validator... validators) {
+        Factory(BigDecimal value, String measure, Validator... validators) {
             this(value, measure, "", validators);
         }
 
-        AmountFactory(BigDecimal value, String measure, String prefix, Validator... validators) {
+        Factory(BigDecimal value, String measure, String prefix, Validator... validators) {
             super(
                 getValidationExecutor(value, measure, prefix, validators),
                 () -> {

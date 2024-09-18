@@ -4,7 +4,6 @@ import pl.dkaluza.domaincore.AbstractPersistable;
 import pl.dkaluza.domaincore.FactoriesComposite;
 import pl.dkaluza.domaincore.Factory;
 
-import static pl.dkaluza.kitchenservice.domain.CookId.CookIdFactory;
 
 public class Cook extends AbstractPersistable<CookId> {
     private final boolean isPersisted;
@@ -28,7 +27,7 @@ public class Cook extends AbstractPersistable<CookId> {
     }
 
     private static Factory<Cook> of(Long id, boolean isPersisted) {
-        var cookIdFactory = new CookIdFactory(id);
+        var cookIdFactory = new CookId.Factory(id);
         return new FactoriesComposite<>(
             () -> new Cook(cookIdFactory.assemble(), isPersisted),
             cookIdFactory

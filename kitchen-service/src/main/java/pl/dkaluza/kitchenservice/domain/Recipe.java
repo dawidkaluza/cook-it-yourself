@@ -1,6 +1,7 @@
 package pl.dkaluza.kitchenservice.domain;
 
 import pl.dkaluza.domaincore.*;
+import pl.dkaluza.domaincore.Factory;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -8,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static pl.dkaluza.domaincore.Validator.validator;
-import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
-import static pl.dkaluza.kitchenservice.domain.CookId.CookIdFactory;
 import static pl.dkaluza.kitchenservice.domain.RecipeId.RecipeIdFactory;
 
 public class Recipe extends AbstractPersistable<RecipeId> {
@@ -69,10 +68,11 @@ public class Recipe extends AbstractPersistable<RecipeId> {
     }
 
     public boolean isOwnedBy(CookId cookId) {
+        System.out.println("Is recipe with id=" + getId().getId() + ", cookId=" + getCookId().getId() + " owned by cookId=" + cookId.getId() + "?");
         return this.cookId.equals(cookId);
     }
 
-    private static abstract class RecipeBuilder<T extends RecipeBuilder<T>> {
+    private static abstract class Builder<T extends Builder<T>> {
         private String name;
         private String description;
         private Duration cookingTime;
@@ -80,7 +80,7 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         private String portionSizeMeasure;
         private Long cookId;
 
-        private RecipeBuilder() { }
+        private Builder() { }
 
         abstract T getThis();
 
@@ -135,15 +135,11 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         Long cookId() {
             return cookId;
         }
-
-        static CookId.CookIdFactory newCookIdFactory(Long id) {
-            return new CookId.CookIdFactory(id, "cookId");
-        }
     }
 
-    public final static class NewRecipeBuilder extends RecipeBuilder<NewRecipeBuilder> {
-        private final List<Ingredient.FactoryDto> ingredients;
-        private final List<Step.FactoryDto> methodSteps;
+    public final static class NewRecipeBuilder extends Builder<NewRecipeBuilder> {
+        private final List<Ingredient.Dto> ingredients;
+        private final List<Step.Dto> methodSteps;
 
         private NewRecipeBuilder() {
             ingredients = new ArrayList<>();
@@ -156,12 +152,12 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
 
         public NewRecipeBuilder ingredient(String name, BigDecimal value, String measure) {
-            ingredients.add(new Ingredient.FactoryDto(null, name, value, measure));
+            ingredients.add(new Ingredient.Dto(null, name, value, measure));
             return this;
         }
 
         public NewRecipeBuilder methodStep(String text) {
-            methodSteps.add(new Step.FactoryDto(null, text));
+            methodSteps.add(new Step.Dto(null, text));
             return this;
         }
 
@@ -169,11 +165,11 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         public Factory<Recipe> build() {
             var nameFactory = new NameFactory(name());
             var descriptionFactory = new DescriptionFactory(description());
-            var ingredientsFactory = Ingredient.IngredientsFactory.newIngredients(ingredients, false, "ingredients");
-            var methodStepsFactory = Step.StepsFactory.newSteps(methodSteps, false, "methodSteps");
+            var ingredientsFactory = Ingredient.ListFactory.newIngredients(ingredients, false, "ingredients");
+            var methodStepsFactory = Step.ListFactory.newSteps(methodSteps, false, "methodSteps");
             var cookingTimeFactory = new CookingTimeFactory(cookingTime());
             var portionSizeFactory = new PortionSizeFactory(portionSizeValue(), portionSizeMeasure(), "portionSize.");
-            var cookIdFactory = new CookIdFactory(cookId(), "cookId");
+            var cookIdFactory = new CookId.Factory(cookId(), "cookId");
 
             return new FactoriesComposite<>(
                 () -> new Recipe(
@@ -194,10 +190,10 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
     }
 
-    public final static class FromPersistenceRecipeBuilder extends RecipeBuilder<FromPersistenceRecipeBuilder> {
+    public final static class FromPersistenceRecipeBuilder extends Builder<FromPersistenceRecipeBuilder> {
         private Long id;
-        private final List<Ingredient.FactoryDto> ingredients;
-        private final List<Step.FactoryDto> methodSteps;
+        private final List<Ingredient.Dto> ingredients;
+        private final List<Step.Dto> methodSteps;
 
         private FromPersistenceRecipeBuilder() {
             ingredients = new ArrayList<>();
@@ -215,12 +211,12 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
 
         public FromPersistenceRecipeBuilder ingredient(Long id, String name, BigDecimal value, String measure) {
-            ingredients.add(new Ingredient.FactoryDto(id, name, value, measure));
+            ingredients.add(new Ingredient.Dto(id, name, value, measure));
             return this;
         }
 
         public FromPersistenceRecipeBuilder methodStep(Long id, String text) {
-            methodSteps.add(new Step.FactoryDto(id, text));
+            methodSteps.add(new Step.Dto(id, text));
             return this;
         }
 
@@ -229,11 +225,11 @@ public class Recipe extends AbstractPersistable<RecipeId> {
             var idFactory = new RecipeIdFactory(id);
             var nameFactory = new NameFactory(name());
             var descriptionFactory = new DescriptionFactory(description());
-            var ingredientsFactory = Ingredient.IngredientsFactory.fromPersistence(ingredients, false, "ingredients");
-            var methodStepsFactory = Step.StepsFactory.fromPersistence(methodSteps, false, "methodSteps");
+            var ingredientsFactory = Ingredient.ListFactory.fromPersistence(ingredients, false, "ingredients");
+            var methodStepsFactory = Step.ListFactory.fromPersistence(methodSteps, false, "methodSteps");
             var cookingTimeFactory = new CookingTimeFactory(cookingTime());
             var portionSizeFactory = new PortionSizeFactory(portionSizeValue(), portionSizeMeasure(), "portionSize.");
-            var cookIdFactory = newCookIdFactory(cookId());
+            var cookIdFactory = new CookId.Factory(cookId(), "cookId");
 
             return new FactoriesComposite<>(
                 () -> new Recipe(
@@ -330,7 +326,7 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         }
     }
 
-    static class PortionSizeFactory extends AmountFactory {
+    static class PortionSizeFactory extends Amount.Factory {
         PortionSizeFactory(BigDecimal value, String measure) {
             this(value, measure, "");
         }

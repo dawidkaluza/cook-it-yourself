@@ -15,46 +15,46 @@ public class Step extends AbstractPersistable<StepId> {
         this.text = text;
     }
 
-    public static Factory<Step> newStep(String text) {
-        return StepFactory.newStep(text);
+    public static pl.dkaluza.domaincore.Factory<Step> newStep(String text) {
+        return Factory.newStep(text);
     }
 
-    public static Factory<Step> fromPersistence(Long id, String text) {
-        return StepFactory.fromPersistence(id, text);
+    public static pl.dkaluza.domaincore.Factory<Step> fromPersistence(Long id, String text) {
+        return Factory.fromPersistence(id, text);
     }
 
     public String getText() {
         return text;
     }
     
-    record FactoryDto(Long id, String text) {}
+    record Dto(Long id, String text) {}
 
-    static class StepFactory extends FactoriesComposite<Step> {
-        private StepFactory(Assembler<Step> assembler, Factory<?>... factories) {
+    static class Factory extends FactoriesComposite<Step> {
+        private Factory(Assembler<Step> assembler, pl.dkaluza.domaincore.Factory<?>... factories) {
             super(assembler, factories);
         }
 
-        static StepFactory newStep(String text) {
+        static Factory newStep(String text) {
             return newStep(text, "");
         }
 
-        static StepFactory newStep(String text, String prefix) {
+        static Factory newStep(String text, String prefix) {
             var textFactory = new TextFactory(text, prefix);
-            return new StepFactory(
+            return new Factory(
                 () -> new Step(null, textFactory.assemble()),
                 textFactory
             );
         }
 
-        static StepFactory fromPersistence(Long id, String text) {
+        static Factory fromPersistence(Long id, String text) {
             return fromPersistence(id, text, "");
         }
 
-        static StepFactory fromPersistence(Long id, String text, String prefix) {
-            var idFactory = new StepId.StepIdFactory(id, prefix);
+        static Factory fromPersistence(Long id, String text, String prefix) {
+            var idFactory = new StepId.Factory(id, prefix);
             var textFactory = new TextFactory(text, prefix);
 
-            return new StepFactory(
+            return new Factory(
                 () -> new Step(idFactory.assemble(), textFactory.assemble()),
                 idFactory, textFactory
             );
@@ -94,12 +94,12 @@ public class Step extends AbstractPersistable<StepId> {
         }
     }
 
-    static class StepsFactory extends FactoriesList<Step> {
-        private StepsFactory(List<? extends Factory<Step>> factories, List<Validator> validators) {
+    static class ListFactory extends FactoriesList<Step> {
+        private ListFactory(List<? extends pl.dkaluza.domaincore.Factory<Step>> factories, List<Validator> validators) {
             super(factories, validators);
         }
 
-        private static StepsFactory of(List<FactoryDto> dtos, Function<FactoryDto, StepFactory> mapper, boolean allowEmpty, String fieldName) {
+        private static ListFactory of(List<Dto> dtos, Function<Dto, Factory> mapper, boolean allowEmpty, String fieldName) {
             var factories = dtos.stream()
                 .map(mapper)
                 .toList();
@@ -108,22 +108,22 @@ public class Step extends AbstractPersistable<StepId> {
                 ? List.of()
                 : List.of(validator(!dtos.isEmpty(), fieldName, "List must not be empty."));
 
-            return new StepsFactory(factories, validators);
+            return new ListFactory(factories, validators);
         }
 
-        public static StepsFactory newSteps(List<FactoryDto> steps, boolean allowEmpty, String fieldName) {
+        public static ListFactory newSteps(List<Dto> steps, boolean allowEmpty, String fieldName) {
             return of(
                 steps,
-                step -> StepFactory.newStep(step.text(), fieldName + "."),
+                step -> Factory.newStep(step.text(), fieldName + "."),
                 allowEmpty,
                 fieldName
             );
         }
 
-        public static StepsFactory fromPersistence(List<FactoryDto> steps, boolean allowEmpty, String fieldName) {
+        public static ListFactory fromPersistence(List<Dto> steps, boolean allowEmpty, String fieldName) {
             return of(
                 steps,
-                step -> StepFactory.fromPersistence(step.id(), step.text(), fieldName + "."),
+                step -> Factory.fromPersistence(step.id(), step.text(), fieldName + "."),
                 allowEmpty,
                 fieldName
             );

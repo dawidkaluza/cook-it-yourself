@@ -1,6 +1,5 @@
 package pl.dkaluza.kitchenservice.domain;
 
-import pl.dkaluza.domaincore.Factory;
 import pl.dkaluza.domaincore.LongIndex;
 
 public class CookId extends LongIndex {
@@ -8,16 +7,16 @@ public class CookId extends LongIndex {
         super(id);
     }
 
-    public static Factory<CookId> of(Long id) {
-        return new CookIdFactory(id);
+    public static pl.dkaluza.domaincore.Factory<CookId> of(Long id) {
+        return new Factory(id);
     }
 
-    static class CookIdFactory extends LongIndexFactory<CookId> {
-        CookIdFactory(Long id) {
+    static class Factory extends LongIndexFactory<CookId> {
+        Factory(Long id) {
             super(id, () -> new CookId(id));
         }
 
-        CookIdFactory(Long id, String fieldName) {
+        Factory(Long id, String fieldName) {
             super(id, () -> new CookId(id), "", fieldName);
         }
 

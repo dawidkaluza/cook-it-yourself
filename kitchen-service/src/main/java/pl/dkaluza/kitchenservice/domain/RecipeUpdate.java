@@ -161,8 +161,8 @@ public class RecipeUpdate {
         }
 
         public static class Builder {
-            private final List<Ingredient.FactoryDto> ingredientsToAdd;
-            private final List<Ingredient.FactoryDto> ingredientsToUpdate;
+            private final List<Ingredient.Dto> ingredientsToAdd;
+            private final List<Ingredient.Dto> ingredientsToUpdate;
             private final List<Long> ingredientsToDelete;
 
             Builder() {
@@ -172,12 +172,12 @@ public class RecipeUpdate {
             }
 
             public Builder ingredientToAdd(String name, BigDecimal value, String measure) {
-                ingredientsToAdd.add(new Ingredient.FactoryDto(null, name, value, measure));
+                ingredientsToAdd.add(new Ingredient.Dto(null, name, value, measure));
                 return this;
             }
 
             public Builder ingredientToUpdate(Long id, String name, BigDecimal value, String measure) {
-                ingredientsToUpdate.add(new Ingredient.FactoryDto(id, name, value, measure));
+                ingredientsToUpdate.add(new Ingredient.Dto(id, name, value, measure));
                 return this;
             }
 
@@ -188,9 +188,9 @@ public class RecipeUpdate {
 
             Factory build() {
                 return new Factory(
-                    Ingredient.IngredientsFactory.newIngredients(ingredientsToAdd, true, "ingredients.ingredientsToAdd"),
-                    Ingredient.IngredientsFactory.fromPersistence(ingredientsToUpdate, true, "ingredients.ingredientsToUpdate"),
-                    new IngredientId.IngredientIdsFactory(ingredientsToDelete, "ingredients.ingredientsToDelete")
+                    Ingredient.ListFactory.newIngredients(ingredientsToAdd, true, "ingredients.ingredientsToAdd"),
+                    Ingredient.ListFactory.fromPersistence(ingredientsToUpdate, true, "ingredients.ingredientsToUpdate"),
+                    new IngredientId.ListFactory(ingredientsToDelete, "ingredients.ingredientsToDelete")
                 );
             }
         }
@@ -201,9 +201,9 @@ public class RecipeUpdate {
             }
 
             Factory(
-                Ingredient.IngredientsFactory ingredientsToAddFactory,
-                Ingredient.IngredientsFactory ingredientsToUpdateFactory,
-                IngredientId.IngredientIdsFactory ingredientsToDeleteFactory
+                Ingredient.ListFactory ingredientsToAddFactory,
+                Ingredient.ListFactory ingredientsToUpdateFactory,
+                IngredientId.ListFactory ingredientsToDeleteFactory
             ) {
                 super(
                     () -> new Ingredients(
@@ -246,8 +246,8 @@ public class RecipeUpdate {
         }
         
         public static class Builder {
-            private final List<Step.FactoryDto> stepsToAdd;
-            private final List<Step.FactoryDto> stepsToUpdate;
+            private final List<Step.Dto> stepsToAdd;
+            private final List<Step.Dto> stepsToUpdate;
             private final List<Long> stepsToDelete;
             
             Builder() {
@@ -257,12 +257,12 @@ public class RecipeUpdate {
             }
 
             public Builder stepToAdd(String text) {
-                stepsToAdd.add(new Step.FactoryDto(null, text));
+                stepsToAdd.add(new Step.Dto(null, text));
                 return this;
             }
     
             public Builder stepToUpdate(Long id, String text) {
-                stepsToUpdate.add(new Step.FactoryDto(id, text));
+                stepsToUpdate.add(new Step.Dto(id, text));
                 return this;
             }
     
@@ -273,9 +273,9 @@ public class RecipeUpdate {
             
             Factory build() {
                 return new Factory(
-                    Step.StepsFactory.newSteps(stepsToAdd, true, "steps.stepsToAdd"),
-                    Step.StepsFactory.fromPersistence(stepsToUpdate, true, "steps.stepsToUpdate"),
-                    new StepId.StepIdsFactory(stepsToDelete, "steps.stepsToDelete")
+                    Step.ListFactory.newSteps(stepsToAdd, true, "steps.stepsToAdd"),
+                    Step.ListFactory.fromPersistence(stepsToUpdate, true, "steps.stepsToUpdate"),
+                    new StepId.ListFactory(stepsToDelete, "steps.stepsToDelete")
                 );
             }
         }
@@ -286,9 +286,9 @@ public class RecipeUpdate {
             }
 
             private Factory(
-                Step.StepsFactory stepsToAddFactory,
-                Step.StepsFactory stepsToUpdateFactory,
-                StepId.StepIdsFactory stepsToDeleteFactory
+                Step.ListFactory stepsToAddFactory,
+                Step.ListFactory stepsToUpdateFactory,
+                StepId.ListFactory stepsToDeleteFactory
             ) {
                 super(
                     () -> new Steps(
