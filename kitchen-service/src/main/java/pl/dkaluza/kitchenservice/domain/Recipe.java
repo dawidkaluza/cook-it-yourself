@@ -68,7 +68,6 @@ public class Recipe extends AbstractPersistable<RecipeId> {
     }
 
     public boolean isOwnedBy(CookId cookId) {
-        System.out.println("Is recipe with id=" + getId().getId() + ", cookId=" + getCookId().getId() + " owned by cookId=" + cookId.getId() + "?");
         return this.cookId.equals(cookId);
     }
 
