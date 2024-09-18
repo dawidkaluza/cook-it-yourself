@@ -43,28 +43,28 @@ class RecipeUpdateTest {
                     "id"
                 },
                 new String[] {
-                    "basicInfo.name",
-                    "basicInfo.description",
+                    "basicInformation.name",
+                    "basicInformation.description",
                 }
             ),
             Arguments.of(
                 RecipeUpdate.builder()
                     .id(1L)
-                    .basicInfo(basicInfo -> basicInfo
+                    .basicInformation(info -> info
                         .name("")
                         .description(null)
                         .cookingTime(Duration.ZERO)
                         .portionSize(BigDecimal.ZERO, "")
                     ),
                 new String[] {
-                    "basicInfo.name",
-                    "basicInfo.description",
-                    "basicInfo.cookingTime",
-                    "basicInfo.portionSize.value",
+                    "basicInformation.name",
+                    "basicInformation.description",
+                    "basicInformation.cookingTime",
+                    "basicInformation.portionSize.value",
                 },
                 new String[] {
                     "id",
-                    "basicInfo.portionSize.measure",
+                    "basicInformation.portionSize.measure",
                     "ingredients.ingredientsToAdd",
                     "steps.stepsToAdd",
                 }
@@ -72,7 +72,7 @@ class RecipeUpdateTest {
             Arguments.of(
                 RecipeUpdate.builder()
                     .id(1L)
-                    .basicInfo(basicInfo -> basicInfo
+                    .basicInformation(info -> info
                         .name("Boiled sausages")
                         .description("")
                         .cookingTime(Duration.ofMinutes(3))
@@ -100,11 +100,11 @@ class RecipeUpdateTest {
                 },
                 new String[] {
                     "id",
-                    "basicInfo.name",
-                    "basicInfo.description",
-                    "basicInfo.cookingTime",
-                    "basicInfo.portionSize.value",
-                    "basicInfo.portionSize.measure",
+                    "basicInformation.name",
+                    "basicInformation.description",
+                    "basicInformation.cookingTime",
+                    "basicInformation.portionSize.value",
+                    "basicInformation.portionSize.measure",
                     "steps.stepsToAdd.text",
                     "steps.stepsToUpdate.id",
                     "steps.stepsToUpdate.text",
@@ -114,7 +114,7 @@ class RecipeUpdateTest {
             Arguments.of(
                 RecipeUpdate.builder()
                     .id(1L)
-                    .basicInfo(basicInfo -> basicInfo
+                    .basicInformation(info -> info
                         .name("Boiled sausages")
                         .description("")
                         .cookingTime(Duration.ofMinutes(3))
@@ -138,11 +138,11 @@ class RecipeUpdateTest {
                 },
                 new String[] {
                     "id",
-                    "basicInfo.name",
-                    "basicInfo.description",
-                    "basicInfo.cookingTime",
-                    "basicInfo.portionSize.value",
-                    "basicInfo.portionSize.measure",
+                    "basicInformation.name",
+                    "basicInformation.description",
+                    "basicInformation.cookingTime",
+                    "basicInformation.portionSize.value",
+                    "basicInformation.portionSize.measure",
                     "ingredients.ingredientsToAdd.name",
                     "ingredients.ingredientsToAdd.value",
                     "ingredients.ingredientsToAdd.measure",
@@ -168,7 +168,7 @@ class RecipeUpdateTest {
 
         var factory = RecipeUpdate.builder()
             .id(id)
-            .basicInfo(basicInfo -> basicInfo
+            .basicInformation(info -> info
                 .name(name)
                 .description(description)
                 .cookingTime(cookingTime)
@@ -186,20 +186,20 @@ class RecipeUpdateTest {
         assertThat(recipeUpdate.getRecipeId().getId())
             .isEqualTo(id);
 
-        assertThat(recipeUpdate.getBasicInfo())
+        assertThat(recipeUpdate.getBasicInformation())
             .isPresent();
 
-        var basicInfo = recipeUpdate.getBasicInfo().get();
-        assertThat(basicInfo.getName())
+        var basicInformation = recipeUpdate.getBasicInformation().get();
+        assertThat(basicInformation.getName())
             .isEqualTo(name);
 
-        assertThat(basicInfo.getDescription())
+        assertThat(basicInformation.getDescription())
             .isEqualTo(description);
 
-        assertThat(basicInfo.getCookingTime())
+        assertThat(basicInformation.getCookingTime())
             .isEqualTo(cookingTime);
 
-        assertThat(basicInfo.getPortionSize())
+        assertThat(basicInformation.getPortionSize())
             .extracting(Amount::getValue, Amount::getMeasure)
             .containsExactly(portionSizeValue, portionSizeMeasure);
 
@@ -238,7 +238,7 @@ class RecipeUpdateTest {
         assertThat(recipeUpdate)
             .isNotNull();
 
-        assertThat(recipeUpdate.getBasicInfo())
+        assertThat(recipeUpdate.getBasicInformation())
             .isEmpty();
 
         assertThat(recipeUpdate.getIngredients())
@@ -302,7 +302,7 @@ class RecipeUpdateTest {
         assertThat(recipeUpdate)
             .isNotNull();
 
-        assertThat(recipeUpdate.getBasicInfo())
+        assertThat(recipeUpdate.getBasicInformation())
             .isEmpty();
 
         assertThat(recipeUpdate.getIngredients())

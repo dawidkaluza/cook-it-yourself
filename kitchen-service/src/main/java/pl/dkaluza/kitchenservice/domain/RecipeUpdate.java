@@ -12,13 +12,13 @@ import java.util.function.Consumer;
 
 public class RecipeUpdate {
     private final RecipeId recipeId;
-    private final BasicInfo basicInfo;
+    private final BasicInformation basicInformation;
     private final Ingredients ingredients;
     private final Steps steps;
 
-    private RecipeUpdate(RecipeId recipeId, BasicInfo basicInfo, Ingredients ingredients, Steps steps) {
+    private RecipeUpdate(RecipeId recipeId, BasicInformation basicInformation, Ingredients ingredients, Steps steps) {
         this.recipeId = recipeId;
-        this.basicInfo = basicInfo;
+        this.basicInformation = basicInformation;
         this.ingredients = ingredients;
         this.steps = steps;
     }
@@ -31,8 +31,8 @@ public class RecipeUpdate {
         return recipeId;
     }
 
-    Optional<BasicInfo> getBasicInfo() {
-        return Optional.ofNullable(basicInfo);
+    Optional<BasicInformation> getBasicInformation() {
+        return Optional.ofNullable(basicInformation);
     }
 
     Optional<Ingredients> getIngredients() {
@@ -43,13 +43,13 @@ public class RecipeUpdate {
         return Optional.ofNullable(steps);
     }
 
-    public static class BasicInfo {
+    public static class BasicInformation {
         private final String name;
         private final String description;
         private final Duration cookingTime;
         private final Amount portionSize;
 
-        private BasicInfo(String name, String description, Duration cookingTime, Amount portionSize) {
+        private BasicInformation(String name, String description, Duration cookingTime, Amount portionSize) {
             this.name = name;
             this.description = description;
             this.cookingTime = cookingTime;
@@ -100,17 +100,17 @@ public class RecipeUpdate {
                 return this;
             }
 
-            BasicInfo.Factory build() {
-                return new BasicInfo.Factory(
-                    new Recipe.NameFactory(name, "basicInfo."),
-                    new Recipe.DescriptionFactory(description, "basicInfo."),
-                    new Recipe.CookingTimeFactory(cookingTime, "basicInfo."),
-                    new Recipe.PortionSizeFactory(portionSizeValue, portionSizeMeasure, "basicInfo.portionSize.")
+            BasicInformation.Factory build() {
+                return new BasicInformation.Factory(
+                    new Recipe.NameFactory(name, "basicInformation."),
+                    new Recipe.DescriptionFactory(description, "basicInformation."),
+                    new Recipe.CookingTimeFactory(cookingTime, "basicInformation."),
+                    new Recipe.PortionSizeFactory(portionSizeValue, portionSizeMeasure, "basicInformation.portionSize.")
                 );
             }
         }
 
-        static class Factory extends FactoriesComposite<BasicInfo> {
+        static class Factory extends FactoriesComposite<BasicInformation> {
             Factory() {
                 super(() -> null);
             }
@@ -120,7 +120,7 @@ public class RecipeUpdate {
                 Recipe.CookingTimeFactory cookingTimeFactory, Recipe.PortionSizeFactory portionSizeFactory
             ) {
                 super(
-                    () -> new BasicInfo(
+                    () -> new BasicInformation(
                         nameFactory.assemble(),
                         descriptionFactory.assemble(),
                         cookingTimeFactory.assemble(),
@@ -131,7 +131,7 @@ public class RecipeUpdate {
             }
 
             @Override
-            protected BasicInfo assemble() {
+            protected BasicInformation assemble() {
                 return super.assemble();
             }
         }
@@ -309,7 +309,7 @@ public class RecipeUpdate {
 
     public static class Builder {
         private Long id;
-        private BasicInfo.Builder basicInfoBuilder;
+        private BasicInformation.Builder basicInformationBuilder;
         private Ingredients.Builder ingredientsBuilder;
         private Steps.Builder stepsBuilder;
 
@@ -320,10 +320,10 @@ public class RecipeUpdate {
             return this;
         }
 
-        public Builder basicInfo(Consumer<BasicInfo.Builder> consumer) {
-            var builder = new BasicInfo.Builder();
+        public Builder basicInformation(Consumer<BasicInformation.Builder> consumer) {
+            var builder = new BasicInformation.Builder();
             consumer.accept(builder);
-            basicInfoBuilder = builder;
+            basicInformationBuilder = builder;
             return this;
         }
 
@@ -343,7 +343,7 @@ public class RecipeUpdate {
 
         public Factory<RecipeUpdate> build() {
             var recipeIdFactory = new RecipeId.RecipeIdFactory(id);
-            var basicInfoFactory = basicInfoBuilder == null ? new BasicInfo.Factory() : basicInfoBuilder.build();
+            var basicInfoFactory = basicInformationBuilder == null ? new BasicInformation.Factory() : basicInformationBuilder.build();
             var ingredientsFactory = ingredientsBuilder == null ? new Ingredients.Factory() : ingredientsBuilder.build();
             var stepsFactory = stepsBuilder == null ? new Steps.Factory() : stepsBuilder.build();
 
