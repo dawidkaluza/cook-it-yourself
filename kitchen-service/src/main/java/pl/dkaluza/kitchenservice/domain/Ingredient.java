@@ -3,12 +3,10 @@ package pl.dkaluza.kitchenservice.domain;
 import pl.dkaluza.domaincore.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 import static pl.dkaluza.domaincore.Validator.validator;
-import static pl.dkaluza.kitchenservice.domain.Amount.AmountFactory;
 import static pl.dkaluza.kitchenservice.domain.IngredientId.IngredientIdFactory;
 
 public class Ingredient extends AbstractPersistable<IngredientId> {
@@ -44,28 +42,8 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             super(assembler, factories);
         }
 
-        private static boolean isNameValid(String name) {
-            if (name == null) {
-                return false;
-            }
-
-            int length = name.trim().length();
-            return !(length < 3 || length > 256);
-        }
-
-        private static Assembler<String> nameAssembler(String name) {
-            return name == null ? () -> null : name::trim;
-        }
-
-        private static Factory<String> nameFactory(String name, String prefix) {
-            return DefaultFactory.newWithAssembler(
-                ValidationExecutor.of(validator(isNameValid(name), prefix + "name", "Name must have from 3 to 256 chars")),
-                nameAssembler(name)
-            );
-        }
-
-        private static AmountFactory amountFactory(BigDecimal value, String measure, String prefix) {
-            return new AmountFactory(
+        private static Amount.AmountFactory amountFactory(BigDecimal value, String measure, String prefix) {
+            return new Amount.AmountFactory(
                 value, measure,
                 prefix,
                 Validator.validator(value != null && value.signum() > 0, prefix + "value", "Value must be a positive number")
@@ -77,11 +55,11 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
         }
 
         static IngredientFactory newIngredient(String name, BigDecimal value, String measure, String prefix) {
-            var nameFactory = nameFactory(name, prefix);
+            var nameFactory = new NameFactory(name, prefix);
             var amountFactory = amountFactory(value, measure, prefix);
 
             return new IngredientFactory(
-                () -> new Ingredient(null, nameAssembler(name).assemble(), amountFactory.assemble()),
+                () -> new Ingredient(null, nameFactory.assemble(), amountFactory.assemble()),
                 nameFactory, amountFactory
             );
         }
@@ -92,11 +70,11 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
 
         static IngredientFactory fromPersistence(Long id, String name, BigDecimal value, String measure, String prefix) {
             var idFactory = new IngredientIdFactory(id, prefix);
-            var nameFactory = nameFactory(name, prefix);
+            var nameFactory = new NameFactory(name, prefix);
             var amountFactory = amountFactory(value, measure, prefix);
 
             return new IngredientFactory(
-                () -> new Ingredient(idFactory.assemble(), nameAssembler(name).assemble(), amountFactory.assemble()),
+                () -> new Ingredient(idFactory.assemble(), nameFactory.assemble(), amountFactory.assemble()),
                 idFactory, nameFactory, amountFactory
             );
         }
@@ -106,48 +84,65 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
             return super.assemble();
         }
     }
-    
-    static class IngredientsFactory extends FactoriesComposite<List<Ingredient>> {
-        private IngredientsFactory(Assembler<List<Ingredient>> assembler, List<Factory<?>> allFactories) {
-            super(assembler, allFactories);
+
+    static class NameFactory extends DefaultFactory<String> {
+        NameFactory(String name) {
+            this(name, "");
         }
 
-        private static List<Ingredient> assemble(List<IngredientFactory> ingredients) {
-            return ingredients.stream()
-                .map(IngredientFactory::assemble)
-                .toList();
+        NameFactory(String name, String prefix) {
+            //noinspection Convert2MethodRef
+            super(
+                () -> name.trim(),
+                ValidationExecutor.of(validator(isNameValid(name), prefix + "name", "Name must have from 3 to 256 chars"))
+            );
         }
 
-        private static IngredientsFactory of(List<FactoryDto> ingredients, Function<FactoryDto, IngredientFactory> mapper, boolean allowEmpty, String fieldName) {
-            var ingredientsFactories = ingredients.stream()
+        private static boolean isNameValid(String name) {
+            if (name == null) {
+                return false;
+            }
+
+            int length = name.trim().length();
+            return !(length < 3 || length > 256);
+        }
+
+        @Override
+        protected String assemble() {
+            return super.assemble();
+        }
+    }
+
+    static class IngredientsFactory extends FactoriesList<Ingredient> {
+        private IngredientsFactory(List<? extends Factory<Ingredient>> factories, List<Validator> validators) {
+            super(factories, validators);
+        }
+
+        private static IngredientsFactory of(List<FactoryDto> dtos, Function<FactoryDto, IngredientFactory> mapper, boolean allowEmpty, String fieldName) {
+            var factories = dtos.stream()
                 .map(mapper)
                 .toList();
 
-            var allFactories = new ArrayList<Factory<?>>(ingredientsFactories);
-            if (!allowEmpty) {
-                var listFactory = DefaultFactory.newWithObject(
-                    ValidationExecutor.of(validator(!ingredients.isEmpty(), fieldName, "Ingredients must not be empty.")),
-                    ingredients
-                );
-                allFactories.add(listFactory);
-            }
+            List<Validator> validators = allowEmpty
+                ? List.of()
+                : List.of(validator(!dtos.isEmpty(), fieldName, "List must not be empty."));
 
-            return new IngredientsFactory(() -> assemble(ingredientsFactories), allFactories);
+            return new IngredientsFactory(factories, validators);
         }
 
-        static IngredientsFactory newIngredients(List<FactoryDto> ingredients, boolean allowEmpty, String fieldName) {
+        static IngredientsFactory newIngredients(List<FactoryDto> dtos, boolean allowEmpty, String fieldName) {
             return of(
-                ingredients,
-                ingredient -> IngredientFactory.newIngredient(ingredient.name(), ingredient.value(), ingredient.measure(), fieldName + "."),
+                dtos,
+                (dto) -> IngredientFactory.newIngredient(dto.name(), dto.value(), dto.measure(), fieldName + "."),
                 allowEmpty,
                 fieldName
             );
         }
 
-        static IngredientsFactory fromPersistence(List<FactoryDto> ingredients, boolean allowEmpty, String fieldName) {
+        static IngredientsFactory fromPersistence(List<FactoryDto> dtos, boolean allowEmpty, String fieldName) {
             return of(
-                ingredients,
-                ingredient -> IngredientFactory.fromPersistence(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure(), fieldName + "."),
+                dtos,
+                (dto) -> IngredientFactory.fromPersistence(dto.id(), dto.name(), dto.value(), dto.measure(), fieldName + "."),
                 allowEmpty,
                 fieldName
             );
@@ -157,5 +152,5 @@ public class Ingredient extends AbstractPersistable<IngredientId> {
         protected List<Ingredient> assemble() {
             return super.assemble();
         }
-    } 
+    }
 }

@@ -1,7 +1,6 @@
 package pl.dkaluza.kitchenservice.domain;
 
 import pl.dkaluza.domaincore.FactoriesComposite;
-import pl.dkaluza.domaincore.FactoriesList;
 import pl.dkaluza.domaincore.Factory;
 
 import java.math.BigDecimal;
@@ -191,7 +190,7 @@ public class RecipeUpdate {
                 return new Factory(
                     Ingredient.IngredientsFactory.newIngredients(ingredientsToAdd, true, "ingredients.ingredientsToAdd"),
                     Ingredient.IngredientsFactory.fromPersistence(ingredientsToUpdate, true, "ingredients.ingredientsToUpdate"),
-                    new IngredientIdsFactory(ingredientsToDelete, "ingredients.ingredientsToDelete")
+                    new IngredientId.IngredientIdsFactory(ingredientsToDelete, "ingredients.ingredientsToDelete")
                 );
             }
         }
@@ -204,7 +203,7 @@ public class RecipeUpdate {
             Factory(
                 Ingredient.IngredientsFactory ingredientsToAddFactory,
                 Ingredient.IngredientsFactory ingredientsToUpdateFactory,
-                IngredientIdsFactory ingredientsToDeleteFactory
+                IngredientId.IngredientIdsFactory ingredientsToDeleteFactory
             ) {
                 super(
                     () -> new Ingredients(
@@ -276,7 +275,7 @@ public class RecipeUpdate {
                 return new Factory(
                     Step.StepsFactory.newSteps(stepsToAdd, true, "steps.stepsToAdd"),
                     Step.StepsFactory.fromPersistence(stepsToUpdate, true, "steps.stepsToUpdate"),
-                    new StepIdsFactory(stepsToDelete, "steps.stepsToDelete")
+                    new StepId.StepIdsFactory(stepsToDelete, "steps.stepsToDelete")
                 );
             }
         }
@@ -289,7 +288,7 @@ public class RecipeUpdate {
             private Factory(
                 Step.StepsFactory stepsToAddFactory,
                 Step.StepsFactory stepsToUpdateFactory,
-                StepIdsFactory stepsToDeleteFactory
+                StepId.StepIdsFactory stepsToDeleteFactory
             ) {
                 super(
                     () -> new Steps(
@@ -357,28 +356,6 @@ public class RecipeUpdate {
                 ),
                 List.of(recipeIdFactory, basicInfoFactory, ingredientsFactory, stepsFactory)
             );
-        }
-    }
-
-    private static class IngredientIdsFactory extends FactoriesList<IngredientId> {
-        private IngredientIdsFactory(List<Long> ids, String fieldName) {
-            super(ids.stream().map(id -> new IngredientId.IngredientIdFactory(id, fieldName + ".")).toList());
-        }
-
-        @Override
-        protected List<IngredientId> assemble() {
-            return super.assemble();
-        }
-    }
-
-    private static class StepIdsFactory extends FactoriesList<StepId> {
-        private StepIdsFactory(List<Long> ids, String fieldName) {
-            super(ids.stream().map(id -> new StepId.StepIdFactory(id, fieldName + ".")).toList());
-        }
-
-        @Override
-        protected List<StepId> assemble() {
-            return super.assemble();
         }
     }
 }

@@ -1,7 +1,10 @@
 package pl.dkaluza.kitchenservice.domain;
 
+import pl.dkaluza.domaincore.FactoriesList;
 import pl.dkaluza.domaincore.Factory;
 import pl.dkaluza.domaincore.LongIndex;
+
+import java.util.List;
 
 public class StepId extends LongIndex {
     private StepId(Long id) {
@@ -23,6 +26,17 @@ public class StepId extends LongIndex {
 
         @Override
         protected StepId assemble() {
+            return super.assemble();
+        }
+    }
+
+    static class StepIdsFactory extends FactoriesList<StepId> {
+        StepIdsFactory(List<Long> ids, String fieldName) {
+            super(ids.stream().map(id -> new StepId.StepIdFactory(id, fieldName + ".")).toList());
+        }
+
+        @Override
+        protected List<StepId> assemble() {
             return super.assemble();
         }
     }
