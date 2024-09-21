@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mapstruct.factory.Mappers;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ObjectNotPersistedException;
@@ -24,6 +25,9 @@ class RecipePersistenceAdapterTest {
     private InMemoryRecipeEntityRepository recipeEntityRepository;
     private InMemoryIngredientEntityRepository ingredientEntityRepository;
     private InMemoryStepEntityRepository stepEntityRepository;
+    private RecipeEntityMapper recipeMapper;
+    private IngredientEntityMapper ingredientMapper;
+    private StepEntityMapper stepMapper;
 
     @BeforeEach
     void beforeEach() {
@@ -32,6 +36,9 @@ class RecipePersistenceAdapterTest {
         recipeEntityRepository = new InMemoryRecipeEntityRepository();
         ingredientEntityRepository = new InMemoryIngredientEntityRepository();
         stepEntityRepository = new InMemoryStepEntityRepository();
+        recipeMapper = Mappers.getMapper(RecipeEntityMapper.class);
+        ingredientMapper = Mappers.getMapper(IngredientEntityMapper.class);
+        stepMapper = Mappers.getMapper(StepEntityMapper.class);
     }
 
     @Test
@@ -438,6 +445,232 @@ class RecipePersistenceAdapterTest {
                 1
             )
             // TODO test scenario when no recipes matches given filters AND returned page is empty
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateRecipeNullParamsProvider")
+    void updateRecipe_nullParams_throwException(Recipe recipe, RecipeUpdate recipeUpdate) {
+        assertThatThrownBy(() -> recipePersistenceAdapter.updateRecipe(recipe, recipeUpdate))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private static Stream<Arguments> updateRecipeNullParamsProvider() {
+        return Stream.of(
+            Arguments.of(
+                null, null
+            ),
+            Arguments.of(
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Boiled sausages")
+                    .description("")
+                    .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+                    .methodStep(3L, "Diy")
+                    .cookingTime(Duration.ofMinutes(3))
+                    .portionSize(new BigDecimal(2), "pc")
+                    .cookId(4L)
+                    .build().produce(),
+                null
+            ),
+            Arguments.of(
+                null,
+                RecipeUpdate.builder()
+                    .build().produce()
+            )
+        );
+    }
+
+
+    @Test
+    void updateRecipe_notPersistedRecipe_throwException() {
+        // Given
+        var recipe = Recipe.newRecipeBuilder()
+            .name("Boiled sausages")
+            .description("")
+            .ingredient("sausage", new BigDecimal(2), "pc")
+            .methodStep("Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(4L)
+            .build().produce();
+
+        var recipeUpdate = RecipeUpdate.builder()
+                .build().produce();
+
+        // When, then
+        assertThatThrownBy(() -> recipePersistenceAdapter.updateRecipe(recipe, recipeUpdate))
+            .isInstanceOf(ObjectNotPersistedException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateRecipeValidParamsProvider")
+    void updateRecipe_variousParams_returnUpdatedRecipe(Recipe recipe, RecipeUpdate recipeUpdate, Recipe expectedRecipe) {
+        // Given
+        var recipeEntity = recipeMapper.toEntity(recipe);
+        recipeEntityRepository.save(recipeEntity);
+        var ingredientEntities = ingredientMapper.toEntities(recipe.getIngredients(), recipeEntity.id());
+        ingredientEntityRepository.saveAll(ingredientEntities);
+        var stepEntities = stepMapper.toEntities(recipe.getMethodSteps(), recipeEntity.id());
+        stepEntityRepository.saveAll(stepEntities);
+
+        // When
+        var updatedRecipe = recipePersistenceAdapter.updateRecipe(recipe, recipeUpdate);
+
+        // Then
+        assertThat(updatedRecipe)
+            .isNotNull()
+            .extracting(
+                Recipe::getId, Recipe::getName, Recipe::getDescription,
+                Recipe::getCookingTime, Recipe::getPortionSize, Recipe::getCookId
+            )
+            .containsExactly(
+                expectedRecipe.getId(), expectedRecipe.getName(), expectedRecipe.getDescription(),
+                expectedRecipe.getCookingTime(), expectedRecipe.getPortionSize(), expectedRecipe.getCookId()
+            );
+
+        var updatedIngredients = updatedRecipe.getIngredients();
+        var expectedIngredients = expectedRecipe.getIngredients();
+        assertThat(updatedIngredients)
+            .isNotNull();
+
+        var ingredientsSize = updatedIngredients.size();
+        assertThat(ingredientsSize)
+            .isEqualTo(expectedIngredients.size());
+
+        for (int i = 0; i < ingredientsSize; i++) {
+            var updatedIngredient = updatedIngredients.get(i);
+            var expectedIngredient = expectedIngredients.get(i);
+
+            assertThat(updatedIngredient)
+                .extracting(
+                    Ingredient::getId, Ingredient::getName, Ingredient::getAmount
+                ).containsExactly(
+                    expectedIngredient.getId(), expectedIngredient.getName(), expectedIngredient.getAmount()
+                );
+        }
+
+        var updatedSteps = updatedRecipe.getMethodSteps();
+        var expectedSteps = expectedRecipe.getMethodSteps();
+        assertThat(updatedSteps)
+            .isNotNull();
+
+        var stepsSize = updatedSteps.size();
+        assertThat(stepsSize)
+            .isEqualTo(expectedSteps.size());
+
+        for (int i = 0; i < stepsSize; i++) {
+            var updatedStep = updatedSteps.get(i);
+            var expectedStep = expectedSteps.get(i);
+
+            assertThat(updatedStep)
+                .extracting(
+                    Step::getId, Step::getText
+                )
+                .containsExactly(
+                    expectedStep.getId(), expectedStep.getText()
+                );
+        }
+    }
+
+    private static Stream<Arguments> updateRecipeValidParamsProvider() {
+        return Stream.of(
+            Arguments.of(
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Boiled sausages")
+                    .description("")
+                    .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+                    .methodStep(3L, "Diy")
+                    .cookingTime(Duration.ofMinutes(3))
+                    .portionSize(new BigDecimal(2), "pc")
+                    .cookId(4L)
+                    .build().produce(),
+                RecipeUpdate.builder()
+                    .basicInformation(info -> info
+                        .name("Sausages")
+                        .description("How to boil sausages properly")
+                        .cookingTime(Duration.ofMinutes(5))
+                        .portionSize(new BigDecimal(2), "")
+                    )
+                    .build().produce(),
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Sausages")
+                    .description("How to boil sausages properly")
+                    .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+                    .methodStep(3L, "Diy")
+                    .cookingTime(Duration.ofMinutes(5))
+                    .portionSize(new BigDecimal(2), "")
+                    .cookId(4L)
+                    .build().produce()
+            ),
+            Arguments.of(
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Boiled sausages")
+                    .description("")
+                    .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+                    .ingredient(3L, "water", new BigDecimal(500), "ml")
+                    .methodStep(4L, "Pour water into a pot and make it boil")
+                    .methodStep(5L, "Add sausages and boil for about a minute")
+                    .cookingTime(Duration.ofMinutes(3))
+                    .portionSize(new BigDecimal(2), "pc")
+                    .cookId(6L)
+                    .build().produce(),
+                RecipeUpdate.builder()
+                    .ingredients(ingredients -> ingredients
+                        .ingredientToAdd("ketchup", new BigDecimal(50), "g")
+                        .ingredientToUpdate(3L, "water", new BigDecimal(700), "ml")
+                        .ingredientToDelete(2L)
+                    )
+                    .build().produce(),
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Boiled sausages")
+                    .description("")
+                    .ingredient(3L, "water", new BigDecimal(700), "ml")
+                    .ingredient(1L, "ketchup", new BigDecimal(50), "g")
+                    .methodStep(4L, "Pour water into a pot and make it boil")
+                    .methodStep(5L, "Add sausages and boil for about a minute")
+                    .cookingTime(Duration.ofMinutes(3))
+                    .portionSize(new BigDecimal(2), "pc")
+                    .cookId(6L)
+                    .build().produce()
+            ),
+            Arguments.of(
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Boiled sausages")
+                    .description("")
+                    .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+                    .ingredient(3L, "water", new BigDecimal(500), "ml")
+                    .methodStep(4L, "Pour water into a pot and make it boil")
+                    .methodStep(5L, "Add sausages and boil for about a minute")
+                    .cookingTime(Duration.ofMinutes(3))
+                    .portionSize(new BigDecimal(2), "pc")
+                    .cookId(6L)
+                    .build().produce(),
+                RecipeUpdate.builder()
+                    .steps(steps -> steps
+                        .stepToAdd("Done")
+                        .stepToUpdate(5L, "Boil sausages for about a minute")
+                        .stepToDelete(4L)
+                    )
+                    .build().produce(),
+                Recipe.fromPersistenceRecipeBuilder()
+                    .id(1L)
+                    .name("Boiled sausages")
+                    .description("")
+                    .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+                    .ingredient(3L, "water", new BigDecimal(500), "ml")
+                    .methodStep(5L, "Boil sausages for about a minute")
+                    .methodStep(1L, "Done")
+                    .cookingTime(Duration.ofMinutes(3))
+                    .portionSize(new BigDecimal(2), "pc")
+                    .cookId(6L)
+                    .build().produce()
+            )
         );
     }
 

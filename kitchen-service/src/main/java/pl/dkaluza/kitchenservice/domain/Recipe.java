@@ -72,6 +72,7 @@ public class Recipe extends AbstractPersistable<RecipeId> {
         return this.cookId.equals(cookId);
     }
 
+    // TODO additionally check that ingredients(and steps) to update/delete do not repeat (update and deletion of the same objects should be forbidden)
     public void validate(RecipeUpdate recipeUpdate) throws IngredientNotFoundException, StepNotFoundException {
         if (recipeUpdate.getIngredients().isPresent()) {
             var recipeUpdateIngredients = recipeUpdate.getIngredients().get();
