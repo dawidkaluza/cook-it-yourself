@@ -11,8 +11,10 @@ import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryCookPersistenceAdapter;
 import pl.dkaluza.kitchenservice.adapters.out.persistence.InMemoryRecipePersistenceAdapter;
+import pl.dkaluza.kitchenservice.domain.exceptions.IngredientNotFoundException;
 import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
 import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
+import pl.dkaluza.kitchenservice.domain.exceptions.StepNotFoundException;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
 import java.math.BigDecimal;
@@ -236,6 +238,191 @@ class DefaultKitchenServiceTest {
         // Then
         assertThat(viewedRecipe)
             .isEqualTo(recipe);
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateRecipeNullParamsProvider")
+    void updateRecipe_nullParams_throwException(RecipeId recipeId, RecipeUpdate recipeUpdate, CookId cookId) {
+        assertThatThrownBy(() -> kitchenService.updateRecipe(recipeId, recipeUpdate, cookId))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private static Stream<Arguments> updateRecipeNullParamsProvider() {
+        return Stream.of(
+            Arguments.of(
+                null, null, null
+            ),
+            Arguments.of(
+                RecipeId.of(1L).produce(), RecipeUpdate.builder().build().produce(), null
+            ),
+            Arguments.of(
+                RecipeId.of(1L).produce(), null, CookId.of(1L).produce()
+            ),
+            Arguments.of(
+                null, RecipeUpdate.builder().build().produce(), CookId.of(1L).produce()
+            )
+        );
+    }
+
+    @Test
+    void updateRecipe_recipeNotFound_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(cook.getId().getId())
+                .build().produce()
+        );
+
+        var recipeId = RecipeId.of(2L).produce();
+        var recipeUpdate = RecipeUpdate.builder().build().produce();
+        var cookId = cook.getId();
+
+        // When, then
+        assertThatThrownBy(() -> kitchenService.updateRecipe(recipeId, recipeUpdate, cookId))
+            .isInstanceOf(RecipeNotFoundException.class);
+    }
+
+    @Test
+    void updateRecipe_recipeNotOwned_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(cook.getId().getId())
+                .build().produce()
+        );
+
+        var recipeId = recipe.getId();
+        var recipeUpdate = RecipeUpdate.builder().build().produce();
+        var cookId = CookId.of(2L).produce();
+
+        // When, then
+        assertThatThrownBy(() -> kitchenService.updateRecipe(recipeId, recipeUpdate, cookId))
+            .isInstanceOf(RecipeNotOwnedException.class);
+    }
+
+    @Test
+    void updateRecipe_ingredientNotFound_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(cook.getId().getId())
+                .build().produce()
+        );
+
+        var recipeId = recipe.getId();
+        var recipeUpdate = RecipeUpdate.builder()
+            .ingredients(ingredients -> ingredients
+                .ingredientToUpdate(6L, "Diy", new BigDecimal(1), "")
+                .ingredientToDelete(5L)
+            )
+            .build().produce();
+        var cookId = cook.getId();
+
+        // When, then
+        assertThatThrownBy(() -> kitchenService.updateRecipe(recipeId, recipeUpdate, cookId))
+            .isInstanceOf(IngredientNotFoundException.class);
+    }
+
+    @Test
+    void updateRecipe_stepNotFound_throwException() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .methodStep("Diy")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(cook.getId().getId())
+                .build().produce()
+        );
+
+        var recipeId = recipe.getId();
+        var recipeUpdate = RecipeUpdate.builder()
+            .steps(steps -> steps
+                .stepToUpdate(6L, "Boil for about a minute")
+                .stepToDelete(5L)
+            )
+            .build().produce();
+        var cookId = cook.getId();
+
+        // When, then
+        assertThatThrownBy(() -> kitchenService.updateRecipe(recipeId, recipeUpdate, cookId))
+            .isInstanceOf(StepNotFoundException.class);
+    }
+
+    @Test
+    void updateRecipe_validParams_returnUpdatedRecipe() {
+        // Given
+        var cook = kitchenService.registerCook(Cook.newCook(1L).produce());
+        var recipe = kitchenService.addRecipe(
+            Recipe.newRecipeBuilder()
+                .name("Boiled sausages")
+                .description("")
+                .ingredient("sausage", new BigDecimal(3), "pc")
+                .ingredient("water", new BigDecimal(500), "ml")
+                .methodStep("Pour water into a pot and make it boil")
+                .methodStep("Add sausages and boil for about a minute")
+                .cookingTime(Duration.ofMinutes(3))
+                .portionSize(new BigDecimal(3), "pc")
+                .cookId(cook.getId().getId())
+                .build().produce()
+        );
+
+        var recipeId = recipe.getId();
+        var firstIngredientId = recipe.getIngredients().get(0).getId().getId();
+        var secondIngredientId = recipe.getIngredients().get(1).getId().getId();
+        var firstStepId = recipe.getMethodSteps().get(0).getId().getId();
+        var secondStepId = recipe.getMethodSteps().get(1).getId().getId();
+        var recipeUpdate = RecipeUpdate.builder()
+            .basicInformation(info -> info
+                .name("Sausages")
+                .description("How to boil sausages properly")
+                .cookingTime(Duration.ofMinutes(5))
+                .portionSize(new BigDecimal("2"), "")
+            )
+            .ingredients(ingredients -> ingredients
+                .ingredientToDelete(secondIngredientId)
+                .ingredientToUpdate(firstIngredientId, "sausage", new BigDecimal("2"), "")
+                .ingredientToAdd("water", new BigDecimal(700), "ml")
+            )
+            .steps(steps -> steps
+                .stepToDelete(firstStepId)
+                .stepToUpdate(secondStepId, "Boil for about a minute")
+                .stepToAdd("After boiling, take them out onto a plate. Bon appetit!")
+            )
+            .build().produce();
+        var cookId = cook.getId();
+
+        // When
+        var upgrededRecipe = kitchenService.updateRecipe(recipeId, recipeUpdate, cookId);
+
+        // Then
+        assertThat(upgrededRecipe)
+            .isNotNull();
     }
 
     @ParameterizedTest
