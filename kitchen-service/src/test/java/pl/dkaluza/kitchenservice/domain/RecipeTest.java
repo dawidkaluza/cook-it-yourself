@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import pl.dkaluza.domaincore.FieldError;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.exceptions.IngredientNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.StepNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -362,7 +363,7 @@ class RecipeTest {
 
         // When, then
         assertThatThrownBy(() -> recipe.validate(recipeUpdate))
-            .isInstanceOf(IngredientNotFoundException.class);
+            .isInstanceOf(StepNotFoundException.class);
     }
 
     @Test
@@ -391,7 +392,7 @@ class RecipeTest {
 
         // When, then
         assertThatThrownBy(() -> recipe.validate(recipeUpdate))
-            .isInstanceOf(IngredientNotFoundException.class);
+            .isInstanceOf(StepNotFoundException.class);
     }
 
     @Test
