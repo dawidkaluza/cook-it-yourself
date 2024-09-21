@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import pl.dkaluza.domaincore.FieldError;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
+import pl.dkaluza.kitchenservice.domain.exceptions.IngredientNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -275,5 +276,152 @@ class RecipeTest {
         assertThat(recipe.isOwnedBy(cookId))
             .isEqualTo(expectedResult);
 
+    }
+
+    @Test
+    void validate_invalidIngredientsToUpdate_throwException() {
+        // Given
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+            .methodStep(3L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(4L)
+            .build().produce();
+
+        var recipeUpdate = RecipeUpdate.builder()
+            .ingredients(ingredients -> ingredients
+                .ingredientToUpdate(1L, "sausages", new BigDecimal(2), "pc")
+                .ingredientToDelete(2L)
+            )
+            .steps(steps -> steps
+                .stepToUpdate(3L, "diy!")
+            )
+            .build().produce();
+
+        // When, then
+        assertThatThrownBy(() -> recipe.validate(recipeUpdate))
+            .isInstanceOf(IngredientNotFoundException.class);
+    }
+
+    @Test
+    void validate_invalidIngredientsToDelete_throwException() {
+        // Given
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+            .methodStep(3L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(4L)
+            .build().produce();
+
+        var recipeUpdate = RecipeUpdate.builder()
+            .ingredients(ingredients -> ingredients
+                .ingredientToUpdate(2L, "sausages", new BigDecimal(2), "pc")
+                .ingredientToDelete(1L)
+            )
+            .steps(steps -> steps
+                .stepToUpdate(3L, "diy!")
+            )
+            .build().produce();
+
+        // When, then
+        assertThatThrownBy(() -> recipe.validate(recipeUpdate))
+            .isInstanceOf(IngredientNotFoundException.class);
+    }
+
+    @Test
+    void validate_invalidStepsToUpdate_throwException() {
+        // Given
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+            .methodStep(3L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(4L)
+            .build().produce();
+
+        var recipeUpdate = RecipeUpdate.builder()
+            .ingredients(ingredients -> ingredients
+                .ingredientToUpdate(2L, "sausages", new BigDecimal(2), "pc")
+            )
+            .steps(steps -> steps
+                .stepToUpdate(1L, "diy!")
+                .stepToDelete(3L)
+            )
+            .build().produce();
+
+        // When, then
+        assertThatThrownBy(() -> recipe.validate(recipeUpdate))
+            .isInstanceOf(IngredientNotFoundException.class);
+    }
+
+    @Test
+    void validate_invalidStepsToDelete_throwException() {
+        // Given
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+            .methodStep(3L, "Diy")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(4L)
+            .build().produce();
+
+        var recipeUpdate = RecipeUpdate.builder()
+            .ingredients(ingredients -> ingredients
+                .ingredientToUpdate(2L, "sausages", new BigDecimal(2), "pc")
+            )
+            .steps(steps -> steps
+                .stepToUpdate(3L, "diy!")
+                .stepToDelete(1L)
+            )
+            .build().produce();
+
+        // When, then
+        assertThatThrownBy(() -> recipe.validate(recipeUpdate))
+            .isInstanceOf(IngredientNotFoundException.class);
+    }
+
+    @Test
+    void validate_validUpdate_noException() {
+        // Given
+        var recipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(1L)
+            .name("Boiled sausages")
+            .description("")
+            .ingredient(2L, "sausage", new BigDecimal(2), "pc")
+            .ingredient(3L, "water", new BigDecimal(500), "ml")
+            .methodStep(4L, "Put water into a pot and make it boil")
+            .methodStep(5L, "Once it start boiling, add sausages and boil on medium power for about a minute")
+            .cookingTime(Duration.ofMinutes(3))
+            .portionSize(new BigDecimal(2), "pc")
+            .cookId(6L)
+            .build().produce();
+
+        var recipeUpdate = RecipeUpdate.builder()
+            .ingredients(ingredients -> ingredients
+                .ingredientToUpdate(2L, "sausages", new BigDecimal(2), "pc")
+                .ingredientToDelete(3L)
+            )
+            .steps(steps -> steps
+                .stepToUpdate(4L, "Really you need a recipe for that?")
+                .stepToDelete(5L)
+            )
+            .build().produce();
+
+        // When, then
+        recipe.validate(recipeUpdate);
     }
 }
