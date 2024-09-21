@@ -11,6 +11,7 @@ import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.Recipe;
 import pl.dkaluza.kitchenservice.domain.RecipeFilters;
 import pl.dkaluza.kitchenservice.domain.RecipeId;
+import pl.dkaluza.kitchenservice.domain.RecipeUpdate;
 import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
 
@@ -48,7 +49,7 @@ class RecipePersistenceAdapter implements RecipeRepository  {
             throw new CookNotFoundException("Cook with id = " + cookId + " could not be found");
         }
 
-        var recipeEntity = recipeMapper.toEntity(recipe, cookId);
+        var recipeEntity = recipeMapper.toEntity(recipe);
         recipeEntity = recipeRepository.save(recipeEntity);
 
         var ingredients = recipe.getIngredients();
@@ -118,7 +119,19 @@ class RecipePersistenceAdapter implements RecipeRepository  {
     }
 
     @Override
-    public void deleteRecipe(Recipe recipe) {
+    public Recipe updateRecipe(Recipe recipe, RecipeUpdate recipeUpdate) {
+        Assertions.assertArgument(recipe != null, "recipe is null");
+        Assertions.assertArgument(recipeUpdate != null, "recipeUpdate is null");
+        ObjectNotPersistedException.throwIfNotPersisted(recipe);
+
+        var recipeEntity = updateBasicInformation(recipe, recipeUpdate);
+        var ingredientEntities = updateIngredients(recipe, recipeUpdate);
+        var stepEntities = updateSteps(recipe, recipeUpdate);
+        return recipeMapper.toDomain(recipeEntity, ingredientEntities, stepEntities);
+    }
+
+    @Override
+    public void deleteRecipe(Recipe recipe) throws ObjectNotPersistedException {
         Assertions.assertArgument(recipe != null, "recipe is null");
         ObjectNotPersistedException.throwIfNotPersisted(recipe);
 
@@ -133,6 +146,144 @@ class RecipePersistenceAdapter implements RecipeRepository  {
         }
 
         recipeRepository.deleteById(recipe.getId().getId());
+    }
+
+    private RecipeEntity updateBasicInformation(Recipe recipe, RecipeUpdate recipeUpdate) {
+        RecipeEntity recipeEntity;
+        if (recipeUpdate.getBasicInformation().isPresent()) {
+            var basicInformation = recipeUpdate.getBasicInformation().get();
+            recipeEntity = recipeMapper.toEntity(recipe, basicInformation);
+            recipeEntity = recipeRepository.save(recipeEntity);
+        } else {
+            recipeEntity = recipeMapper.toEntity(recipe);
+        }
+        return recipeEntity;
+    }
+
+    private List<IngredientEntity> updateIngredients(Recipe recipe, RecipeUpdate recipeUpdate) {
+        var recipeId = recipe.getId().getId();
+        List<IngredientEntity> ingredientEntities = ingredientMapper.toEntities(recipe.getIngredients(), recipeId);
+        if (recipeUpdate.getIngredients().isPresent()) {
+            var recipeUpdateIngredients = recipeUpdate.getIngredients().get();
+
+            var ingredientsToDelete = recipeUpdateIngredients.getIngredientsToDelete();
+            var lowestIndexOfDeletedIngredients = ingredientEntities.size();
+            for (var ingredientId : ingredientsToDelete) {
+                var idValue = ingredientId.getId();
+                var ingredientsSize = ingredientEntities.size();
+                for (int i = 0; i < ingredientsSize; i++) {
+                    var ingredientEntity = ingredientEntities.get(i);
+                    if (ingredientEntity.id().equals(idValue)) {
+                        ingredientEntities.remove(i);
+                        ingredientRepository.deleteById(idValue);
+
+                        if (i < lowestIndexOfDeletedIngredients) {
+                            lowestIndexOfDeletedIngredients = i;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            var ingredientsSize = ingredientEntities.size();
+            for (int i = lowestIndexOfDeletedIngredients; i < ingredientsSize; i++) {
+                var ingredientEntity = ingredientEntities.get(i);
+                ingredientEntity = new IngredientEntity(
+                    ingredientEntity.id(),
+                    ingredientEntity.name(),
+                    ingredientEntity.amount(),
+                    ingredientEntity.measure(),
+                    i + 1,
+                    ingredientEntity.recipeId()
+                );
+                ingredientEntity = ingredientRepository.save(ingredientEntity);
+                ingredientEntities.set(i, ingredientEntity);
+            }
+
+            var ingredientsToUpdate = recipeUpdateIngredients.getIngredientsToUpdate();
+            for (var ingredient : ingredientsToUpdate) {
+                var idValue = ingredient.getId().getId();
+                int position = ingredientEntities.stream()
+                    .filter(ingredientEntity -> ingredientEntity.id().equals(idValue))
+                    .findFirst().orElseThrow()
+                    .position();
+
+                var ingredientEntity = ingredientMapper.toEntity(ingredient, position, recipeId);
+                ingredientEntity = ingredientRepository.save(ingredientEntity);
+                ingredientEntities.set(position - 1, ingredientEntity);
+            }
+
+            var ingredientsToAdd = recipeUpdateIngredients.getIngredientsToAdd();
+            for (var ingredient : ingredientsToAdd) {
+                var ingredientEntity = ingredientMapper.toEntity(ingredient, ingredientEntities.size() + 1, recipeId);
+                ingredientEntity = ingredientRepository.save(ingredientEntity);
+                ingredientEntities.add(ingredientEntity);
+            }
+        }
+        return ingredientEntities;
+    }
+
+    private List<StepEntity> updateSteps(Recipe recipe, RecipeUpdate recipeUpdate) {
+        var recipeId = recipe.getId().getId();
+        List<StepEntity> stepEntities = stepMapper.toEntities(recipe.getMethodSteps(), recipeId);
+        if (recipeUpdate.getSteps().isPresent()) {
+            var recipeUpdateSteps = recipeUpdate.getSteps().get();
+
+            var stepsToDelete = recipeUpdateSteps.getStepsToDelete();
+            var lowestIndexOfDeletedSteps = stepEntities.size();
+            for (var stepId : stepsToDelete) {
+                var idValue = stepId.getId();
+                var stepsSize = stepEntities.size();
+                for (int i = 0; i < stepsSize; i++) {
+                    var stepEntity = stepEntities.get(i);
+                    if (stepEntity.id().equals(idValue)) {
+                        stepEntities.remove(i);
+                        stepRepository.deleteById(idValue);
+
+                        if (i < lowestIndexOfDeletedSteps) {
+                            lowestIndexOfDeletedSteps = i;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            var stepsSize = stepEntities.size();
+            for (int i = lowestIndexOfDeletedSteps; i < stepsSize; i++) {
+                var stepEntity = stepEntities.get(i);
+                stepEntity = new StepEntity(
+                    stepEntity.id(),
+                    stepEntity.text(),
+                    i + 1,
+                    stepEntity.recipeId()
+                );
+                stepEntity = stepRepository.save(stepEntity);
+                stepEntities.set(i, stepEntity);
+            }
+
+            var stepsToUpdate = recipeUpdateSteps.getStepsToUpdate();
+            for (var step : stepsToUpdate) {
+                var idValue = step.getId().getId();
+                int position = stepEntities.stream()
+                    .filter(stepEntity -> stepEntity.id().equals(idValue))
+                    .findFirst().orElseThrow()
+                    .position();
+
+                var stepEntity = stepMapper.toEntity(step, position, recipeId);
+                stepEntity = stepRepository.save(stepEntity);
+                stepEntities.set(position - 1, stepEntity);
+            }
+
+            var stepsToAdd = recipeUpdateSteps.getStepsToAdd();
+            for (var step : stepsToAdd) {
+                var stepEntity = stepMapper.toEntity(step, stepEntities.size() + 1, recipeId);
+                stepEntity = stepRepository.save(stepEntity);
+                stepEntities.add(stepEntity);
+            }
+        }
+        return stepEntities;
     }
 
     private Recipe fetchAndMap(RecipeEntity recipeEntity) {

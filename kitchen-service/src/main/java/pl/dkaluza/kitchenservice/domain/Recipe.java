@@ -1,7 +1,8 @@
 package pl.dkaluza.kitchenservice.domain;
 
 import pl.dkaluza.domaincore.*;
-import pl.dkaluza.domaincore.Factory;
+import pl.dkaluza.kitchenservice.domain.exceptions.IngredientNotFoundException;
+import pl.dkaluza.kitchenservice.domain.exceptions.StepNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -69,6 +70,40 @@ public class Recipe extends AbstractPersistable<RecipeId> {
 
     public boolean isOwnedBy(CookId cookId) {
         return this.cookId.equals(cookId);
+    }
+
+    public void validate(RecipeUpdate recipeUpdate) throws IngredientNotFoundException, StepNotFoundException {
+        if (recipeUpdate.getIngredients().isPresent()) {
+            var recipeUpdateIngredients = recipeUpdate.getIngredients().get();
+            for (var ingredient : recipeUpdateIngredients.getIngredientsToUpdate()) {
+                if (!ingredients.contains(ingredient)) {
+                    throw new IngredientNotFoundException("Ingredient with id = " + ingredient.getId() + " not found");
+                }
+            }
+
+            var ingredientsIds = ingredients.stream().map(Ingredient::getId).toList();
+            for (var ingredientId : recipeUpdateIngredients.getIngredientsToDelete()) {
+                if (!ingredientsIds.contains(ingredientId)) {
+                    throw new IngredientNotFoundException("Ingredient with id = " + ingredientId + " not found");
+                }
+            }
+        }
+
+        if (recipeUpdate.getSteps().isPresent()) {
+            var recipeUpdateSteps = recipeUpdate.getSteps().get();
+            for (var step : recipeUpdateSteps.getStepsToUpdate()) {
+                if (!methodSteps.contains(step)) {
+                    throw new StepNotFoundException("Step with id = " + step.getId() + " not found");
+                }
+            }
+
+            var stepsIds = methodSteps.stream().map(Step::getId).toList();
+            for (var stepId : recipeUpdateSteps.getStepsToDelete()) {
+                if (!stepsIds.contains(stepId)) {
+                    throw new StepNotFoundException("Step with id = " + stepId + " not found");
+                }
+            }
+        }
     }
 
     private static abstract class Builder<T extends Builder<T>> {

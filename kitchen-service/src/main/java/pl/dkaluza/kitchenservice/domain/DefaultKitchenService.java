@@ -4,9 +4,7 @@ import pl.dkaluza.domaincore.Assertions;
 import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
-import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
+import pl.dkaluza.kitchenservice.domain.exceptions.*;
 import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 import pl.dkaluza.kitchenservice.ports.out.CookRepository;
 import pl.dkaluza.kitchenservice.ports.out.RecipeRepository;
@@ -51,6 +49,23 @@ class DefaultKitchenService implements KitchenService {
         }
 
         return recipe;
+    }
+
+    @Override
+    public Recipe updateRecipe(RecipeId recipeId, RecipeUpdate recipeUpdate, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException, IngredientNotFoundException, StepNotFoundException {
+        Assertions.assertArgument(recipeId != null, "recipeId is null");
+        Assertions.assertArgument(recipeUpdate != null, "recipeUpdate is null");
+        Assertions.assertArgument(cookId != null, "cookId is null");
+
+        var recipe = recipeRepository.findRecipeById(recipeId)
+            .orElseThrow(() -> new RecipeNotFoundException("Recipe with id = " + recipeId + " could not be found"));
+
+        if (!recipe.isOwnedBy(cookId)) {
+            throw new RecipeNotOwnedException("Recipe with id = " + recipeId + " is not owned by " + cookId);
+        }
+
+        recipe.validate(recipeUpdate);
+        return recipeRepository.updateRecipe(recipe, recipeUpdate);
     }
 
     @Override

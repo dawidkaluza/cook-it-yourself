@@ -24,8 +24,14 @@ class DomainConfig {
     DefaultKitchenService defaultUserService(RecipeRepository recipeRepository, CookRepository cookRepository) {
         var kitchenService = new DefaultKitchenService(recipeRepository, cookRepository);
         var attrSource = new NameMatchTransactionAttributeSource();
+        var readOnlyTxnAttr = new DefaultTransactionAttribute();
+        readOnlyTxnAttr.setReadOnly(true);
 
         attrSource.addTransactionalMethod("addRecipe", new DefaultTransactionAttribute());
+        attrSource.addTransactionalMethod("browseRecipes", new DefaultTransactionAttribute(readOnlyTxnAttr));
+        attrSource.addTransactionalMethod("viewRecipe", new DefaultTransactionAttribute(readOnlyTxnAttr));
+        attrSource.addTransactionalMethod("updateRecipe", new DefaultTransactionAttribute());
+        attrSource.addTransactionalMethod("deleteRecipe", new DefaultTransactionAttribute());
         attrSource.addTransactionalMethod("registerCook", new DefaultTransactionAttribute());
         return transactional(kitchenService, attrSource);
     }

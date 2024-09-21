@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.CookId;
 import pl.dkaluza.kitchenservice.domain.Recipe;
+import pl.dkaluza.kitchenservice.domain.RecipeUpdate;
 
 import java.time.Duration;
 import java.util.List;
@@ -15,8 +16,17 @@ interface RecipeEntityMapper {
     @Mapping(target = "cookingTime", source = "recipe.cookingTime.seconds")
     @Mapping(target = "portionSizeAmount", source = "recipe.portionSize.value")
     @Mapping(target = "portionSizeMeasure", source = "recipe.portionSize.measure")
-    @Mapping(target = "cookId", source = "cookId.id")
-    RecipeEntity toEntity(Recipe recipe, CookId cookId);
+    @Mapping(target = "cookId", source = "recipe.cookId.id")
+    RecipeEntity toEntity(Recipe recipe);
+
+    @Mapping(target = "id", source = "recipe.id.id")
+    @Mapping(target = "name", source = "basicInformation.name")
+    @Mapping(target = "description", source = "basicInformation.description")
+    @Mapping(target = "cookingTime", source = "basicInformation.cookingTime.seconds")
+    @Mapping(target = "portionSizeAmount", source = "basicInformation.portionSize.value")
+    @Mapping(target = "portionSizeMeasure", source = "basicInformation.portionSize.measure")
+    @Mapping(target = "cookId", source = "recipe.cookId.id")
+    RecipeEntity toEntity(Recipe recipe, RecipeUpdate.BasicInformation basicInformation);
 
     default Recipe toDomain(RecipeEntity recipeEntity, List<IngredientEntity> ingredientEntities, List<StepEntity> stepEntities) throws ValidationException {
         var builder = Recipe.fromPersistenceRecipeBuilder()

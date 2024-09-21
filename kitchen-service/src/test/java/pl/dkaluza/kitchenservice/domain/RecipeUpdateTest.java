@@ -38,18 +38,6 @@ class RecipeUpdateTest {
         return Stream.of(
             Arguments.of(
                 RecipeUpdate.builder()
-                    .id(null),
-                new String[] {
-                    "id"
-                },
-                new String[] {
-                    "basicInformation.name",
-                    "basicInformation.description",
-                }
-            ),
-            Arguments.of(
-                RecipeUpdate.builder()
-                    .id(1L)
                     .basicInformation(info -> info
                         .name("")
                         .description(null)
@@ -63,7 +51,6 @@ class RecipeUpdateTest {
                     "basicInformation.portionSize.value",
                 },
                 new String[] {
-                    "id",
                     "basicInformation.portionSize.measure",
                     "ingredients.ingredientsToAdd",
                     "steps.stepsToAdd",
@@ -71,7 +58,6 @@ class RecipeUpdateTest {
             ),
             Arguments.of(
                 RecipeUpdate.builder()
-                    .id(1L)
                     .basicInformation(info -> info
                         .name("Boiled sausages")
                         .description("")
@@ -99,7 +85,6 @@ class RecipeUpdateTest {
                     "ingredients.ingredientsToDelete.id",
                 },
                 new String[] {
-                    "id",
                     "basicInformation.name",
                     "basicInformation.description",
                     "basicInformation.cookingTime",
@@ -113,7 +98,6 @@ class RecipeUpdateTest {
             ),
             Arguments.of(
                 RecipeUpdate.builder()
-                    .id(1L)
                     .basicInformation(info -> info
                         .name("Boiled sausages")
                         .description("")
@@ -137,7 +121,6 @@ class RecipeUpdateTest {
                     "steps.stepsToDelete.id",
                 },
                 new String[] {
-                    "id",
                     "basicInformation.name",
                     "basicInformation.description",
                     "basicInformation.cookingTime",
@@ -159,7 +142,6 @@ class RecipeUpdateTest {
     @Test
     void builder_validBasicInfo_returnNewObject() {
         // Given
-        var id = 1L;
         var name = "Corn flakes";
         var description = "";
         var cookingTime = Duration.ofMinutes(3);
@@ -167,7 +149,6 @@ class RecipeUpdateTest {
         var portionSizeMeasure = "g";
 
         var factory = RecipeUpdate.builder()
-            .id(id)
             .basicInformation(info -> info
                 .name(name)
                 .description(description)
@@ -182,9 +163,6 @@ class RecipeUpdateTest {
         // Then
         assertThat(recipeUpdate)
             .isNotNull();
-
-        assertThat(recipeUpdate.getRecipeId().getId())
-            .isEqualTo(id);
 
         assertThat(recipeUpdate.getBasicInformation())
             .isPresent();
@@ -223,7 +201,6 @@ class RecipeUpdateTest {
         var ingredientToDeleteId = 3L;
 
         var factory = RecipeUpdate.builder()
-            .id(1L)
             .ingredients(ingredients -> ingredients
                 .ingredientToAdd(ingredientToAddName, ingredientToAddValue, ingredientToAddMeasure)
                 .ingredientToUpdate(ingredientToUpdateId, ingredientToUpdateName, ingredientToUpdateValue, ingredientToUpdateMeasure)
@@ -287,7 +264,6 @@ class RecipeUpdateTest {
         var stepToDeleteId = 3L;
 
         var factory = RecipeUpdate.builder()
-            .id(1L)
             .steps(steps -> steps
                 .stepToAdd(stepToAddText)
                 .stepToUpdate(stepToUpdateId, stepToUpdateText)
@@ -336,7 +312,6 @@ class RecipeUpdateTest {
     void builder_validParamsMixed_returnNewObject() {
         // Given
         var factory = RecipeUpdate.builder()
-            .id(1L)
             .ingredients(ingredients -> ingredients
                 .ingredientToAdd("Potatoes", new BigDecimal("1"), "kg")
             )

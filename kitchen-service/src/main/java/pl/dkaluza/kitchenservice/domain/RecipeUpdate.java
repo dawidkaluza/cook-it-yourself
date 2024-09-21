@@ -11,13 +11,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class RecipeUpdate {
-    private final RecipeId recipeId;
     private final BasicInformation basicInformation;
     private final Ingredients ingredients;
     private final Steps steps;
 
-    private RecipeUpdate(RecipeId recipeId, BasicInformation basicInformation, Ingredients ingredients, Steps steps) {
-        this.recipeId = recipeId;
+    private RecipeUpdate(BasicInformation basicInformation, Ingredients ingredients, Steps steps) {
         this.basicInformation = basicInformation;
         this.ingredients = ingredients;
         this.steps = steps;
@@ -27,19 +25,15 @@ public class RecipeUpdate {
         return new Builder();
     }
 
-    RecipeId getRecipeId() {
-        return recipeId;
-    }
-
-    Optional<BasicInformation> getBasicInformation() {
+    public Optional<BasicInformation> getBasicInformation() {
         return Optional.ofNullable(basicInformation);
     }
 
-    Optional<Ingredients> getIngredients() {
+    public Optional<Ingredients> getIngredients() {
         return Optional.ofNullable(ingredients);
     }
 
-    Optional<Steps> getSteps() {
+    public Optional<Steps> getSteps() {
         return Optional.ofNullable(steps);
     }
 
@@ -56,19 +50,19 @@ public class RecipeUpdate {
             this.portionSize = portionSize;
         }
 
-        String getName() {
+        public String getName() {
             return name;
         }
 
-        String getDescription() {
+        public String getDescription() {
             return description;
         }
 
-        Duration getCookingTime() {
+        public Duration getCookingTime() {
             return cookingTime;
         }
 
-        Amount getPortionSize() {
+        public Amount getPortionSize() {
             return portionSize;
         }
 
@@ -137,7 +131,7 @@ public class RecipeUpdate {
         }
     }
 
-    static class Ingredients {
+    public static class Ingredients {
         private final List<Ingredient> ingredientsToAdd;
         private final List<Ingredient> ingredientsToUpdate;
         private final List<IngredientId> ingredientsToDelete;
@@ -308,17 +302,11 @@ public class RecipeUpdate {
     }
 
     public static class Builder {
-        private Long id;
         private BasicInformation.Builder basicInformationBuilder;
         private Ingredients.Builder ingredientsBuilder;
         private Steps.Builder stepsBuilder;
 
         private Builder() { }
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
 
         public Builder basicInformation(Consumer<BasicInformation.Builder> consumer) {
             var builder = new BasicInformation.Builder();
@@ -342,19 +330,17 @@ public class RecipeUpdate {
         }
 
         public Factory<RecipeUpdate> build() {
-            var recipeIdFactory = new RecipeId.RecipeIdFactory(id);
             var basicInfoFactory = basicInformationBuilder == null ? new BasicInformation.Factory() : basicInformationBuilder.build();
             var ingredientsFactory = ingredientsBuilder == null ? new Ingredients.Factory() : ingredientsBuilder.build();
             var stepsFactory = stepsBuilder == null ? new Steps.Factory() : stepsBuilder.build();
 
             return new FactoriesComposite<>(
                 () -> new RecipeUpdate(
-                    recipeIdFactory.assemble(),
                     basicInfoFactory.assemble(),
                     ingredientsFactory.assemble(),
                     stepsFactory.assemble()
                 ),
-                List.of(recipeIdFactory, basicInfoFactory, ingredientsFactory, stepsFactory)
+                List.of(basicInfoFactory, ingredientsFactory, stepsFactory)
             );
         }
     }

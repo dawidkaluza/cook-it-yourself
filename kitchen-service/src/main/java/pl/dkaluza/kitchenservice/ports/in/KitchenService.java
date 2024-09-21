@@ -4,9 +4,7 @@ import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.domaincore.PageRequest;
 import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.kitchenservice.domain.*;
-import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
+import pl.dkaluza.kitchenservice.domain.exceptions.*;
 
 public interface KitchenService {
     /**
@@ -37,6 +35,19 @@ public interface KitchenService {
     Recipe viewRecipe(RecipeId recipeId, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException;
 
     /**
+     * Updates recipe.
+     * @param recipeId id of recipe to be updated.
+     * @param recipeUpdate object containing updates to be performed.
+     * @param cookId id of cook who wants to update the recipe.
+     * @return updated recipe.
+     * @throws RecipeNotFoundException if the recipe can't be found.
+     * @throws RecipeNotOwnedException if the recipe does not belong to given cook.
+     * @throws IngredientNotFoundException if ingredients in the update object do not exist or are not part of the recipe.
+     * @throws StepNotFoundException if steps in the update object do not exist or are not part of the recipe.
+     */
+    Recipe updateRecipe(RecipeId recipeId, RecipeUpdate recipeUpdate, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException, IngredientNotFoundException, StepNotFoundException;
+
+    /**
      * Deletes recipe by id.
      * @param recipeId id of recipe to be deleted
      * @param cookId id of cook wha want to delete the recipe.
@@ -46,7 +57,7 @@ public interface KitchenService {
     void deleteRecipe(RecipeId recipeId, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException;
 
     /**
-     * Registers a new cook in the application.
+     * Registers a new cook.
      * To does not matter whether cook is already saved in persistence layer - as long as object is created via
      * "newCook" static method, it can be registered in the system whether it has already been there or not.
      * @param cook a cook to be registered
