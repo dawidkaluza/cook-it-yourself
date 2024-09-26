@@ -1,5 +1,6 @@
 package pl.dkaluza.kitchenservice.domain;
 
+import pl.dkaluza.domaincore.Assembler;
 import pl.dkaluza.domaincore.FactoriesComposite;
 import pl.dkaluza.domaincore.Factory;
 
@@ -9,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import static pl.dkaluza.domaincore.DefaultFactory.validatingFactory;
+import static pl.dkaluza.domaincore.ValidationExecutor.of;
+import static pl.dkaluza.domaincore.Validator.validator;
 
 public class RecipeUpdate {
     private final BasicInformation basicInformation;
@@ -181,33 +186,58 @@ public class RecipeUpdate {
             }
 
             Factory build() {
-                return new Factory(
-                    Ingredient.ListFactory.newIngredients(ingredientsToAdd, true, "ingredients.ingredientsToAdd"),
-                    Ingredient.ListFactory.fromPersistence(ingredientsToUpdate, true, "ingredients.ingredientsToUpdate"),
-                    new IngredientId.ListFactory(ingredientsToDelete, "ingredients.ingredientsToDelete")
+                var deletionsOverlapUpdates = false;
+                for (var ingredient : ingredientsToUpdate) {
+                    if (ingredientsToDelete.contains(ingredient.id())) {
+                        deletionsOverlapUpdates = true;
+                        break;
+                    }
+                }
+
+                var ingredientsToAddFactory = Ingredient.ListFactory.newIngredients(ingredientsToAdd, true, "ingredients.ingredientsToAdd");
+                var ingredientsToUpdateFactory = Ingredient.ListFactory.fromPersistence(ingredientsToUpdate, true, "ingredients.ingredientsToUpdate");
+                var ingredientsToDeleteFactory = new IngredientId.ListFactory(ingredientsToDelete, "ingredients.ingredientsToDelete");
+                return Factory.of(
+                    ingredientsToAddFactory,
+                    ingredientsToUpdateFactory,
+                    ingredientsToDeleteFactory,
+                    List.of(
+                        validatingFactory(of(validator(!deletionsOverlapUpdates, "ingredients.ingredientsToDelete", "Ingredients to update and delete must not overlap.")))
+                    )
                 );
             }
         }
         
         static class Factory extends FactoriesComposite<Ingredients> {
-            Factory() {
-                super(() -> null);
+            private Factory(Assembler<Ingredients> assembler, List<pl.dkaluza.domaincore.Factory<?>> factories) {
+                super(assembler, factories);
             }
 
-            Factory(
+            static Factory of() {
+                return new Factory(() -> null, List.of());
+            }
+
+            static Factory of(
                 Ingredient.ListFactory ingredientsToAddFactory,
                 Ingredient.ListFactory ingredientsToUpdateFactory,
-                IngredientId.ListFactory ingredientsToDeleteFactory
+                IngredientId.ListFactory ingredientsToDeleteFactory,
+                List<? extends pl.dkaluza.domaincore.Factory<?>> validatingFactories
             ) {
-                super(
+                List<pl.dkaluza.domaincore.Factory<?>> allFactories = new ArrayList<>(validatingFactories);
+                allFactories.add(ingredientsToAddFactory);
+                allFactories.add(ingredientsToUpdateFactory);
+                allFactories.add(ingredientsToDeleteFactory);
+
+                return new Factory(
                     () -> new Ingredients(
                         ingredientsToAddFactory.assemble(),
                         ingredientsToUpdateFactory.assemble(),
                         ingredientsToDeleteFactory.assemble()
                     ),
-                    ingredientsToAddFactory, ingredientsToUpdateFactory, ingredientsToDeleteFactory
+                    allFactories
                 );
             }
+
 
             @Override
             protected Ingredients assemble() {
@@ -266,31 +296,55 @@ public class RecipeUpdate {
             }
             
             Factory build() {
-                return new Factory(
-                    Step.ListFactory.newSteps(stepsToAdd, true, "steps.stepsToAdd"),
-                    Step.ListFactory.fromPersistence(stepsToUpdate, true, "steps.stepsToUpdate"),
-                    new StepId.ListFactory(stepsToDelete, "steps.stepsToDelete")
+                var deletionOverlapUpdates = false;
+                for (var step : stepsToUpdate) {
+                    if (stepsToDelete.contains(step.id())) {
+                        deletionOverlapUpdates = true;
+                        break;
+                    }
+                }
+
+                var stepsToAddFactory = Step.ListFactory.newSteps(stepsToAdd, true, "steps.stepsToAdd");
+                var stepsToUpdateFactory = Step.ListFactory.fromPersistence(stepsToUpdate, true, "steps.stepsToUpdate");
+                var stepsToDeleteFactory = new StepId.ListFactory(stepsToDelete, "steps.stepsToDelete");
+                return Factory.of(
+                    stepsToAddFactory,
+                    stepsToUpdateFactory,
+                    stepsToDeleteFactory,
+                    List.of(
+                        validatingFactory(of(validator(!deletionOverlapUpdates, "steps.stepsToDelete", "Steps to update and delete must not overlap.")))
+                    )
                 );
             }
         }
 
         static class Factory extends FactoriesComposite<Steps> {
-            private Factory() {
-                super(() -> null);
+            private Factory(Assembler<Steps> assembler, List<pl.dkaluza.domaincore.Factory<?>> factories) {
+                super(assembler, factories);
             }
 
-            private Factory(
+            static Factory of() {
+                return new Factory(() -> null, List.of());
+            }
+
+            static Factory of(
                 Step.ListFactory stepsToAddFactory,
                 Step.ListFactory stepsToUpdateFactory,
-                StepId.ListFactory stepsToDeleteFactory
+                StepId.ListFactory stepsToDeleteFactory,
+                List<? extends pl.dkaluza.domaincore.Factory<?>> validatingFactories
             ) {
-                super(
+                List<pl.dkaluza.domaincore.Factory<?>> allFactories = new ArrayList<>(validatingFactories);
+                allFactories.add(stepsToAddFactory);
+                allFactories.add(stepsToUpdateFactory);
+                allFactories.add(stepsToDeleteFactory);
+
+                return new Factory(
                     () -> new Steps(
                         stepsToAddFactory.assemble(),
                         stepsToUpdateFactory.assemble(),
                         stepsToDeleteFactory.assemble()
                     ),
-                    stepsToAddFactory, stepsToUpdateFactory, stepsToDeleteFactory
+                    allFactories
                 );
             }
 
@@ -331,8 +385,8 @@ public class RecipeUpdate {
 
         public Factory<RecipeUpdate> build() {
             var basicInfoFactory = basicInformationBuilder == null ? new BasicInformation.Factory() : basicInformationBuilder.build();
-            var ingredientsFactory = ingredientsBuilder == null ? new Ingredients.Factory() : ingredientsBuilder.build();
-            var stepsFactory = stepsBuilder == null ? new Steps.Factory() : stepsBuilder.build();
+            var ingredientsFactory = ingredientsBuilder == null ? Ingredients.Factory.of() : ingredientsBuilder.build();
+            var stepsFactory = stepsBuilder == null ? Steps.Factory.of() : stepsBuilder.build();
 
             return new FactoriesComposite<>(
                 () -> new RecipeUpdate(

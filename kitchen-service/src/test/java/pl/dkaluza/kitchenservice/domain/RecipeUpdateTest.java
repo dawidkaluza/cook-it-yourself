@@ -135,6 +135,31 @@ class RecipeUpdateTest {
                     "ingredients.ingredientsToUpdate.measure",
                     "ingredients.ingredientsToDelete.id",
                 }
+            ),
+            Arguments.of(
+                RecipeUpdate.builder()
+                    .ingredients(ingredients -> ingredients
+                        .ingredientToUpdate(2L, "water", new BigDecimal("1"), "liter")
+                        .ingredientToDelete(2L)
+                    )
+                    .steps(steps -> steps
+                        .stepToUpdate(3L, "Text text text")
+                        .stepToDelete(3L)
+                    ),
+                new String[] {
+                    "ingredients.ingredientsToDelete",
+                    "steps.stepsToDelete",
+                },
+                new String[] {
+                    "ingredients.ingredientsToUpdate.id",
+                    "ingredients.ingredientsToUpdate.name",
+                    "ingredients.ingredientsToUpdate.value",
+                    "ingredients.ingredientsToUpdate.measure",
+                    "ingredients.ingredientsToDelete.id",
+                    "steps.stepsToUpdate.id",
+                    "steps.stepsToUpdate.text",
+                    "steps.stepsToDelete.id",
+                }
             )
         );
     }
