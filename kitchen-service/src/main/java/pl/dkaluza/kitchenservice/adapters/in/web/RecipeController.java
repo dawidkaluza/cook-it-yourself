@@ -34,6 +34,10 @@ class RecipeController {
         return recipeFacade.viewRecipe(auth, id);
     }
 
+    ResponseEntity<?> updateRecipe(Authentication auth, @PathVariable Long id, @RequestBody UpdateRecipeRequest reqBody) {
+        return recipeFacade.updateRecipe(auth, id, reqBody);
+    }
+
     ResponseEntity<?> deleteRecipe(Authentication auth, @PathVariable Long id) {
         return recipeFacade.deleteRecipe(auth, id);
     }

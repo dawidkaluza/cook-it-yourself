@@ -487,6 +487,64 @@ class RecipeControllerTest {
     }
 
     @ParameterizedTest
+    @ValueSource(longs = { -1, 0 })
+    void updateRecipe_invalidId_returnError(Long id) {
+        // Given
+        var auth = authentication(1L);
+        var reqBody = new UpdateRecipeRequest(null, null, null);
+
+        // When
+        var resp = recipeController.updateRecipe(auth, id, reqBody);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+
+        assertThat(respBody.fields())
+            .isNotNull()
+            .extracting(ErrorResponse.Field::name)
+            .contains("id");
+    }
+
+    void updateRecipe_invalidRequestBody_returnError(UpdateRecipeRequest reqBody) {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+
+        // When
+        var resp = recipeController.updateRecipe(auth, id, reqBody);
+    }
+
+    void updateRecipe_recipeNotFound_returnError() {}
+
+    void updateRecipe_recipeNotOwned_returnError() {}
+
+    void updateRecipe_ingredientNotFound_returnError() {}
+
+    void updateRecipe_stepNotFound_returnError() {
+
+    }
+
+
+
+    @ParameterizedTest
     @ValueSource(longs = { -1L, 0L })
     void deleteRecipe_invalidId_returnError(Long id) {
         // Given

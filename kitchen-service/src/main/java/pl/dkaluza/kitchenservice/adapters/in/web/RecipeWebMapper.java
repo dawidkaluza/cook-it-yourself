@@ -5,10 +5,7 @@ import org.mapstruct.Mapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
-import pl.dkaluza.kitchenservice.domain.CookId;
-import pl.dkaluza.kitchenservice.domain.Ingredient;
-import pl.dkaluza.kitchenservice.domain.Recipe;
-import pl.dkaluza.kitchenservice.domain.Step;
+import pl.dkaluza.kitchenservice.domain.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -43,6 +40,57 @@ abstract class RecipeWebMapper {
         }
 
         builder.cookId(toCookIdValue(auth));
+
+        return builder.build().produce();
+    }
+
+    RecipeUpdate toUpdate(UpdateRecipeRequest reqBody) throws ValidationException {
+        //noinspection ExtractMethodRecommender
+        var builder = RecipeUpdate.builder();
+
+        if (reqBody.basicInformation() != null) {
+            builder.basicInformation(info -> info
+                .name(reqBody.basicInformation().name())
+                .description(reqBody.basicInformation().description())
+                .cookingTime(reqBody.basicInformation().cookingTime() == null ? null : Duration.ofSeconds(reqBody.basicInformation().cookingTime()))
+                .portionSize(reqBody.basicInformation().portionSize().value(), reqBody.basicInformation().portionSize().measure())
+            );
+        }
+
+        if (reqBody.ingredients() != null) {
+            builder.ingredients(ingredientsBuilder -> {
+                var ingredients = reqBody.ingredients();
+
+                for (var ingredient : ingredients.ingredientsToAdd()) {
+                    ingredientsBuilder.ingredientToAdd(ingredient.name(), ingredient.value(), ingredient.measure());
+                }
+
+                for (var ingredient : ingredients.ingredientsToUpdate()) {
+                    ingredientsBuilder.ingredientToUpdate(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure());
+                }
+
+                for (var id : ingredients.ingredientsToDelete()) {
+                    ingredientsBuilder.ingredientToDelete(id);
+                }
+            });
+        }
+
+        if (reqBody.steps() != null) {
+            builder.steps(stepsBuilder -> {
+                var steps = reqBody.steps();
+                for (var step : steps.stepsToAdd()) {
+                    stepsBuilder.stepToAdd(step.text());
+                }
+
+                for (var step : steps.stepsToUpdate()) {
+                    stepsBuilder.stepToUpdate(step.id(), step.text());
+                }
+
+                for (var id : steps.stepsToDelete()) {
+                    stepsBuilder.stepToDelete(id);
+                }
+            });
+        }
 
         return builder.build().produce();
     }

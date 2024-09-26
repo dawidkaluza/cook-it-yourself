@@ -42,8 +42,8 @@ public interface KitchenService {
      * @return updated recipe.
      * @throws RecipeNotFoundException if the recipe can't be found.
      * @throws RecipeNotOwnedException if the recipe does not belong to given cook.
-     * @throws IngredientNotFoundException if ingredients in the update object do not exist or are not part of the recipe.
-     * @throws StepNotFoundException if steps in the update object do not exist or are not part of the recipe.
+     * @throws IngredientNotFoundException if any ingredient in the update object does not exist or is not part of the recipe.
+     * @throws StepNotFoundException if any step in the update object does not exist or is not part of the recipe.
      */
     Recipe updateRecipe(RecipeId recipeId, RecipeUpdate recipeUpdate, CookId cookId) throws RecipeNotFoundException, RecipeNotOwnedException, IngredientNotFoundException, StepNotFoundException;
 

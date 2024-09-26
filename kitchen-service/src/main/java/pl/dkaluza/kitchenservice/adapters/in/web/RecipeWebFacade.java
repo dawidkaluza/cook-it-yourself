@@ -9,9 +9,7 @@ import pl.dkaluza.domaincore.exceptions.ObjectAlreadyPersistedException;
 import pl.dkaluza.domaincore.exceptions.ValidationException;
 import pl.dkaluza.kitchenservice.domain.RecipeFilters;
 import pl.dkaluza.kitchenservice.domain.RecipeId;
-import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
+import pl.dkaluza.kitchenservice.domain.exceptions.*;
 import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 
 import java.time.ZoneOffset;
@@ -129,6 +127,57 @@ class RecipeWebFacade {
             return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .build();
+        }
+    }
+
+    ResponseEntity<?> updateRecipe(Authentication auth, Long id, UpdateRecipeRequest reqBody) {
+        try {
+            var cookId = recipeWebMapper.toCookId(auth);
+            var recipeId = RecipeId.of(id).produce();
+            var recipeUpdate = recipeWebMapper.toUpdate(reqBody);
+            var recipe = kitchenService.updateRecipe(recipeId, recipeUpdate, cookId);
+            var respBody = recipeWebMapper.toResponse(recipe);
+            return ResponseEntity.ok(respBody);
+        } catch (ValidationException e) {
+            var errors = e.getErrors().stream()
+                .map(error -> new ErrorResponse.Field(error.name(), error.message()))
+                .toList();
+
+            return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(
+                    new ErrorResponse(
+                        "Invalid fields values", ZonedDateTime.now(ZoneOffset.UTC), errors
+                    )
+                );
+        } catch (RecipeNotFoundException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    new ErrorResponse(
+                        "Recipe with given id could not be found", ZonedDateTime.now(ZoneOffset.UTC)
+                    )
+                );
+        } catch (RecipeNotOwnedException e) {
+            return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .build();
+        } catch (IngredientNotFoundException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    new ErrorResponse(
+                        "One of given ingredients could not be found", ZonedDateTime.now(ZoneOffset.UTC)
+                    )
+                );
+        } catch (StepNotFoundException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    new ErrorResponse(
+                        "One of given steps could not be found", ZonedDateTime.now(ZoneOffset.UTC)
+                    )
+                );
         }
     }
 
