@@ -49,12 +49,21 @@ abstract class RecipeWebMapper {
         var builder = RecipeUpdate.builder();
 
         if (reqBody.basicInformation() != null) {
-            builder.basicInformation(info -> info
-                .name(reqBody.basicInformation().name())
-                .description(reqBody.basicInformation().description())
-                .cookingTime(reqBody.basicInformation().cookingTime() == null ? null : Duration.ofSeconds(reqBody.basicInformation().cookingTime()))
-                .portionSize(reqBody.basicInformation().portionSize().value(), reqBody.basicInformation().portionSize().measure())
-            );
+            builder.basicInformation(info -> {
+                info
+                    .name(reqBody.basicInformation().name())
+                    .description(reqBody.basicInformation().description());
+
+                var cookingTime = reqBody.basicInformation().cookingTime();
+                if (cookingTime != null) {
+                    info.cookingTime(Duration.ofSeconds(cookingTime));
+                }
+
+                var portionSize = reqBody.basicInformation().portionSize();
+                if (portionSize != null) {
+                    info.portionSize(portionSize.value(), portionSize.measure());
+                }
+            });
         }
 
         if (reqBody.ingredients() != null) {

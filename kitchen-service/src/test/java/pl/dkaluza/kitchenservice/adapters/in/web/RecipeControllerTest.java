@@ -13,9 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import pl.dkaluza.domaincore.Page;
 import pl.dkaluza.kitchenservice.domain.Recipe;
-import pl.dkaluza.kitchenservice.domain.exceptions.CookNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotFoundException;
-import pl.dkaluza.kitchenservice.domain.exceptions.RecipeNotOwnedException;
+import pl.dkaluza.kitchenservice.domain.exceptions.*;
 import pl.dkaluza.kitchenservice.ports.in.KitchenService;
 
 import java.math.BigDecimal;
@@ -523,26 +521,301 @@ class RecipeControllerTest {
             .contains("id");
     }
 
-    void updateRecipe_invalidRequestBody_returnError(UpdateRecipeRequest reqBody) {
+    @ParameterizedTest
+    @MethodSource("updateRecipeInvalidRequestBodyParamsProvider")
+    void updateRecipe_invalidRequestBody_returnError(UpdateRecipeRequest reqBody, String[] expectedFieldsNames) {
         // Given
         var auth = authentication(1L);
         var id = 1L;
 
         // When
         var resp = recipeController.updateRecipe(auth, id, reqBody);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+
+        assertThat(respBody.fields())
+            .isNotNull()
+            .extracting(ErrorResponse.Field::name)
+            .contains(expectedFieldsNames);
     }
 
-    void updateRecipe_recipeNotFound_returnError() {}
-
-    void updateRecipe_recipeNotOwned_returnError() {}
-
-    void updateRecipe_ingredientNotFound_returnError() {}
-
-    void updateRecipe_stepNotFound_returnError() {
-
+    private static Stream<Arguments> updateRecipeInvalidRequestBodyParamsProvider() {
+        return Stream.of(
+            Arguments.of(
+                new UpdateRecipeRequest(
+                    new UpdateRecipeRequest.BasicInformation(
+                        null,
+                        null,
+                        null,
+                        new UpdateRecipeRequest.PortionSize(null, null)
+                    ),
+                    new UpdateRecipeRequest.Ingredients(
+                        List.of(new UpdateRecipeRequest.Ingredients.New(null, null, null)),
+                        List.of(new UpdateRecipeRequest.Ingredients.Update(null, null, null, null)),
+                        List.of()
+                    ),
+                    new UpdateRecipeRequest.Steps(
+                        List.of(new UpdateRecipeRequest.Steps.New(null)),
+                        List.of(new UpdateRecipeRequest.Steps.Update(null, null)),
+                        List.of()
+                    )
+                ),
+                new String[] {
+                    "basicInformation.name",
+                    "basicInformation.description",
+                    "basicInformation.cookingTime",
+                    "basicInformation.portionSize.value",
+                    "basicInformation.portionSize.measure",
+                    "ingredients.ingredientsToAdd.name",
+                    "ingredients.ingredientsToAdd.value",
+                    "ingredients.ingredientsToAdd.measure",
+                    "ingredients.ingredientsToUpdate.id",
+                    "ingredients.ingredientsToUpdate.name",
+                    "ingredients.ingredientsToUpdate.value",
+                    "ingredients.ingredientsToUpdate.measure",
+                    "steps.stepsToAdd.text",
+                    "steps.stepsToUpdate.id",
+                    "steps.stepsToUpdate.text",
+                }
+            ),
+            Arguments.of(
+                new UpdateRecipeRequest(
+                    new UpdateRecipeRequest.BasicInformation(
+                        "Oats with milk",
+                        "",
+                        null,
+                        null
+                    ),
+                    new UpdateRecipeRequest.Ingredients(
+                        List.of(),
+                        List.of(),
+                        List.of()
+                    ),
+                    new UpdateRecipeRequest.Steps(
+                        List.of(),
+                        List.of(new UpdateRecipeRequest.Steps.Update(1L, "New text")),
+                        List.of(1L)
+                    )
+                ),
+                new String[] {
+                    "basicInformation.cookingTime",
+                    "basicInformation.portionSize.value",
+                    "basicInformation.portionSize.measure",
+                    "steps.stepsToDelete",
+                }
+            )
+        );
     }
 
+    @ParameterizedTest
+    @MethodSource("updateRecipeObjectNotFoundParamsProvider")
+    void updateRecipe_objectNotFound_returnError(KitchenException exception) {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+        var reqBody = new UpdateRecipeRequest(
+            null,
+            new UpdateRecipeRequest.Ingredients(
+                List.of(),
+                List.of(),
+                List.of(2L)
+            ),
+            new UpdateRecipeRequest.Steps(
+                List.of(),
+                List.of(),
+                List.of(3L)
+            )
+        );
 
+        doThrow(exception)
+            .when(kitchenService).updateRecipe(any(), any(), any());
+
+        // When
+        var resp = recipeController.updateRecipe(auth, id, reqBody);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.NOT_FOUND);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(ErrorResponse.class);
+
+        var respBody = (ErrorResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.message())
+            .isNotNull();
+
+        assertThat(respBody.timestamp())
+            .isNotNull();
+    }
+
+    private static Stream<KitchenException> updateRecipeObjectNotFoundParamsProvider() {
+        return Stream.of(
+            new RecipeNotFoundException("Recipe not found"),
+            new IngredientNotFoundException("Ingredient not found"),
+            new StepNotFoundException("Step not found")
+        );
+    }
+
+    @Test
+    void updateRecipe_recipeNotOwned_returnError() {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+        var reqBody = new UpdateRecipeRequest(null, null, null);
+
+        doThrow(new RecipeNotOwnedException("Recipe not owned"))
+            .when(kitchenService).updateRecipe(any(), any(), any());
+
+        // When
+        var resp = recipeController.updateRecipe(auth, id, reqBody);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void updateRecipe_validParams_returnUpdatedRecipe() {
+        // Given
+        var auth = authentication(1L);
+        var id = 1L;
+        var reqBody = new UpdateRecipeRequest(
+            new UpdateRecipeRequest.BasicInformation(
+                "Oats with milk",
+                "",
+                300L,
+                new UpdateRecipeRequest.PortionSize(new BigDecimal("500"), "g")
+            ),
+            null,
+            null
+        );
+
+        var updatedRecipe = Recipe.fromPersistenceRecipeBuilder()
+            .id(id)
+            .name("Oats with milk")
+            .description("")
+            .ingredient(2L, "Oats", new BigDecimal("500"), "g")
+            .methodStep(3L, "Diy")
+            .cookingTime(Duration.ofSeconds(300))
+            .portionSize(new BigDecimal("500"), "g")
+            .cookId(4L)
+            .build().produce();
+        doReturn(updatedRecipe).when(kitchenService).updateRecipe(any(), any(), any());
+
+        // When
+        var resp = recipeController.updateRecipe(auth, id, reqBody);
+
+        // Then
+        assertThat(resp)
+            .isNotNull();
+
+        assertThat(resp.getStatusCode())
+            .isEqualTo(HttpStatus.OK);
+
+        assertThat(resp.getBody())
+            .isInstanceOf(RecipeResponse.class);
+
+        var respBody = (RecipeResponse) resp.getBody();
+
+        assertThat(respBody)
+            .isNotNull();
+
+        assertThat(respBody.id())
+            .isEqualTo(updatedRecipe.getId().getId());
+
+        assertThat(respBody.name())
+            .isEqualTo(updatedRecipe.getName());
+
+        assertThat(respBody.description())
+            .isEqualTo(updatedRecipe.getDescription());
+
+        var updatedIngredients = updatedRecipe.getIngredients();
+        var updatedIngredientsSize = updatedIngredients.size();
+        var respIngredients = respBody.ingredients();
+        var respIngredientsSize = respIngredients.size();
+
+        assertThat(updatedIngredientsSize)
+            .isEqualTo(respIngredientsSize);
+
+        for (var i = 0; i < respIngredientsSize; i++) {
+            var updatedIngredient = updatedIngredients.get(i);
+            var respIngredient = respIngredients.get(i);
+
+            assertThat(respIngredient)
+                .isNotNull();
+
+            assertThat(respIngredient.id())
+                .isEqualTo(updatedIngredient.getId().getId());
+
+            assertThat(respIngredient.name())
+                .isEqualTo(updatedIngredient.getName());
+
+            assertThat(respIngredient.value())
+                .isEqualTo(updatedIngredient.getAmount().getValue());
+
+            assertThat(respIngredient.measure())
+                .isEqualTo(updatedIngredient.getAmount().getMeasure());
+        }
+
+        var updatedSteps = updatedRecipe.getMethodSteps();
+        var updatedStepsSize = updatedSteps.size();
+        var respSteps = respBody.methodSteps();
+        var respStepsSize = respSteps.size();
+
+        assertThat(updatedStepsSize)
+            .isEqualTo(respStepsSize);
+
+        for (var i = 0; i < respStepsSize; i++) {
+            var updatedStep = updatedSteps.get(i);
+            var respStep = respSteps.get(i);
+
+            assertThat(respStep)
+                .isNotNull();
+
+            assertThat(respStep.id())
+                .isEqualTo(updatedStep.getId().getId());
+
+            assertThat(respStep.text())
+                .isEqualTo(updatedStep.getText());
+        }
+
+        assertThat(respBody.cookingTime())
+            .isEqualTo(reqBody.basicInformation().cookingTime());
+
+        assertThat(respBody.portionSize())
+            .isNotNull()
+            .extracting(RecipeResponse.PortionSize::value, RecipeResponse.PortionSize::measure)
+            .containsExactly(reqBody.basicInformation().portionSize().value(), reqBody.basicInformation().portionSize().measure());
+    }
 
     @ParameterizedTest
     @ValueSource(longs = { -1L, 0L })
