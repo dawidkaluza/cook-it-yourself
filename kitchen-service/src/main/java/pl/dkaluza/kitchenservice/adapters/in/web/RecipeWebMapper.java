@@ -49,28 +49,43 @@ abstract class RecipeWebMapper {
         var builder = RecipeUpdate.builder();
 
         if (reqBody.basicInformation() != null) {
-            builder.basicInformation(info -> info
-                .name(reqBody.basicInformation().name())
-                .description(reqBody.basicInformation().description())
-                .cookingTime(reqBody.basicInformation().cookingTime() == null ? null : Duration.ofSeconds(reqBody.basicInformation().cookingTime()))
-                .portionSize(reqBody.basicInformation().portionSize().value(), reqBody.basicInformation().portionSize().measure())
-            );
+            builder.basicInformation(info -> {
+                var basicInfo = reqBody.basicInformation();
+
+                info
+                    .name(basicInfo.name())
+                    .description(basicInfo.description());
+
+                if (basicInfo.cookingTime() != null) {
+                    info.cookingTime(Duration.ofSeconds(basicInfo.cookingTime()));
+                }
+
+                if(basicInfo.portionSize() != null) {
+                    info.portionSize(basicInfo.portionSize().value(), basicInfo.portionSize().measure());
+                }
+            });
         }
 
         if (reqBody.ingredients() != null) {
             builder.ingredients(ingredientsBuilder -> {
                 var ingredients = reqBody.ingredients();
 
-                for (var ingredient : ingredients.ingredientsToAdd()) {
-                    ingredientsBuilder.ingredientToAdd(ingredient.name(), ingredient.value(), ingredient.measure());
+                if (ingredients.ingredientsToAdd() != null) {
+                    for (var ingredient : ingredients.ingredientsToAdd()) {
+                        ingredientsBuilder.ingredientToAdd(ingredient.name(), ingredient.value(), ingredient.measure());
+                    }
                 }
 
-                for (var ingredient : ingredients.ingredientsToUpdate()) {
-                    ingredientsBuilder.ingredientToUpdate(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure());
+                if (ingredients.ingredientsToUpdate() != null) {
+                    for (var ingredient : ingredients.ingredientsToUpdate()) {
+                        ingredientsBuilder.ingredientToUpdate(ingredient.id(), ingredient.name(), ingredient.value(), ingredient.measure());
+                    }
                 }
 
-                for (var id : ingredients.ingredientsToDelete()) {
-                    ingredientsBuilder.ingredientToDelete(id);
+                if (ingredients.ingredientsToDelete() != null) {
+                    for (var id : ingredients.ingredientsToDelete()) {
+                        ingredientsBuilder.ingredientToDelete(id);
+                    }
                 }
             });
         }
@@ -78,16 +93,23 @@ abstract class RecipeWebMapper {
         if (reqBody.steps() != null) {
             builder.steps(stepsBuilder -> {
                 var steps = reqBody.steps();
-                for (var step : steps.stepsToAdd()) {
-                    stepsBuilder.stepToAdd(step.text());
+
+                if (steps.stepsToAdd() != null) {
+                    for (var step : steps.stepsToAdd()) {
+                        stepsBuilder.stepToAdd(step.text());
+                    }
                 }
 
-                for (var step : steps.stepsToUpdate()) {
-                    stepsBuilder.stepToUpdate(step.id(), step.text());
+                if (steps.stepsToUpdate() != null) {
+                    for (var step : steps.stepsToUpdate()) {
+                        stepsBuilder.stepToUpdate(step.id(), step.text());
+                    }
                 }
 
-                for (var id : steps.stepsToDelete()) {
-                    stepsBuilder.stepToDelete(id);
+                if (steps.stepsToDelete() != null) {
+                    for (var id : steps.stepsToDelete()) {
+                        stepsBuilder.stepToDelete(id);
+                    }
                 }
             });
         }
