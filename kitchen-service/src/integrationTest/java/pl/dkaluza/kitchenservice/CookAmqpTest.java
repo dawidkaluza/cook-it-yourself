@@ -31,6 +31,9 @@ class CookAmqpTest {
         jdbiFacade = new JdbiFacade();
         jdbiFacade.start();
         var handle = jdbiFacade.getHandle();
+        handle.execute("DELETE FROM step");
+        handle.execute("DELETE FROM ingredient");
+        handle.execute("DELETE FROM recipe");
         handle.execute("DELETE FROM cook");
     }
 

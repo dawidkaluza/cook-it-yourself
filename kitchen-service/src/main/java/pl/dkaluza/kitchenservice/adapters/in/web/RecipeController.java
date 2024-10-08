@@ -34,6 +34,7 @@ class RecipeController {
         return recipeFacade.viewRecipe(auth, id);
     }
 
+    @PutMapping("/{id}")
     ResponseEntity<?> updateRecipe(Authentication auth, @PathVariable Long id, @RequestBody UpdateRecipeRequest reqBody) {
         return recipeFacade.updateRecipe(auth, id, reqBody);
     }
