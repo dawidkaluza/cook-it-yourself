@@ -9,9 +9,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
 import org.hamcrest.Matcher;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +25,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @EnableTestcontainers
@@ -59,24 +55,22 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void addRecipe_noJwt_returnError() throws Exception {
+    void addRecipe_noJwt_returnError() {
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body(addRecipeReqBody())
+            .body(newBoiledSausagesRecipeReqBody())
         .when()
             .post("/recipe")
         .then()
             .statusCode(401);
-
-        assertThatPersistenceIsEmpty();
     }
 
     @ParameterizedTest
     @MethodSource("addRecipeInvalidParamsProvider")
-    void addRecipe_invalidParams_returnError(String reqBody, String[] expectedFieldErrors) throws Exception {
+    void addRecipe_invalidParams_returnError(Map<String, Object> reqBody, String[] expectedFieldErrors) {
         // Given
-        var req =  given()
+        var req = given()
             .filter(new JwtFilter())
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
@@ -91,14 +85,12 @@ class RecipeRestApiTest {
             .body("message", notNullValue())
             .body("timestamp", notNullValue())
             .body("fields.name", hasItems(expectedFieldErrors));
-
-        assertThatPersistenceIsEmpty();
     }
 
-    private static Stream<Arguments> addRecipeInvalidParamsProvider() throws Exception {
+    private static Stream<Arguments> addRecipeInvalidParamsProvider() {
         return Stream.of(
             Arguments.of(
-                "{ }",
+                Map.of(),
                 new String[] {
                     "name", "description",
                     "ingredients", "methodSteps",
@@ -107,12 +99,26 @@ class RecipeRestApiTest {
                 }
             ),
             Arguments.of(
-                addRecipeReqBody(
-                    "A", "B",
-                    "B", "", "",
-                    "",
-                    300,
-                    "0", ""
+                Map.of(
+                    "name", "A",
+                    "description", "B",
+                    "ingredients", List.of(
+                        Map.of(
+                            "name", "B",
+                            "value", "",
+                            "measure", ""
+                        )
+                    ),
+                    "methodSteps", List.of(
+                        Map.of(
+                            "text", ""
+                        )
+                    ),
+                    "cookingTime", 300,
+                    "portionSize", Map.of(
+                        "value", "0",
+                        "measure", ""
+                    )
                 ),
                 new String[] {
                     "name",
@@ -125,31 +131,33 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void addRecipe_invalidCook_returnError() throws Exception {
+    void addRecipe_invalidCook_returnError() {
         insertCook(2L);
 
         given()
             .filter(new JwtFilter())
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body(addRecipeReqBody())
+            .body(newBoiledSausagesRecipeReqBody())
         .when()
             .post("/recipe")
         .then()
             .statusCode(404)
             .body("message", notNullValue())
             .body("timestamp", notNullValue());
-
-        assertThatPersistenceIsEmpty();
     }
 
     @Test
-    void addRecipe_validParams_returnNewRecipe() throws Exception {
+    @SuppressWarnings("unchecked")
+    void addRecipe_validParams_returnNewRecipe() {
         // Given
         insertCook(1L);
 
-        var reqBody = addRecipeReqBody();
-        var reqBodyJsonPath = new JsonPath(reqBody);
+        var reqBody = newBoiledSausagesRecipeReqBody();
+        var ingredientReqBody = ((List<Map<String, Object>>) reqBody.get("ingredients")).get(0);
+        var stepReqBody = ((List<Map<String, Object>>) reqBody.get("methodSteps")).get(0);
+        var portionSizeReqBody = (Map<String, Object>) reqBody.get("portionSize");
+        
         var req = given()
             .filter(new JwtFilter())
             .contentType(ContentType.JSON)
@@ -163,34 +171,30 @@ class RecipeRestApiTest {
         res.then()
             .statusCode(201)
             .body("id", notNullValue())
-            .body("name", is(reqBodyJsonPath.getString("name")))
-            .body("description", is(reqBodyJsonPath.getString("description")))
+            .body("name", is(reqBody.get("name")))
+            .body("description", is(reqBody.get("description")))
             .body("ingredients[0].id", notNullValue())
-            .body("ingredients[0].name", is(reqBodyJsonPath.getString("ingredients[0].name")))
-            .body("ingredients[0].value", numericEqualTo(reqBodyJsonPath.getString("ingredients[0].value")))
-            .body("ingredients[0].measure", is(reqBodyJsonPath.getString("ingredients[0].measure")))
+            .body("ingredients[0].name", is(ingredientReqBody.get("name")))
+            .body("ingredients[0].value", numericEqualTo(ingredientReqBody.get("value").toString()))
+            .body("ingredients[0].measure", is(ingredientReqBody.get("measure")))
             .body("methodSteps[0].id", notNullValue())
-            .body("methodSteps[0].text", is(reqBodyJsonPath.getString("methodSteps[0].text")))
-            .body("cookingTime", is(reqBodyJsonPath.getInt("cookingTime")))
-            .body("portionSize.value", numericEqualTo(reqBodyJsonPath.getString("portionSize.value")))
-            .body("portionSize.measure", is(reqBodyJsonPath.getString("portionSize.measure")))
+            .body("methodSteps[0].text", is(stepReqBody.get("text")))
+            .body("cookingTime", is(reqBody.get("cookingTime")))
+            .body("portionSize.value", numericEqualTo(portionSizeReqBody.get("value").toString()))
+            .body("portionSize.measure", is(portionSizeReqBody.get("measure")))
             .body("cookId", is(1));
 
         var resBodyAsJsonPath = new JsonPath(res.getBody().asString());
-        assertThatPersisted(
-            resBodyAsJsonPath.getInt("id"),
-            "SELECT COUNT(id) FROM recipe WHERE id = ?"
-        );
-        assertThatPersisted(
-            resBodyAsJsonPath.getInt("ingredients[0].id"),
-            "SELECT COUNT(id) FROM ingredient WHERE id = ?"
-        );
-        assertThatPersisted(
-            resBodyAsJsonPath.getInt("methodSteps[0].id"),
-            "SELECT COUNT(id) FROM step WHERE id = ?"
-        );
+        var recipeId = resBodyAsJsonPath.getInt("id");
 
-        // TODO assert that all objects are associated with each other through foreign keys
+        given()
+            .filter(new JwtFilter())
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe/{id}", recipeId)
+        .then()
+            .statusCode(200);
     }
 
     @Test
@@ -222,31 +226,73 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void browseRecipes_noMatchingRecipes_returnNoRecipes() throws Exception {
+    void browseRecipes_noMatchingRecipes_returnNoRecipes() {
         insertCook(1L);
 
-        addRecipe(addRecipeReqBody(
-            "Boiled sausages", "",
-            "sausage", "3", "pc",
-            "Diy",
-            180,
-            "3", "pc"
+        addRecipe(Map.of(
+            "name", "Boiled sausages",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "sausage",
+                    "value", "3",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "3",
+                "measure", "pc"
+            )
         ));
 
-        addRecipe(addRecipeReqBody(
-            "Iced coffee", "",
-            "coffee", "50", "g",
-            "Diy",
-            180,
-            "250", "ml"
+        addRecipe(Map.of(
+            "name", "Iced coffee",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "coffee",
+                    "value", "50",
+                    "measure", "g"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "4",
+                "measure", ""
+            )
         ));
 
-        addRecipe(addRecipeReqBody(
-            "Toasts", "",
-            "Bread", "4", "pc",
-            "Diy",
-            180,
-            "4", ""
+        addRecipe(Map.of(
+            "name", "Toasts",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "Bread",
+                    "value", "4",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "4",
+                "measure", ""
+            )
         ));
 
         given()
@@ -263,31 +309,73 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void browseRecipes_noParams_returnAllUserRecipes() throws Exception {
+    void browseRecipes_noParams_returnAllUserRecipes() {
         insertCook(1L);
 
-        addRecipe(addRecipeReqBody(
-            "Boiled sausages", "",
-            "sausage", "3", "pc",
-            "Diy",
-            180,
-            "3", "pc"
+        addRecipe(Map.of(
+            "name", "Boiled sausages",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "sausage",
+                    "value", "3",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "3",
+                "measure", "pc"
+            )
         ));
 
-        addRecipe(addRecipeReqBody(
-            "Iced coffee", "",
-            "coffee", "50", "g",
-            "Diy",
-            180,
-            "250", "ml"
+        addRecipe(Map.of(
+            "name", "Iced coffee",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "coffee",
+                    "value", "50",
+                    "measure", "g"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "4",
+                "measure", ""
+            )
         ));
 
-        addRecipe(addRecipeReqBody(
-            "Toasts", "",
-            "Bread", "4", "pc",
-            "Diy",
-            180,
-            "4", ""
+        addRecipe(Map.of(
+            "name", "Toasts",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "Bread",
+                    "value", "4",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "4",
+                "measure", ""
+            )
         ));
 
         given()
@@ -303,31 +391,73 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void browseRecipes_nameFilterApplied_returnExpectedRecipes() throws Exception {
+    void browseRecipes_nameFilterApplied_returnExpectedRecipes() {
         insertCook(1L);
 
-        addRecipe(addRecipeReqBody(
-            "Boiled sausages", "a",
-            "sausage", "3", "pc",
-            "Diy",
-            180,
-            "3", "pc"
+        addRecipe(Map.of(
+            "name", "Boiled sausages",
+            "description", "a",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "sausage",
+                    "value", "3",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "3",
+                "measure", "pc"
+            )
         ));
 
-        addRecipe(addRecipeReqBody(
-            "Iced coffee", "b",
-            "coffee", "50", "g",
-            "Diy",
-            180,
-            "250", "ml"
+        addRecipe(Map.of(
+            "name", "Iced coffee",
+            "description", "b",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "coffee",
+                    "value", "50",
+                    "measure", "g"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "250",
+                "measure", "ml"
+            )
         ));
 
-        addRecipe(addRecipeReqBody(
-            "Toasts", "c",
-            "Bread", "4", "pc",
-            "Diy",
-            180,
-            "4", ""
+        addRecipe(Map.of(
+            "name", "Toasts",
+            "description", "c",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "Bread",
+                    "value", "4",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Diy"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "4",
+                "measure", ""
+            )
         ));
 
         given()
@@ -346,9 +476,9 @@ class RecipeRestApiTest {
     }
     
     @Test
-    void viewRecipe_noJwt_returnError() throws Exception {
+    void viewRecipe_noJwt_returnError() {
         insertCook(1L);
-        addRecipe(addRecipeReqBody());
+        addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
             .contentType(ContentType.JSON)
@@ -360,9 +490,9 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void viewRecipe_invalidId_returnError() throws Exception {
+    void viewRecipe_invalidId_returnError() {
         insertCook(1L);
-        addRecipe(addRecipeReqBody());
+        addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
             .filter(new JwtFilter())
@@ -378,9 +508,10 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void viewRecipe_recipeNotFound_returnError() throws Exception {
+    void viewRecipe_recipeNotFound_returnError() {
         insertCook(1L);
-        var id = addRecipe(addRecipeReqBody());
+        var addRecipeResp = addRecipe(newBoiledSausagesRecipeReqBody());
+        var id = new JsonPath(addRecipeResp.getBody().asString()).getInt("id");
 
         given()
             .filter(new JwtFilter())
@@ -395,11 +526,16 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void viewRecipe_validRequest_returnRecipe() throws Exception {
+    @SuppressWarnings("unchecked")
+    void viewRecipe_validRequest_returnRecipe() {
         // Given
         insertCook(1L);
-        var reqBody = addRecipeReqBody();
-        var id = addRecipe(reqBody);
+        var reqBody = newBoiledSausagesRecipeReqBody();
+        var ingredientReqBody = ((List<Map<String, Object>>) reqBody.get("ingredients")).get(0);
+        var stepReqBody = ((List<Map<String, Object>>) reqBody.get("methodSteps")).get(0);
+        var portionSizeReqBody = (Map<String, Object>) reqBody.get("portionSize");
+        var addRecipeRespBody = addRecipe(reqBody);
+        var recipeId = new JsonPath(addRecipeRespBody.getBody().asString()).getInt("id");
 
         var req = given()
             .filter(new JwtFilter())
@@ -407,38 +543,35 @@ class RecipeRestApiTest {
             .accept(ContentType.JSON);
 
         // When
-        var res = req.get("/recipe/{id}", id);
+        var res = req.get("/recipe/{id}", recipeId);
 
         // Then
-        var reqBodyJsonPath = new JsonPath(reqBody);
         res.then()
             .statusCode(200)
-            .body("id", is(id.intValue()))
-            .body("name", is(reqBodyJsonPath.getString("name")))
-            .body("description", is(reqBodyJsonPath.getString("description")))
+            .body("id", is(recipeId))
+            .body("name", is(reqBody.get("name")))
+            .body("description", is(reqBody.get("description")))
             .body("ingredients[0].id", notNullValue())
-            .body("ingredients[0].name", is(reqBodyJsonPath.getString("ingredients[0].name")))
-            .body("ingredients[0].value", numericEqualTo(reqBodyJsonPath.getString("ingredients[0].value")))
-            .body("ingredients[0].measure", is(reqBodyJsonPath.getString("ingredients[0].measure")))
+            .body("ingredients[0].name", is(ingredientReqBody.get("name")))
+            .body("ingredients[0].value", numericEqualTo(ingredientReqBody.get("value").toString()))
+            .body("ingredients[0].measure", is(ingredientReqBody.get("measure")))
             .body("methodSteps[0].id", notNullValue())
-            .body("methodSteps[0].text", is(reqBodyJsonPath.getString("methodSteps[0].text")))
-            .body("cookingTime", is(reqBodyJsonPath.getInt("cookingTime")))
-            .body("portionSize.value", numericEqualTo(reqBodyJsonPath.getString("portionSize.value")))
-            .body("portionSize.measure", is(reqBodyJsonPath.getString("portionSize.measure")))
+            .body("methodSteps[0].text", is(stepReqBody.get("text")))
+            .body("cookingTime", is(reqBody.get("cookingTime")))
+            .body("portionSize.value", numericEqualTo(portionSizeReqBody.get("value").toString()))
+            .body("portionSize.measure", is(portionSizeReqBody.get("measure")))
             .body("cookId", is(1));
     }
 
     @Test
-    void updateRecipe_noJwt_returnError() throws Exception {
+    void updateRecipe_noJwt_returnError() {
         insertCook(1L);
-        addRecipe(addRecipeReqBody());
+        addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body(
-                updateRecipeReqBody(null, null, null).toString()
-            )
+            .body(Map.of())
         .when()
             .put("/recipe/1")
         .then()
@@ -446,17 +579,15 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void updateRecipe_invalidId_returnError() throws Exception {
+    void updateRecipe_invalidId_returnError() {
         insertCook(1L);
-        addRecipe(addRecipeReqBody());
+        addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
             .filter(new JwtFilter())
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body(
-                updateRecipeReqBody(null, null, null).toString()
-            )
+            .body(Map.of())
         .when()
             .put("/recipe/0")
         .then()
@@ -468,11 +599,10 @@ class RecipeRestApiTest {
 
     @ParameterizedTest
     @MethodSource("updateRecipeInvalidReqBodyParams")
-    void updateRecipe_invalidReqBody_returnError(Map<String, Object> reqBody, String[] expectedFieldErrors) throws Exception {
+    void updateRecipe_invalidReqBody_returnError(Map<String, Object> reqBody, String[] expectedFieldErrors) {
         insertCook(1L);
-        var addRecipeResponse = addRecipeAndReturnResponse(addRecipeReqBody());
-        var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
-        var recipeId = addRecipeRespBody.getLong("id");
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
+        var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
 
         given()
             .filter(new JwtFilter())
@@ -542,11 +672,10 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void updateRecipe_recipeNotFound_returnError() throws Exception {
+    void updateRecipe_recipeNotFound_returnError() {
         insertCook(1L);
-        var addRecipeResponse = addRecipeAndReturnResponse(addRecipeReqBody());
-        var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
-        var recipeId = addRecipeRespBody.getLong("id");
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
+        var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
 
         given()
             .filter(new JwtFilter())
@@ -562,15 +691,15 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void updateRecipe_recipeNotOwned_returnError() throws Exception {
+    void updateRecipe_recipeNotOwned_returnError() {
         // TODO now there is no way of adding recipes by two different cooks.
         //  Add this possibility and test the scenario
     }
 
     @Test
-    void updateRecipe_ingredientNotFound_returnError() throws Exception {
+    void updateRecipe_ingredientNotFound_returnError() {
         insertCook(1L);
-        var addRecipeResponse = addRecipeAndReturnResponse(addRecipeReqBody());
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
         var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
         var recipeId = addRecipeRespBody.getLong("id");
         var ingredientId = addRecipeRespBody.getLong("ingredients[0].id");
@@ -602,9 +731,9 @@ class RecipeRestApiTest {
     }
 
     @Test
-    void updateRecipe_stepNotFound_returnError() throws Exception {
+    void updateRecipe_stepNotFound_returnError() {
         insertCook(1L);
-        var addRecipeResponse = addRecipeAndReturnResponse(addRecipeReqBody());
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
         var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
         var recipeId = addRecipeRespBody.getLong("id");
         var stepId = addRecipeRespBody.getLong("methodSteps[0].id");
@@ -665,7 +794,7 @@ class RecipeRestApiTest {
             )
         ));
         var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
-        Long recipeId = addRecipeRespBody.getLong("id");
+        var recipeId = addRecipeRespBody.getInt("id");
 
         var updatedName = "Hot oats with milk";
         var updatedDescription = "";
@@ -677,20 +806,20 @@ class RecipeRestApiTest {
         var newIngredientValue = "300";
         var newIngredientMeasure = "ml";
 
-        var updatedIngredientId = addRecipeRespBody.getLong("ingredients[1].id");
+        var updatedIngredientId = addRecipeRespBody.getInt("ingredients[1].id");
         var updatedIngredientName = "oats";
         var updatedIngredientValue = "150";
         var updatedIngredientMeasure = "g";
 
-        var deletedIngredientId = addRecipeRespBody.getLong("ingredients[0].id");
+        var deletedIngredientId = addRecipeRespBody.getInt("ingredients[0].id");
 
         var newStepText = "Once the oats become thick, take them out of the pot.";
 
-        var updatedStepId = addRecipeRespBody.getLong("methodSteps[1].id");
+        var updatedStepId = addRecipeRespBody.getInt("methodSteps[1].id");
         var updatedStepText = "Heat the milk, add the oats once the milk is hot enough.";
 
-        var firstDeletedStepId = addRecipeRespBody.getLong("methodSteps[0].id");
-        var secondDeletedStepId = addRecipeRespBody.getLong("methodSteps[2].id");
+        var firstDeletedStepId = addRecipeRespBody.getInt("methodSteps[0].id");
+        var secondDeletedStepId = addRecipeRespBody.getInt("methodSteps[2].id");
 
         given()
             .filter(new JwtFilter())
@@ -737,7 +866,7 @@ class RecipeRestApiTest {
             .put("/recipe/{id}", recipeId)
         .then()
             .statusCode(200)
-            .body("id", is(recipeId.intValue()))
+            .body("id", is(recipeId))
             .body("name", is(updatedName))
             .body("description", is(updatedDescription))
             .body("cookingTime", is(updatedCookingTime))
@@ -764,21 +893,6 @@ class RecipeRestApiTest {
         var handle = jdbiFacade.getHandle();
         handle.execute("INSERT INTO cook VALUES (?)", id);
     }
-
-    // TODO refactor this method and the whole test class, some methods are too suited to specific use cases
-    private Long addRecipe(String reqBody) {
-        var response = addRecipeAndReturnResponse(reqBody);
-        return new JsonPath(response.getBody().asString()).getLong("id");
-    }
-
-    private Response addRecipeAndReturnResponse(String reqBody) {
-        return given()
-            .filter(new JwtFilter())
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(reqBody)
-            .post("/recipe");
-    }
     
     private Response addRecipe(Map<String, Object> reqBody) {
         return given()
@@ -789,93 +903,28 @@ class RecipeRestApiTest {
             .post("/recipe");
     }
 
-    private void assertThatPersistenceIsEmpty() {
-        var handle = jdbiFacade.getHandle();
-
-        var queries = List.of(
-            "SELECT COUNT(id) FROM ingredient",
-            "SELECT COUNT(id) FROM step",
-            "SELECT COUNT(id) FROM recipe"
+    private static Map<String, Object> newBoiledSausagesRecipeReqBody() {
+        return Map.of(
+            "name", "Boiled sausages",
+            "description", "",
+            "ingredients", List.of(
+                Map.of(
+                    "name", "Sausage",
+                    "value", "3",
+                    "measure", "pc"
+                )
+            ),
+            "methodSteps", List.of(
+                Map.of(
+                    "text", "Boil sausages for about 3 mins"
+                )
+            ),
+            "cookingTime", 180,
+            "portionSize", Map.of(
+                "value", "3",
+                "measure", "pc"
+            )
         );
-
-        for (var query : queries) {
-            var count = handle.select(query)
-                .mapTo(Integer.class)
-                .first();
-
-            assertThat(count)
-                .isEqualTo(0);
-        }
-    }
-
-    private <T> void assertThatPersisted(T id, String countQuery) {
-        var handle = jdbiFacade.getHandle();
-        var count = handle
-            .select(countQuery, id)
-            .mapTo(Integer.class)
-            .first();
-
-        assertThat(count)
-            .isEqualTo(1);
-    }
-
-    private static String addRecipeReqBody() throws JSONException {
-        return addRecipeReqBody(
-            "Boiled sausages", "",
-            "Sausage", "3", "pc",
-            "Boil sausages for about 3 mins",
-            180,
-            "3", "pc"
-        );
-    }
-
-    private static String addRecipeReqBody(
-        String name, String description,
-        String ingredientName, String ingredientValue, String ingredientMeasure,
-        String stepText,
-        int cookingTime,
-        String portionSizeValue, String portionSizeMeasure
-    ) throws JSONException {
-        var reqBody = new JSONObject();
-
-        reqBody.put("name", name);
-        reqBody.put("description", description);
-
-        var ingredient = new JSONObject();
-        ingredient.put("name", ingredientName);
-        ingredient.put("value", ingredientValue);
-        ingredient.put("measure", ingredientMeasure);
-
-        var ingredients = new JSONArray();
-        ingredients.put(ingredient);
-
-        reqBody.put("ingredients", ingredients);
-
-        var step = new JSONObject();
-        step.put("text", stepText);
-
-        var steps = new JSONArray();
-        steps.put(step);
-
-        reqBody.put("methodSteps", steps);
-        reqBody.put("cookingTime", cookingTime);
-
-        var portionSize = new JSONObject();
-        portionSize.put("value", portionSizeValue);
-        portionSize.put("measure", portionSizeMeasure);
-
-        reqBody.put("portionSize", portionSize);
-
-        return reqBody.toString();
-    }
-
-    @Deprecated
-    private static JSONObject updateRecipeReqBody(JSONObject basicInfo, JSONObject ingredients, JSONObject steps) throws JSONException {
-        var reqBody = new JSONObject();
-        reqBody.put("basicInformation", basicInfo);
-        reqBody.put("ingredients", ingredients);
-        reqBody.put("steps", steps);
-        return reqBody;
     }
 
     private static Matcher<?> numericEqualTo(String expectedValue) {

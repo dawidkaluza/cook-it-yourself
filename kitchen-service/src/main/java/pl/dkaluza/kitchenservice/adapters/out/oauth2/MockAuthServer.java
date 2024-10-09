@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.gen.JWKGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,7 +25,7 @@ class MockAuthServer implements InitializingBean, DisposableBean {
     private static final String JWT_PAYLOAD_TEMPLATE =
         """
         {
-            "sub": "1",
+            "sub": "SUBJECT",
             "aud": "ciy-web",
             "name": "Dawid",
             "iat": ISSUED_AT,
@@ -51,17 +52,10 @@ class MockAuthServer implements InitializingBean, DisposableBean {
 
     private void configure() throws JOSEException {
         var client = new WireMock(server.port());
-        var rsaKey = new RSAKeyGenerator(2048).generate();
+        var rsaKeyGenerator = new RSAKeyGenerator(2048).generate();
 
-        mockOauthJwksEndpoint(client, new JWKSet(rsaKey));
-
-        var unixTimeNow = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond();
-        var payload = new Payload(
-            JWT_PAYLOAD_TEMPLATE
-                .replace("ISSUED_AT", Long.toString(unixTimeNow))
-                .replace("EXPIRES_AT", Long.toString(unixTimeNow + 604800)) // +1 week
-        );
-        mockJwtEndpoint(client, new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload, new RSASSASigner(rsaKey));
+        mockOauthJwksEndpoint(client, new JWKSet(rsaKeyGenerator));
+        mockJwtEndpoint(client, new JWSHeader.Builder(JWSAlgorithm.RS256).build(), new RSASSASigner(rsaKeyGenerator));
     }
 
     private void mockOauthJwksEndpoint(WireMock client, JWKSet jwkSet) {
@@ -72,14 +66,32 @@ class MockAuthServer implements InitializingBean, DisposableBean {
         );
     }
 
-    private void mockJwtEndpoint(WireMock client, JWSHeader header, Payload payload, JWSSigner signer) throws JOSEException {
-        var jws = new JWSObject(header, payload);
-        jws.sign(signer);
+    private void mockJwtEndpoint(WireMock client, JWSHeader header, JWSSigner signer) throws JOSEException {
+        var unixTimeNow = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond();
+        var payloadTemplate = JWT_PAYLOAD_TEMPLATE
+                .replace("ISSUED_AT", Long.toString(unixTimeNow))
+                .replace("EXPIRES_AT", Long.toString(unixTimeNow + 604800)); // +1 week
 
+        var firstPayload = new Payload(payloadTemplate.replace("SUBJECT", "1"));
+        var firstJws = new JWSObject(header, firstPayload);
+        firstJws.sign(signer);
         client.register(
-            get("/jwt").willReturn(
-                aResponse().withBody(jws.serialize())
-            )
+            get("/jwt")
+                .withQueryParam("subject", or(absent(), equalTo("1")))
+                .willReturn(
+                    aResponse().withBody(firstJws.serialize())
+                )
+        );
+
+        var secondPayload = new Payload(payloadTemplate.replace("SUBJECT", "2"));
+        var secondJws = new JWSObject(header, secondPayload);
+        secondJws.sign(signer);
+        client.register(
+            get("/jwt")
+                .withQueryParam("subject", equalTo("2"))
+                .willReturn(
+                    aResponse().withBody(secondJws.serialize())
+                )
         );
     }
 }
