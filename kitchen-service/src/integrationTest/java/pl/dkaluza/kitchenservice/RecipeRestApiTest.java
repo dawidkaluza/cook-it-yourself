@@ -909,7 +909,7 @@ class RecipeRestApiTest {
             .body("portionSize.measure", is(updatedPortionSizeMeasure))
             .body("ingredients[0].id", notNullValue())
             .body("ingredients[0].name", is(updatedIngredientName))
-            .body("ingredients[0].value", is(updatedIngredientValue))
+            .body("ingredients[0].value", numericEqualTo(updatedIngredientValue))
             .body("ingredients[0].measure", is(updatedIngredientMeasure))
             .body("ingredients[1].id", notNullValue())
             .body("ingredients[1].name", is(newIngredientName))
@@ -922,7 +922,33 @@ class RecipeRestApiTest {
             .body("methodSteps[1].text", is(newStepText))
             .body("methodSteps.size()", is(2));
 
-        // TODO check if HTTP GET request returns updated recipe
+        given()
+            .filter(new JwtFilter(1))
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe/{id}", recipeId)
+        .then()
+            .statusCode(200)
+            .body("name", is(updatedName))
+            .body("description", is(updatedDescription))
+            .body("cookingTime", is(updatedCookingTime))
+            .body("portionSize.value", numericEqualTo(updatedPortionSizeValue))
+            .body("portionSize.measure", is(updatedPortionSizeMeasure))
+            .body("ingredients[0].id", notNullValue())
+            .body("ingredients[0].name", is(updatedIngredientName))
+            .body("ingredients[0].value", numericEqualTo(updatedIngredientValue))
+            .body("ingredients[0].measure", is(updatedIngredientMeasure))
+            .body("ingredients[1].id", notNullValue())
+            .body("ingredients[1].name", is(newIngredientName))
+            .body("ingredients[1].value", numericEqualTo(newIngredientValue))
+            .body("ingredients[1].measure", is(newIngredientMeasure))
+            .body("ingredients.size()", is(2))
+            .body("methodSteps[0].id", notNullValue())
+            .body("methodSteps[0].text", is(updatedStepText))
+            .body("methodSteps[1].id", notNullValue())
+            .body("methodSteps[1].text", is(newStepText))
+            .body("methodSteps.size()", is(2));
     }
 
     @Test
