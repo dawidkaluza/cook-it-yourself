@@ -79,7 +79,7 @@ class RecipeRestApiTest {
     void addRecipe_invalidParams_returnError(Map<String, Object> reqBody, String[] expectedFieldErrors) {
         // Given
         var req = given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(reqBody);
@@ -143,7 +143,7 @@ class RecipeRestApiTest {
         signUpCook(2L);
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(newBoiledSausagesRecipeReqBody())
@@ -167,7 +167,7 @@ class RecipeRestApiTest {
         var portionSizeReqBody = (Map<String, Object>) reqBody.get("portionSize");
         
         var req = given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(reqBody);
@@ -196,7 +196,7 @@ class RecipeRestApiTest {
         var recipeId = resBodyAsJsonPath.getInt("id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
         .when()
@@ -219,7 +219,7 @@ class RecipeRestApiTest {
     @Test
     void browseRecipes_invalidPageParams_returnError() {
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .param("page", "0")
@@ -304,7 +304,7 @@ class RecipeRestApiTest {
         ));
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .param("name", "Sth veeeery specific")
@@ -387,7 +387,7 @@ class RecipeRestApiTest {
         ));
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
         .when()
@@ -469,7 +469,7 @@ class RecipeRestApiTest {
         ));
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .param("name", "a")
@@ -503,7 +503,7 @@ class RecipeRestApiTest {
         addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
         .when()
@@ -522,7 +522,7 @@ class RecipeRestApiTest {
         var id = new JsonPath(addRecipeResp.getBody().asString()).getInt("id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
         .when()
@@ -531,6 +531,22 @@ class RecipeRestApiTest {
             .statusCode(404)
             .body("message", notNullValue())
             .body("timestamp", notNullValue());
+    }
+
+    @Test
+    void viewRecipe_recipeNotOwned_returnError() {
+        signUpCook(1L);
+        var addRecipeResp = addRecipe(newBoiledSausagesRecipeReqBody());
+        var id = new JsonPath(addRecipeResp.getBody().asString()).getInt("id");
+
+        given()
+            .filter(new JwtFilter(2L))
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .get("/recipe/{id}", id)
+        .then()
+            .statusCode(403);
     }
 
     @Test
@@ -546,7 +562,7 @@ class RecipeRestApiTest {
         var recipeId = new JsonPath(addRecipeRespBody.getBody().asString()).getInt("id");
 
         var req = given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON);
 
@@ -592,7 +608,7 @@ class RecipeRestApiTest {
         addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(Map.of())
@@ -613,7 +629,7 @@ class RecipeRestApiTest {
         var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(reqBody)
@@ -686,7 +702,7 @@ class RecipeRestApiTest {
         var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(Map.of())
@@ -700,8 +716,19 @@ class RecipeRestApiTest {
 
     @Test
     void updateRecipe_recipeNotOwned_returnError() {
-        // TODO now there is no way of adding recipes by two different cooks.
-        //  Add this possibility and test the scenario
+        signUpCook(1L);
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
+        var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
+
+        given()
+            .filter(new JwtFilter(2L))
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .body(Map.of())
+        .when()
+            .put("/recipe/{id}", recipeId)
+        .then()
+            .statusCode(403);
     }
 
     @Test
@@ -713,7 +740,7 @@ class RecipeRestApiTest {
         var ingredientId = addRecipeRespBody.getLong("ingredients[0].id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(
@@ -747,7 +774,7 @@ class RecipeRestApiTest {
         var stepId = addRecipeRespBody.getLong("methodSteps[0].id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(
@@ -830,7 +857,7 @@ class RecipeRestApiTest {
         var secondDeletedStepId = addRecipeRespBody.getInt("methodSteps[2].id");
 
         given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(
@@ -924,7 +951,7 @@ class RecipeRestApiTest {
     
     private Response addRecipe(Map<String, Object> reqBody) {
         return given()
-            .filter(new JwtFilter())
+            .filter(new JwtFilter(1))
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
             .body(reqBody)
@@ -960,9 +987,21 @@ class RecipeRestApiTest {
     }
 
     private static class JwtFilter implements Filter {
+        private final long id;
+
+        JwtFilter(long id) {
+            if (id < 1 || id > 2) {
+                throw new IllegalArgumentException("id must be between 1 and 2");
+            }
+
+            this.id = id;
+        }
+
         @Override
         public Response filter(FilterableRequestSpecification requestSpec, FilterableResponseSpecification responseSpec, FilterContext ctx) {
-            var res = given().get("http://localhost:8081/jwt"); //cook (aka user/resource owner) id encoded in jwt is 1
+            var res = given()
+                .queryParam("subject", id)
+                .get("http://localhost:8081/jwt");
             requestSpec.header("Authorization", "Bearer " + res.getBody().asString());
             return ctx.next(requestSpec, responseSpec);
         }

@@ -76,7 +76,7 @@ class MockAuthServer implements InitializingBean, DisposableBean {
         var firstJws = new JWSObject(header, firstPayload);
         firstJws.sign(signer);
         client.register(
-            get("/jwt")
+            get(urlPathEqualTo("/jwt"))
                 .withQueryParam("subject", or(absent(), equalTo("1")))
                 .willReturn(
                     aResponse().withBody(firstJws.serialize())
@@ -87,7 +87,7 @@ class MockAuthServer implements InitializingBean, DisposableBean {
         var secondJws = new JWSObject(header, secondPayload);
         secondJws.sign(signer);
         client.register(
-            get("/jwt")
+            get(urlPathEqualTo("/jwt"))
                 .withQueryParam("subject", equalTo("2"))
                 .willReturn(
                     aResponse().withBody(secondJws.serialize())
