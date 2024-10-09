@@ -39,6 +39,7 @@ class RecipeController {
         return recipeFacade.updateRecipe(auth, id, reqBody);
     }
 
+    @DeleteMapping("/{id}")
     ResponseEntity<?> deleteRecipe(Authentication auth, @PathVariable Long id) {
         return recipeFacade.deleteRecipe(auth, id);
     }

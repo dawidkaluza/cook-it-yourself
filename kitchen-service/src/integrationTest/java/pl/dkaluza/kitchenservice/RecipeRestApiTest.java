@@ -921,6 +921,80 @@ class RecipeRestApiTest {
             .body("methodSteps[1].id", notNullValue())
             .body("methodSteps[1].text", is(newStepText))
             .body("methodSteps.size()", is(2));
+
+        // TODO check if HTTP GET request returns updated recipe
+    }
+
+    @Test
+    void deleteRecipe_noJwt_returnError() {
+        signUpCook(1L);
+        addRecipe(newBoiledSausagesRecipeReqBody());
+
+        given()
+        .when()
+            .delete("/recipe/1")
+        .then()
+            .statusCode(401);
+    }
+
+    @Test
+    void deleteRecipe_invalidId_returnError() {
+        signUpCook(1L);
+        addRecipe(newBoiledSausagesRecipeReqBody());
+
+        given()
+            .filter(new JwtFilter(1))
+        .when()
+            .delete("/recipe/0")
+        .then()
+            .statusCode(422)
+            .body("message", notNullValue())
+            .body("timestamp", notNullValue())
+            .body("fields.name", hasItems("id"));
+    }
+
+    @Test
+    void deleteRecipe_recipeNotFound_returnError() {
+        signUpCook(1L);
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
+        var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
+
+        given()
+            .filter(new JwtFilter(1))
+        .when()
+            .delete("/recipe/{id}", recipeId + 1) //+1 to look for a recipe that definitely does not exist
+        .then()
+            .statusCode(404)
+            .body("message", notNullValue())
+            .body("timestamp", notNullValue());
+    }
+
+    @Test
+    void deleteRecipe_recipeNotOwned_returnError() {
+        signUpCook(1L);
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
+        var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
+
+        given()
+            .filter(new JwtFilter(2))
+        .when()
+            .delete("/recipe/{id}", recipeId)
+        .then()
+            .statusCode(403);
+    }
+
+    @Test
+    void deleteRecipe_validRequest_returnNoContent() {
+        signUpCook(1L);
+        var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
+        var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
+
+        given()
+            .filter(new JwtFilter(1))
+        .when()
+            .delete("/recipe/{id}", recipeId)
+        .then()
+            .statusCode(204);
     }
 
     private void signUpCook(Long id) {
