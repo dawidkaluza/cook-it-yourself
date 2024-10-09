@@ -19,39 +19,47 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import pl.dkaluza.kitchenservice.config.EnableTestcontainers;
 import pl.dkaluza.kitchenservice.config.JdbiFacade;
+import pl.dkaluza.kitchenservice.config.RabbitFacade;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 
 @EnableTestcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RecipeRestApiTest {
     private JdbiFacade jdbiFacade;
+    private RabbitFacade rabbitFacade;
 
     @LocalServerPort
     private Integer port;
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws Exception {
         jdbiFacade = new JdbiFacade();
         jdbiFacade.start();
-
         var handle = jdbiFacade.getHandle();
         handle.execute("DELETE FROM step");
         handle.execute("DELETE FROM ingredient");
         handle.execute("DELETE FROM recipe");
         handle.execute("DELETE FROM cook");
 
+        rabbitFacade = new RabbitFacade();
+        rabbitFacade.start();
+
         RestAssured.baseURI = "http://localhost:" + port;
     }
 
     @AfterEach
-    void afterEach() {
+    void afterEach() throws Exception {
         jdbiFacade.stop();
+        rabbitFacade.stop();
     }
 
     @Test
@@ -132,7 +140,7 @@ class RecipeRestApiTest {
 
     @Test
     void addRecipe_invalidCook_returnError() {
-        insertCook(2L);
+        signUpCook(2L);
 
         given()
             .filter(new JwtFilter())
@@ -151,7 +159,7 @@ class RecipeRestApiTest {
     @SuppressWarnings("unchecked")
     void addRecipe_validParams_returnNewRecipe() {
         // Given
-        insertCook(1L);
+        signUpCook(1L);
 
         var reqBody = newBoiledSausagesRecipeReqBody();
         var ingredientReqBody = ((List<Map<String, Object>>) reqBody.get("ingredients")).get(0);
@@ -227,7 +235,7 @@ class RecipeRestApiTest {
 
     @Test
     void browseRecipes_noMatchingRecipes_returnNoRecipes() {
-        insertCook(1L);
+        signUpCook(1L);
 
         addRecipe(Map.of(
             "name", "Boiled sausages",
@@ -310,7 +318,7 @@ class RecipeRestApiTest {
 
     @Test
     void browseRecipes_noParams_returnAllUserRecipes() {
-        insertCook(1L);
+        signUpCook(1L);
 
         addRecipe(Map.of(
             "name", "Boiled sausages",
@@ -392,7 +400,7 @@ class RecipeRestApiTest {
 
     @Test
     void browseRecipes_nameFilterApplied_returnExpectedRecipes() {
-        insertCook(1L);
+        signUpCook(1L);
 
         addRecipe(Map.of(
             "name", "Boiled sausages",
@@ -477,7 +485,7 @@ class RecipeRestApiTest {
     
     @Test
     void viewRecipe_noJwt_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
@@ -491,7 +499,7 @@ class RecipeRestApiTest {
 
     @Test
     void viewRecipe_invalidId_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
@@ -509,7 +517,7 @@ class RecipeRestApiTest {
 
     @Test
     void viewRecipe_recipeNotFound_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         var addRecipeResp = addRecipe(newBoiledSausagesRecipeReqBody());
         var id = new JsonPath(addRecipeResp.getBody().asString()).getInt("id");
 
@@ -529,7 +537,7 @@ class RecipeRestApiTest {
     @SuppressWarnings("unchecked")
     void viewRecipe_validRequest_returnRecipe() {
         // Given
-        insertCook(1L);
+        signUpCook(1L);
         var reqBody = newBoiledSausagesRecipeReqBody();
         var ingredientReqBody = ((List<Map<String, Object>>) reqBody.get("ingredients")).get(0);
         var stepReqBody = ((List<Map<String, Object>>) reqBody.get("methodSteps")).get(0);
@@ -565,7 +573,7 @@ class RecipeRestApiTest {
 
     @Test
     void updateRecipe_noJwt_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
@@ -580,7 +588,7 @@ class RecipeRestApiTest {
 
     @Test
     void updateRecipe_invalidId_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         addRecipe(newBoiledSausagesRecipeReqBody());
 
         given()
@@ -600,7 +608,7 @@ class RecipeRestApiTest {
     @ParameterizedTest
     @MethodSource("updateRecipeInvalidReqBodyParams")
     void updateRecipe_invalidReqBody_returnError(Map<String, Object> reqBody, String[] expectedFieldErrors) {
-        insertCook(1L);
+        signUpCook(1L);
         var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
         var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
 
@@ -673,7 +681,7 @@ class RecipeRestApiTest {
 
     @Test
     void updateRecipe_recipeNotFound_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
         var recipeId = new JsonPath(addRecipeResponse.getBody().asString()).getLong("id");
 
@@ -698,7 +706,7 @@ class RecipeRestApiTest {
 
     @Test
     void updateRecipe_ingredientNotFound_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
         var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
         var recipeId = addRecipeRespBody.getLong("id");
@@ -732,7 +740,7 @@ class RecipeRestApiTest {
 
     @Test
     void updateRecipe_stepNotFound_returnError() {
-        insertCook(1L);
+        signUpCook(1L);
         var addRecipeResponse = addRecipe(newBoiledSausagesRecipeReqBody());
         var addRecipeRespBody = new JsonPath(addRecipeResponse.getBody().asString());
         var recipeId = addRecipeRespBody.getLong("id");
@@ -760,7 +768,7 @@ class RecipeRestApiTest {
     @Test
     void updateRecipe_validRequest_returnUpdatedRecipe() {
         // Given
-        insertCook(1L);
+        signUpCook(1L);
         var addRecipeResponse = addRecipe(Map.of(
             "name", "Oats with milk",
             "description", "How to prepare delicious hot oats on milk",
@@ -888,10 +896,30 @@ class RecipeRestApiTest {
             .body("methodSteps.size()", is(2));
     }
 
-    // TODO reimpl to use AMQP API
-    private void insertCook(Long id) {
-        var handle = jdbiFacade.getHandle();
-        handle.execute("INSERT INTO cook VALUES (?)", id);
+    private void signUpCook(Long id) {
+        try {
+            var channel = rabbitFacade.getChannel();
+            channel.exchangeDeclare("userService", "topic", true);
+
+            var msg = String.format("{\"id\": %d}", id);
+            channel.basicPublish(
+                "userService", "user.signUp", null,
+                msg.getBytes(StandardCharsets.UTF_8)
+            );
+
+            await()
+                .atMost(Duration.ofSeconds(15))
+                .until(() -> {
+                    var handle = jdbiFacade.getHandle();
+                    var count = handle.select("SELECT COUNT(id) FROM cook WHERE id = ?", id)
+                        .mapTo(Integer.class)
+                        .first();
+
+                    return count > 0;
+                });
+        } catch (Exception e) {
+            throw new IllegalStateException("Sign up thrown unexpected exception", e);
+        }
     }
     
     private Response addRecipe(Map<String, Object> reqBody) {
