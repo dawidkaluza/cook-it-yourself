@@ -10,7 +10,7 @@ const ReviewRecipe = async ({ id } : Props) => {
   return (
     <div className="container-fluid">
       <div className="row">
-        <div className="col-8 offset-2">
+        <div className="col-md-8 offset-md-2">
           <div>
             <h1>{recipe.name}</h1>
             <h6>{recipe.description}</h6>
