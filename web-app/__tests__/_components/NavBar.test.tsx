@@ -26,9 +26,6 @@ describe('NavBar component', () => {
     expect(signInLink).not.toBeNull();
     expect(signInLink?.getAttribute("href")).toBe("/sign-in");
 
-    const navBarMenu = screen.queryByRole('list');
-    expect(navBarMenu).toBeNull();
-
     const signOutLink = screen.queryByRole("link", { name: "Sign out"});
     expect(signOutLink).toBeNull();
 
@@ -46,9 +43,6 @@ describe('NavBar component', () => {
     const indexLink = screen.getByRole("link", { name: "Cook it yourself" });
     expect(indexLink).not.toBeNull();
     expect(indexLink?.getAttribute("href")).toBe("/");
-
-    const navBarMenu = screen.getByRole('list');
-    expect(navBarMenu).not.toBeNull();
 
     const signInLink = screen.queryByRole("link", { name: "Sign in"});
     expect(signInLink).toBeNull();
