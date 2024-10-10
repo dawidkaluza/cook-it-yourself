@@ -1,7 +1,7 @@
 import {Mock} from 'vitest'
-import {NavBar} from "@/app/_components/NavBar";
 import {render, screen} from "@testing-library/react";
 import {isSignedIn} from "@/app/_api/auth";
+import {Header} from "@/app/_components/Header";
 
 vi.mock("@/app/_api/auth", () => {
   return {
@@ -9,13 +9,13 @@ vi.mock("@/app/_api/auth", () => {
   };
 });
 
-describe('NavBar component', () => {
+describe('Header component', () => {
   test('render when signed out', () => {
     // Given
     (isSignedIn as Mock).mockImplementation(() => false);
 
     // When
-    const navBar = render(<NavBar />);
+    const navBar = render(<Header />);
 
     // Then
     const indexLink = screen.getByRole("link", { name: "Cook it yourself" });
@@ -37,7 +37,7 @@ describe('NavBar component', () => {
     (isSignedIn as Mock).mockImplementation(() => true);
 
     // When
-    const navBar = render(<NavBar />);
+    const navBar = render(<Header />);
 
     // Then
     const indexLink = screen.getByRole("link", { name: "Cook it yourself" });

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'
-import {NavBar} from "@/app/_components/NavBar";
 import {Main} from "@/app/_components/Main";
+import {Header} from "@/app/_components/Header";
 
 export const metadata: Metadata = {
   title: "Cook It Yourself",
@@ -17,7 +17,7 @@ const RootLayout = ({
   return (
     <html lang="en" data-bs-theme="dark">
       <body>
-        <NavBar />
+        <Header />
         <Main>{children}</Main>
       </body>
     </html>
