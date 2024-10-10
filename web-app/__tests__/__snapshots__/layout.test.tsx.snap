@@ -33,7 +33,7 @@ exports[`layout component > renders 1`] = `
         <p
           class="text-center"
         >
-          Manage recipes, rate dishes, plan diet, plan grocery shopping and more.
+          Simple application in which you can organize your recipes.
         </p>
         <p
           class="text-center"
