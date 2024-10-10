@@ -1,28 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`page component > render when signed in 1`] = `
+exports[`page component > render 1`] = `
 <div>
   <p
     class="text-center"
   >
-    Welcome, 
-    Dawid
-    !
-  </p>
-  <p
-    class="text-center"
-  >
-    Use the navigation above to start your cooking journey.
-  </p>
-</div>
-`;
-
-exports[`page component > render when signed out 1`] = `
-<div>
-  <p
-    class="text-center"
-  >
-    Manage recipes, rate dishes, plan diet, plan grocery shopping and more.
+    Simple application in which you can organize your recipes.
   </p>
   <p
     class="text-center"

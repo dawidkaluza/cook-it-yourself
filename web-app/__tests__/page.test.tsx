@@ -1,11 +1,22 @@
 import {render, screen} from "@testing-library/react";
-import {WelcomeMessage} from "@/app/_components/WelcomeMessage";
+import Page from "@/app/page";
+import {isSignedIn} from "@/app/_api/auth";
+import {Mock} from "vitest";
 
-describe("WelcomeMessage component", () => {
+
+vi.mock("@/app/_api/auth", () => {
+  return {
+    isSignedIn: vi.fn(),
+  };
+});
+
+describe("page component", () => {
   test("render", () => {
     // Given
+    (isSignedIn as Mock).mockImplementation(() => false);
+
     // When
-    const page = render(<WelcomeMessage />);
+    const page = render(<Page />);
 
     // Then
     const signInLink = screen.getByRole("link", { name: /sign in/i });

@@ -1,4 +1,3 @@
-import {WelcomeMessage} from "@/app/_components/WelcomeMessage";
 import {isSignedIn} from "@/app/_api/auth";
 import {redirect} from "next/navigation";
 
@@ -9,7 +8,14 @@ const Page = () => {
   }
 
   return (
-    <WelcomeMessage />
+    <>
+      <p className="text-center">
+        Simple application in which you can organize your recipes.
+      </p>
+      <p className="text-center">
+        Want to try it out? <a href="/sign-in">Sign in</a>.
+      </p>
+    </>
   );
 };
 

@@ -7,7 +7,7 @@ exports[`layout component > renders 1`] = `
     lang="en"
   >
     <body>
-      <nav
+      <header
         class="navbar navbar-expand bg-body-tertiary"
       >
         <div
@@ -26,7 +26,7 @@ exports[`layout component > renders 1`] = `
             Sign in
           </a>
         </div>
-      </nav>
+      </header>
       <main
         style="margin: 1em;"
       >

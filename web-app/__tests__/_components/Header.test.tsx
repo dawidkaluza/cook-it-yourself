@@ -15,7 +15,7 @@ describe('Header component', () => {
     (isSignedIn as Mock).mockImplementation(() => false);
 
     // When
-    const navBar = render(<Header />);
+    const header = render(<Header />);
 
     // Then
     const indexLink = screen.getByRole("link", { name: "Cook it yourself" });
@@ -29,7 +29,7 @@ describe('Header component', () => {
     const signOutLink = screen.queryByRole("link", { name: "Sign out"});
     expect(signOutLink).toBeNull();
 
-    expect(navBar.container).toMatchSnapshot();
+    expect(header.container).toMatchSnapshot();
   });
 
   test('render when signed in', () => {
@@ -37,7 +37,7 @@ describe('Header component', () => {
     (isSignedIn as Mock).mockImplementation(() => true);
 
     // When
-    const navBar = render(<Header />);
+    const header = render(<Header />);
 
     // Then
     const indexLink = screen.getByRole("link", { name: "Cook it yourself" });
@@ -51,6 +51,6 @@ describe('Header component', () => {
     expect(signOutLink).not.toBeNull();
     expect(signOutLink?.getAttribute("href")).toBe("/sign-out");
 
-    expect(navBar.container).toMatchSnapshot();
+    expect(header.container).toMatchSnapshot();
   });
 });

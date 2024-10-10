@@ -1,0 +1,51 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Header component > render when signed in 1`] = `
+<div>
+  <header
+    class="navbar navbar-expand bg-body-tertiary"
+  >
+    <div
+      class="container-fluid text-center"
+    >
+      <a
+        class="navbar-brand"
+        href="/"
+      >
+        Cook it yourself
+      </a>
+      <a
+        class="btn btn-primary btn-sm"
+        href="/sign-out"
+      >
+        Sign out
+      </a>
+    </div>
+  </header>
+</div>
+`;
+
+exports[`Header component > render when signed out 1`] = `
+<div>
+  <header
+    class="navbar navbar-expand bg-body-tertiary"
+  >
+    <div
+      class="container-fluid text-center"
+    >
+      <a
+        class="navbar-brand"
+        href="/"
+      >
+        Cook it yourself
+      </a>
+      <a
+        class="btn btn-primary btn-sm"
+        href="/sign-in"
+      >
+        Sign in
+      </a>
+    </div>
+  </header>
+</div>
+`;

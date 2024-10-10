@@ -14,8 +14,8 @@ describe("layout component", () => {
     const layout = render(<RootLayout><Page /></RootLayout>);
 
     // Then
-    const navBar = screen.getByRole("navigation");
-    expect(navBar).not.toBeNull();
+    const header = screen.getByRole("banner");
+    expect(header).not.toBeNull();
 
     const main = screen.getByRole("main");
     expect(main).not.toBeNull();
