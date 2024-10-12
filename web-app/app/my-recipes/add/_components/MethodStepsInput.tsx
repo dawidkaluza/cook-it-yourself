@@ -45,8 +45,8 @@ const MethodStepsInput = ({ fieldErrors }: Props) => {
 
   return (
     <div className="row mb-4">
-      <label htmlFor="newMethodStep" className="col-sm-2 col-form-label">Method steps</label>
-      <div className="col-sm-10">
+      <label htmlFor="newMethodStep" className="col-md-3 col-form-label text-md-end">Method steps</label>
+      <div className="col-md-9">
         {steps.map(step => (
           <div key={step.id} className="row">
             <MethodStepFields step={step} onDelete={() => deleteStep(step.id)} />

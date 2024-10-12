@@ -7,8 +7,8 @@ type Props = {
 const CookingTimeInput = ({ fieldErrors }: Props) => {
   return (
     <div className="row mb-4">
-      <label htmlFor="cookingTime" className="col-sm-2 col-form-label">Cooking time</label>
-      <div className="col-sm-10">
+      <label htmlFor="cookingTime" className="col-md-3 col-form-label text-md-end">Cooking time</label>
+      <div className="col-md-9">
         <input
           name="cookingTime"
           id="cookingTime"

@@ -6,7 +6,7 @@ const Main = ({
   children: React.ReactNode
 }>) => {
   return (
-    <main style={{margin: "1em"}}>
+    <main className="m-3">
       {children}
     </main>
   );

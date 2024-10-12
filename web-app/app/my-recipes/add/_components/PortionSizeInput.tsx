@@ -7,13 +7,13 @@ type Props = {
 const PortionSizeInput = ({ fieldErrors }: Props) => {
   return (
     <div className="row mb-4">
-      <label htmlFor="portionSize" className="col-sm-2 col-form-label">Portion size</label>
-      <div className="col-sm-10">
+      <label htmlFor="portionSize" className="col-md-3 col-form-label text-md-end">Portion size</label>
+      <div className="col-md-9">
         <input
           name="portionSize"
           id="portionSize"
           className="form-control"
-          placeholder="Amount and unit (4 plates, 800g, etc.)"
+          placeholder="Amount and unit (e.g., 4 plates, 800g)"
         />
         {fieldErrors && fieldErrors.map(fieldError => {
           return (

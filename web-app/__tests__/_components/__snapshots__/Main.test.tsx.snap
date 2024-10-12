@@ -3,7 +3,7 @@
 exports[`Main component > renders 1`] = `
 <div>
   <main
-    style="margin: 1em;"
+    class="m-3"
   >
     <p>
       Main page

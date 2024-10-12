@@ -76,8 +76,8 @@ const IngredientsInput = ({ fieldErrors }: Props) => {
 
   return (
     <div className="row mb-4">
-      <label htmlFor="newIngredient" className="col-sm-2 col-form-label">Ingredients</label>
-      <div className="col-sm-10">
+      <label htmlFor="newIngredient" className="col-md-3 col-form-label text-md-end">Ingredients</label>
+      <div className="col-md-9">
         {ingredients.map(ingredient => (
           <div key={ingredient.id} className="row">
             <IngredientFields
@@ -120,7 +120,8 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
         value={name}
         onChange={(event) => setName(event.target.value)}
         className="form-control"
-        placeholder="Name" style={{minWidth: "60%"}}
+        style={{minWidth: "50%"}}
+        placeholder="Name"
       />
 
       <input
@@ -128,7 +129,8 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
         value={amount}
         onChange={(event) => setAmount(event.target.value)}
         className="form-control"
-        placeholder="Amount" style={{minWidth: "20%"}}
+        style={{minWidth: "15%"}}
+        placeholder="Amount"
       />
 
       <input
@@ -136,6 +138,7 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
         value={unit}
         onChange={(event) => setUnit(event.target.value)}
         className="form-control"
+        style={{minWidth: "15%"}}
         placeholder="Unit"
       />
 
@@ -160,9 +163,10 @@ const NewIngredientFields = (
   return (
     <div className="input-group">
       <input
-        name="newIngredient" id="newIngredient" className="form-control"
+        name="newIngredient" id="newIngredient"
+        className="form-control"
         value={value}
-        placeholder="Name and optionally amount (paprikas 3, sugar 250g, etc.)"
+        placeholder="e.g., water, apple 2, sugar 250g"
         onChange={(e) => onChange(e.currentTarget.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
