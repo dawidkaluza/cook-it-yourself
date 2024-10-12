@@ -17,11 +17,11 @@ const MyRecipesSkeleton = () => {
           <h1>My recipes</h1>
         </div>
       </div>
-      <div className="row row-cols-1 row-cols-md-2">
-        <div className="col" style={{margin: "2em 0"}}>
+      <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3">
+        <div className="col my-3">
           <RecipeCardSkeleton/>
         </div>
-        <div className="col" style={{margin: "2em 0"}}>
+        <div className="col my-3">
           <RecipeCardSkeleton/>
         </div>
       </div>
@@ -31,7 +31,7 @@ const MyRecipesSkeleton = () => {
 
 const RecipeCardSkeleton = () => {
   return (
-    <div className="card">
+    <article className="card h-100">
       <div className="card-body">
         <h5 className="card-title placeholder-wave">
           <span className="placeholder col-3"></span>
@@ -43,6 +43,6 @@ const RecipeCardSkeleton = () => {
           <span className="placeholder col-1"></span>
         </a>
       </div>
-    </div>
+    </article>
   );
 };

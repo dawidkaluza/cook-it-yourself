@@ -22,9 +22,9 @@ export const MyRecipesList = async () => {
         </div>
       }
 
-      <div className="row row-cols-1 row-cols-md-2">
+      <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3">
         {recipes.map((recipe) =>
-          <div key={recipe.id} className="col" style={{margin: "2em 0"}}>
+          <div key={recipe.id} className="col my-3">
             <RecipeCard recipe={recipe}/>
           </div>
         )}
@@ -34,7 +34,7 @@ export const MyRecipesList = async () => {
         <div className="col-12">
           <hr/>
         </div>
-        <div className="col-3">
+        <div className="col-12 d-flex justify-content-end">
           <AddRecipeButton />
         </div>
       </div>
@@ -46,13 +46,13 @@ const RecipeCard = (
   {recipe}: { recipe: Recipe }
 ) => {
   return (
-    <div className="card">
+    <article className="card h-100">
       <div className="card-body">
         <h5 className="card-title">{recipe.name}</h5>
         <p className="card-text">{recipe.description}</p>
         <Link href={`/my-recipes/${recipe.id}`} className="card-link">See more</Link>
       </div>
-    </div>
+    </article>
   );
 };
 

@@ -17,14 +17,13 @@ exports[`MyRecipesList component > renders with my recipes 1`] = `
       </div>
     </div>
     <div
-      class="row row-cols-1 row-cols-md-2"
+      class="row row-cols-1 row-cols-md-2 row-cols-xl-3"
     >
       <div
-        class="col"
-        style="margin: 2em 0px;"
+        class="col my-3"
       >
-        <div
-          class="card"
+        <article
+          class="card h-100"
         >
           <div
             class="card-body"
@@ -46,7 +45,7 @@ exports[`MyRecipesList component > renders with my recipes 1`] = `
               See more
             </a>
           </div>
-        </div>
+        </article>
       </div>
     </div>
     <div
@@ -58,7 +57,7 @@ exports[`MyRecipesList component > renders with my recipes 1`] = `
         <hr />
       </div>
       <div
-        class="col-3"
+        class="col-12 d-flex justify-content-end"
       >
         <a
           class="btn btn-success"
@@ -102,7 +101,7 @@ exports[`MyRecipesList component > renders with no recipes 1`] = `
       </div>
     </div>
     <div
-      class="row row-cols-1 row-cols-md-2"
+      class="row row-cols-1 row-cols-md-2 row-cols-xl-3"
     />
     <div
       class="row justify-content-end"
@@ -113,7 +112,7 @@ exports[`MyRecipesList component > renders with no recipes 1`] = `
         <hr />
       </div>
       <div
-        class="col-3"
+        class="col-12 d-flex justify-content-end"
       >
         <a
           class="btn btn-success"
