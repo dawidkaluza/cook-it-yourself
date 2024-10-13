@@ -1,4 +1,4 @@
-import {FieldError} from "@/app/my-recipes/add/actions";
+import {FieldError} from "@/app/my-recipes/_dtos/errors";
 
 type Props = {
   fieldErrors?: FieldError[];

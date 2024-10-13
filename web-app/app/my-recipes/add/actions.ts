@@ -3,11 +3,7 @@
 import {Ingredient, PortionSize, RecipeDetails, Step} from "@/app/my-recipes/_dtos/recipe";
 import {ApiError, fetchFromServer} from "@/app/_api/fetch";
 import {redirect} from "next/navigation";
-
-export type FieldError = {
-  name: string;
-  message: string;
-};
+import {FieldError} from "@/app/my-recipes/_dtos/errors";
 
 export async function addRecipe(prevState: any, formData: FormData) : Promise<FieldError[]> {
   const mapToIngredients = (formData: FormData) : Ingredient[] => {

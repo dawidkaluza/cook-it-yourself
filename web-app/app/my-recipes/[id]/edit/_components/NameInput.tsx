@@ -1,10 +1,9 @@
-import {FieldError} from "@/app/my-recipes/_dtos/errors";
-
 type Props = {
-  fieldErrors?: FieldError[];
+  errors?: string[];
+  defaultValue?: string;
 };
 
-const NameInput = ({ fieldErrors }: Props) => {
+const NameInput = ({ errors, defaultValue }: Props) => {
   return (
     <div className="row mb-4">
       <label htmlFor="name" className="col-md-3 col-form-label text-md-end">Name</label>
@@ -13,12 +12,13 @@ const NameInput = ({ fieldErrors }: Props) => {
           name="name"
           id="name"
           className="form-control"
-          placeholder="Name of your new recipe"
+          placeholder="Name of your recipe"
+          defaultValue={defaultValue}
         />
-        {fieldErrors && fieldErrors.map(fieldError => {
+        {errors && errors.map(error => {
           return (
-            <div className="invalid-feedback d-block" key={fieldError.message}>
-              {fieldError.message}
+            <div className="invalid-feedback d-block" key={error}>
+              {error}
             </div>
           )
         })}

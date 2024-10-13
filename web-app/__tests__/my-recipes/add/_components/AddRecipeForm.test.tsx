@@ -2,7 +2,7 @@ import {Mock} from "vitest";
 import {useFormState} from "react-dom";
 import {render, screen} from "@testing-library/react";
 import {AddRecipeForm} from "@/app/my-recipes/add/_components/AddRecipeForm";
-import {FieldError} from "@/app/my-recipes/add/actions";
+import {FieldError} from "@/app/my-recipes/_dtos/errors";
 
 vi.mock("react-dom", () => {
   return {

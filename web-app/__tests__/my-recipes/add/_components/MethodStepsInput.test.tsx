@@ -1,6 +1,6 @@
 import {MethodStepsInput} from "@/app/my-recipes/add/_components/MethodStepsInput";
 import {render, screen, within} from "@testing-library/react";
-import {FieldError} from "@/app/my-recipes/add/actions";
+import {FieldError} from "@/app/my-recipes/_dtos/errors";
 import userEvent from "@testing-library/user-event";
 
 describe("MethodStepsInput component", () => {
