@@ -8,6 +8,12 @@ vi.mock("@/app/_api/auth", () => {
   };
 });
 
+vi.mock("next/navigation", () => {
+  return {
+    usePathname: () => "/",
+  };
+});
+
 describe("layout component", () => {
   test("renders", () => {
     // Given, when

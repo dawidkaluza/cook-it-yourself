@@ -1,0 +1,100 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Navigation component > renders '/' 1`] = `
+<div>
+  <nav
+    class="m-3"
+  >
+    <ol
+      class="breadcrumb"
+    >
+      <li
+        class="breadcrumb-item active"
+      >
+        Home
+      </li>
+    </ol>
+  </nav>
+</div>
+`;
+
+exports[`Navigation component > renders '/recipes/1' 1`] = `
+<div>
+  <nav
+    class="m-3"
+  >
+    <ol
+      class="breadcrumb"
+    >
+      <li
+        class="breadcrumb-item"
+      >
+        <a
+          href="/"
+        >
+          Home
+        </a>
+      </li>
+      <li
+        class="breadcrumb-item"
+      >
+        <a
+          href="/recipes"
+        >
+          Recipes
+        </a>
+      </li>
+      <li
+        class="breadcrumb-item active"
+      >
+        View
+      </li>
+    </ol>
+  </nav>
+</div>
+`;
+
+exports[`Navigation component > renders '/recipes/1/edit' 1`] = `
+<div>
+  <nav
+    class="m-3"
+  >
+    <ol
+      class="breadcrumb"
+    >
+      <li
+        class="breadcrumb-item"
+      >
+        <a
+          href="/"
+        >
+          Home
+        </a>
+      </li>
+      <li
+        class="breadcrumb-item"
+      >
+        <a
+          href="/recipes"
+        >
+          Recipes
+        </a>
+      </li>
+      <li
+        class="breadcrumb-item"
+      >
+        <a
+          href="/recipes/1"
+        >
+          View
+        </a>
+      </li>
+      <li
+        class="breadcrumb-item active"
+      >
+        Edit
+      </li>
+    </ol>
+  </nav>
+</div>
+`;

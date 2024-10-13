@@ -27,6 +27,19 @@ exports[`layout component > renders 1`] = `
           </a>
         </div>
       </header>
+      <nav
+        class="m-3"
+      >
+        <ol
+          class="breadcrumb"
+        >
+          <li
+            class="breadcrumb-item active"
+          >
+            Home
+          </li>
+        </ol>
+      </nav>
       <main
         class="m-3"
       >
