@@ -1,4 +1,5 @@
 import {reviewRecipe} from "@/app/my-recipes/[id]/actions";
+import Link from "next/link";
 
 type Props = {
   id: number;
@@ -38,6 +39,17 @@ const ReviewRecipe = async ({ id } : Props) => {
               <p key={step.id}>{step.text}</p>
             ))}
           </div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-8 offset-md-2">
+          <hr/>
+        </div>
+
+        {/* TODO test this part */}
+        <div className="col-md-8 offset-md-2 d-flex justify-content-center justify-content-sm-start">
+          <Link href={`/my-recipes/${recipe.id}/edit`} className="btn btn-primary mx-2">Modify</Link>
+          <Link href={`/my-recipes/${recipe.id}/delete`} className="btn btn-danger mx-2">Delete</Link>
         </div>
       </div>
     </div>
