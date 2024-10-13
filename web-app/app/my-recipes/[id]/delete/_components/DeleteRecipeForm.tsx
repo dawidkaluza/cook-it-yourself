@@ -9,7 +9,7 @@ const DeleteRecipeForm = ({ id } : { id: number }) => {
 
   return (
     <form action={action} noValidate>
-      <input type="hidden" name="id" value={id}/>
+      <input type="hidden" name="id" value={id} />
       <p>
         Are you sure that you want to delete the recipe?
       </p>
