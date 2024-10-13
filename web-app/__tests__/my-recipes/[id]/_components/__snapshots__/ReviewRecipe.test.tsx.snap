@@ -56,6 +56,31 @@ exports[`ReviewRecipe component > renders given recipe 1`] = `
         </div>
       </div>
     </div>
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-8 offset-md-2"
+      >
+        <hr />
+      </div>
+      <div
+        class="col-md-8 offset-md-2 d-flex justify-content-center justify-content-sm-start"
+      >
+        <a
+          class="btn btn-primary mx-2"
+          href="/my-recipes/1/edit"
+        >
+          Modify
+        </a>
+        <a
+          class="btn btn-danger mx-2"
+          href="/my-recipes/1/delete"
+        >
+          Delete
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 `;

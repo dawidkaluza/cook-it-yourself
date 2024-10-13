@@ -10,7 +10,7 @@ const DeleteRecipeForm = ({ id } : { id: number }) => {
   return (
     <form action={action} noValidate>
       <input type="hidden" name="id" value={id}/>
-      <p className="text-center">
+      <p>
         Are you sure that you want to delete the recipe?
       </p>
 
@@ -32,7 +32,7 @@ const DeleteRecipeForm = ({ id } : { id: number }) => {
       </div>
 
       {error && (
-        <p className="text-center text-danger">
+        <p className="text-danger">
           {error}
         </p>
       )}
