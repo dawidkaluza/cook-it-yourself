@@ -6,6 +6,7 @@ import {editRecipe} from "@/app/my-recipes/[id]/edit/actions";
 import {NameInput} from "@/app/my-recipes/[id]/edit/_components/NameInput";
 import {DescriptionInput} from "@/app/my-recipes/[id]/edit/_components/DescriptionInput";
 import {IngredientsInput} from "@/app/my-recipes/[id]/edit/_components/IngredientsInput";
+import {MethodStepsInput} from "@/app/my-recipes/[id]/edit/_components/MethodStepsInput";
 
 const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
   const [fieldErrors, action] = useFormState(editRecipe, []);
@@ -35,6 +36,15 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         errors={
           fieldErrors
             .filter(fieldError => fieldError.name.startsWith("ingredient"))
+            .map(fieldError => fieldError.message)
+        }
+      />
+
+      <MethodStepsInput
+        steps={recipe.methodSteps}
+        errors={
+          fieldErrors
+            .filter(fieldError => fieldError.name.startsWith("methodStep"))
             .map(fieldError => fieldError.message)
         }
       />

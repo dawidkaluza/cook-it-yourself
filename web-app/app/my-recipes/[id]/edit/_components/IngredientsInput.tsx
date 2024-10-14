@@ -122,7 +122,6 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
 
   return (
     <div className="input-group">
-
       {id && (
         <input
           type="hidden"
@@ -130,6 +129,7 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
           value={id}
         />
       )}
+
       <input
         name="ingredientName"
         value={name}

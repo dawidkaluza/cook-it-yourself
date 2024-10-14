@@ -1,3 +1,4 @@
+// TODO rename, previously there were two buttons, now it's onyl a submit button
 const FormButtons = () => {
   return (
     <div className="row mb-4">
