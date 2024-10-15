@@ -14,6 +14,7 @@ const IngredientsInput = (props: IngredientsInputProps) => {
   const initialIngredients = props.ingredients.map((ingredient, index) => {
     return {
       ...ingredient,
+      value: Number(ingredient.value).toString(), //temporary workaround
       key: index + 1,
     };
   });

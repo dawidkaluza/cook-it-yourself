@@ -1,19 +1,20 @@
 type Props = {
   errors?: string[];
-  name?: string;
+  cookingTime?: number;
 };
 
-const NameInput = ({ errors, name }: Props) => {
+const CookingTimeInput = ({ errors, cookingTime }: Props) => {
   return (
     <div className="row mb-4">
-      <label htmlFor="name" className="col-md-3 col-form-label text-md-end">Name</label>
+      <label htmlFor="cookingTime" className="col-md-3 col-form-label text-md-end">Cooking time</label>
       <div className="col-md-9">
         <input
-          name="name"
-          id="name"
+          name="cookingTime"
+          id="cookingTime"
+          type="number"
           className="form-control"
-          placeholder="Name of your recipe"
-          defaultValue={name}
+          placeholder="In minutes"
+          defaultValue={cookingTime}
         />
         {errors && errors.map(error => {
           return (
@@ -27,4 +28,4 @@ const NameInput = ({ errors, name }: Props) => {
   );
 };
 
-export {NameInput};
+export {CookingTimeInput};

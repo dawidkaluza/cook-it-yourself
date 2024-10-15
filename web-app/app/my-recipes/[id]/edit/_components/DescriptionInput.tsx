@@ -1,9 +1,9 @@
 type Props = {
   errors?: string[];
-  defaultValue?: string;
+  description?: string;
 };
 
-const DescriptionInput = ({ errors, defaultValue }: Props) => {
+const DescriptionInput = ({ errors, description }: Props) => {
   return (
     <div className="row mb-4">
       <label htmlFor="description" className="col-md-3 col-form-label text-md-end">Description</label>
@@ -12,7 +12,7 @@ const DescriptionInput = ({ errors, defaultValue }: Props) => {
           name="description"
           id="description"
           className="form-control"
-          defaultValue={defaultValue}
+          defaultValue={description}
           placeholder="A few words describing your recipe"
           style={{height: "100px"}}
         />

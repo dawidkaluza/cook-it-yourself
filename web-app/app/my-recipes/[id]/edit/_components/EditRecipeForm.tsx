@@ -7,6 +7,8 @@ import {NameInput} from "@/app/my-recipes/[id]/edit/_components/NameInput";
 import {DescriptionInput} from "@/app/my-recipes/[id]/edit/_components/DescriptionInput";
 import {IngredientsInput} from "@/app/my-recipes/[id]/edit/_components/IngredientsInput";
 import {MethodStepsInput} from "@/app/my-recipes/[id]/edit/_components/MethodStepsInput";
+import {CookingTimeInput} from "@/app/my-recipes/[id]/edit/_components/CookingTimeInput";
+import {PortionSizeInput} from "@/app/my-recipes/[id]/edit/_components/PortionSizeInput";
 
 const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
   const [fieldErrors, action] = useFormState(editRecipe, []);
@@ -14,7 +16,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
   return (
     <form action={action} noValidate className="mt-4">
       <NameInput
-        defaultValue={recipe.name}
+        name={recipe.name}
         errors={
           fieldErrors
             .filter(fieldError => fieldError.name.startsWith("name"))
@@ -23,7 +25,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
       />
 
       <DescriptionInput
-        defaultValue={recipe.description}
+        description={recipe.description}
         errors={
           fieldErrors
             .filter(fieldError => fieldError.name.startsWith("name"))
@@ -45,6 +47,24 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         errors={
           fieldErrors
             .filter(fieldError => fieldError.name.startsWith("methodStep"))
+            .map(fieldError => fieldError.message)
+        }
+      />
+
+      <CookingTimeInput
+        cookingTime={recipe.cookingTime}
+        errors={
+          fieldErrors
+            .filter(fieldError => fieldError.name.startsWith("cookingTime"))
+            .map(fieldError => fieldError.message)
+        }
+      />
+
+      <PortionSizeInput
+        portionSize={recipe.portionSize}
+        errors={
+          fieldErrors
+            .filter(fieldError => fieldError.name.startsWith("portionSize"))
             .map(fieldError => fieldError.message)
         }
       />
