@@ -27,3 +27,22 @@ export type RecipeDetails = Recipe & {
   cookingTime: number;
   portionSize: PortionSize;
 };
+
+export type UpdateRecipeRequest = {
+  basicInformation?: {
+    name: string;
+    description: string;
+    cookingTime: number;
+    portionSize: PortionSize;
+  };
+  ingredients?: {
+    ingredientsToAdd: (Ingredient & { id: undefined })[],
+    ingredientsToUpdate: (Ingredient & { id: number })[],
+    ingredientsToDelete: number[],
+  };
+  steps?: {
+    stepsToAdd: (Step & { id: undefined })[],
+    stepsToUpdate: (Step & { id: number })[],
+    stepsToDelete: number[],
+  };
+};

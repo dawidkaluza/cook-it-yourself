@@ -15,6 +15,8 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
 
   return (
     <form action={action} noValidate className="mt-4">
+      <input type="hidden" name="id" value={recipe.id} />
+
       <NameInput
         name={recipe.name}
         errors={
