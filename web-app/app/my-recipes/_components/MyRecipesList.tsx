@@ -1,9 +1,9 @@
-import {getMyRecipes} from "@/app/my-recipes/actions";
+import {getRecipes} from "@/app/my-recipes/actions";
 import Link from "next/link";
 import {Recipe} from "@/app/my-recipes/_dtos/recipe";
 
 export const MyRecipesList = async () => {
-  const recipesResponse = await getMyRecipes();
+  const recipesResponse = await getRecipes();
   const recipes : Recipe[] = recipesResponse ? recipesResponse.items : [];
 
   return (

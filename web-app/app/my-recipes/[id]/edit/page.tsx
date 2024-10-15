@@ -1,9 +1,9 @@
 import {EditRecipeForm} from "@/app/my-recipes/[id]/edit/_components/EditRecipeForm";
-import {reviewRecipe} from "@/app/my-recipes/[id]/actions";
+import {getRecipe} from "@/app/my-recipes/actions";
 
 const Page = async ({ params } : { params: { id: number }}) => {
   const { id } = params;
-  const recipe = await reviewRecipe(id);
+  const recipe = await getRecipe(id);
 
   return (
     <div className="container-fluid">

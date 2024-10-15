@@ -2,16 +2,16 @@
 
 import {RecipeDetails} from "@/app/my-recipes/_dtos/recipe";
 import {useFormState} from "react-dom";
-import {editRecipe} from "@/app/my-recipes/[id]/edit/actions";
 import {NameInput} from "@/app/my-recipes/[id]/edit/_components/NameInput";
 import {DescriptionInput} from "@/app/my-recipes/[id]/edit/_components/DescriptionInput";
 import {IngredientsInput} from "@/app/my-recipes/[id]/edit/_components/IngredientsInput";
 import {MethodStepsInput} from "@/app/my-recipes/[id]/edit/_components/MethodStepsInput";
 import {CookingTimeInput} from "@/app/my-recipes/[id]/edit/_components/CookingTimeInput";
 import {PortionSizeInput} from "@/app/my-recipes/[id]/edit/_components/PortionSizeInput";
+import {updateRecipe} from "@/app/my-recipes/actions";
 
 const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
-  const [fieldErrors, action] = useFormState(editRecipe, []);
+  const [fieldErrors, action] = useFormState(updateRecipe, []);
 
   return (
     <form action={action} noValidate className="mt-4">

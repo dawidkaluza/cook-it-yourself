@@ -1,8 +1,8 @@
 "use client";
 
-import {deleteRecipe} from "@/app/my-recipes/[id]/delete/actions";
 import Link from "next/link";
 import {useFormState} from "react-dom";
+import {deleteRecipe} from "@/app/my-recipes/actions";
 
 const DeleteRecipeForm = ({ id } : { id: number }) => {
   let [error, action] = useFormState(deleteRecipe, "");

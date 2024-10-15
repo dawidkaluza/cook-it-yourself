@@ -1,12 +1,12 @@
-import {reviewRecipe} from "@/app/my-recipes/[id]/actions";
 import Link from "next/link";
+import {getRecipe} from "@/app/my-recipes/actions";
 
 type Props = {
   id: number;
 };
 
 const ReviewRecipe = async ({ id } : Props) => {
-  const recipe = await reviewRecipe(id);
+  const recipe = await getRecipe(id);
 
   return (
     <div className="container-fluid">

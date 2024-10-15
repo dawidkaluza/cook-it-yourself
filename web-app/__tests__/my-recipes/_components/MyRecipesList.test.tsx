@@ -1,5 +1,5 @@
 import {Mock} from "vitest";
-import {getMyRecipes} from "@/app/my-recipes/actions";
+import {getRecipes} from "@/app/my-recipes/actions";
 import {Recipe} from "@/app/my-recipes/_dtos/recipe";
 import {Page} from "@/app/my-recipes/_dtos/page";
 import {render, screen} from "@testing-library/react";
@@ -7,14 +7,14 @@ import {MyRecipesList} from "@/app/my-recipes/_components/MyRecipesList";
 
 vi.mock("@/app/my-recipes/actions", () => {
   return {
-    getMyRecipes: vi.fn(),
+    getRecipes: vi.fn(),
   }
 });
 
 describe("MyRecipesList component", () => {
   test("renders with no recipes", async () => {
     // Given
-    (getMyRecipes as Mock).mockResolvedValue(
+    (getRecipes as Mock).mockResolvedValue(
       {
         items: [] as Recipe[],
         totalPages: 1,
@@ -33,7 +33,7 @@ describe("MyRecipesList component", () => {
 
   test("renders with my recipes", async () => {
     // Given
-    (getMyRecipes as Mock).mockResolvedValue(
+    (getRecipes as Mock).mockResolvedValue(
       {
         items: [
           {

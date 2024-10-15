@@ -1,12 +1,12 @@
 import {Mock} from "vitest";
-import {reviewRecipe} from "@/app/my-recipes/[id]/actions";
 import {render, screen} from "@testing-library/react";
 import {ReviewRecipe} from "@/app/my-recipes/[id]/_components/ReviewRecipe";
 import {RecipeDetails} from "@/app/my-recipes/_dtos/recipe";
+import {getRecipe} from "@/app/my-recipes/actions";
 
-vi.mock("@/app/my-recipes/[id]/actions", () => {
+vi.mock("@/app/my-recipes/actions", () => {
   return {
-    reviewRecipe: vi.fn(),
+    getRecipe: vi.fn(),
   };
 });
 
@@ -37,7 +37,7 @@ describe("ReviewRecipe component", () => {
         measure: "plate",
       }
     };
-    (reviewRecipe as Mock).mockResolvedValue(recipe);
+    (getRecipe as Mock).mockResolvedValue(recipe);
 
     // When
     const reviewComponent = render(await ReviewRecipe({ id: 1 }));
