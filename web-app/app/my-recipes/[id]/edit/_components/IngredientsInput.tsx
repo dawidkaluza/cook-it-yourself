@@ -1,19 +1,34 @@
 import React, {useState} from "react";
 import {Ingredient} from "@/app/my-recipes/_dtos/recipe";
 
-type Props = {
+type IngredientComponentData = Ingredient & {
+  key: number;
+};
+
+type IngredientsInputProps = {
   errors?: string[];
   ingredients: Ingredient[];
 };
 
-const IngredientsInput = (props: Props) => {
-  const [newIngredient, setNewIngredient] = useState("");
-  const [ingredients, setIngredients] = useState<Ingredient[]>(props.ingredients);
-  const [ingredientsToDelete, setIngredientsToDelete] = useState<Number[]>([]);
+const IngredientsInput = (props: IngredientsInputProps) => {
+  const initialIngredients = props.ingredients.map((ingredient, index) => {
+    return {
+      ...ingredient,
+      key: index + 1,
+    };
+  });
 
-  const calcKey = (ingredient: Ingredient) => {
-    return ingredient.name + ingredient.value + ingredient.measure;
-  }
+  const [newIngredient, setNewIngredient] = useState("");
+  const [ingredients, setIngredients] = useState<IngredientComponentData[]>(initialIngredients);
+  const [ingredientsToDelete, setIngredientsToDelete] = useState<number[]>([]);
+  const [lastKey, setLastKey] = useState(initialIngredients.length);
+
+  // TODO maybe extract it to a separate hook?
+  const generateKey = () => {
+    const generatedKey = lastKey + 1;
+    setLastKey(generatedKey);
+    return generatedKey;
+  };
 
   const addNewIngredient = () => {
     if (newIngredient.trim().length === 0) {
@@ -28,6 +43,7 @@ const IngredientsInput = (props: Props) => {
         name: newIngredient,
         value: "1",
         measure: "",
+        key: generateKey(),
       });
     } else {
       const name = newIngredient.slice(0, lastSpaceIndex);
@@ -39,6 +55,7 @@ const IngredientsInput = (props: Props) => {
           name: name,
           value: fullAmount,
           measure: "",
+          key: generateKey(),
         });
       } else {
         const amount = fullAmount.slice(0, unitIndex);
@@ -48,6 +65,7 @@ const IngredientsInput = (props: Props) => {
           name: name,
           value: amount,
           measure: unit,
+          key: generateKey(),
         });
       }
     }
@@ -56,7 +74,15 @@ const IngredientsInput = (props: Props) => {
     setNewIngredient("");
   }
 
-  const deleteIngredient = (index: number) => {
+  const updateIngredient = (ingredient: IngredientComponentData) => {
+    const newIngredients = [ ...ingredients ];
+    const index = newIngredients.findIndex(filteredIngredient => filteredIngredient.key === ingredient.key);
+    newIngredients[index] = ingredient;
+    setIngredients(newIngredients);
+  };
+
+  const deleteIngredient = (key: number) => {
+    const index = ingredients.findIndex(ingredient => ingredient.key === key);
     const ingredient = ingredients[index];
     if (ingredient.id) {
       const newIngredientsToDelete = [ ...ingredientsToDelete ];
@@ -84,11 +110,12 @@ const IngredientsInput = (props: Props) => {
           ))}
         </div>
 
-        {ingredients.map((ingredient, index) => (
-          <div key={calcKey(ingredient)} className="row">
+        {ingredients.map(ingredient => (
+          <div key={ingredient.key} className="row">
             <IngredientFields
               ingredient={ingredient}
-              onDelete={() => deleteIngredient(index)}
+              onUpdate={(ingredient) => updateIngredient(ingredient)}
+              onDelete={() => deleteIngredient(ingredient.key)}
             />
           </div>
         ))}
@@ -113,12 +140,15 @@ const IngredientsInput = (props: Props) => {
   );
 };
 
-const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void }) => {
-  const { ingredient, onDelete } = props;
+type IngredientFieldsProps = {
+  ingredient: IngredientComponentData;
+  onDelete: () => void;
+  onUpdate: (ingredient: IngredientComponentData) => void;
+};
+
+const IngredientFields = (props: IngredientFieldsProps) => {
+  const { ingredient, onDelete, onUpdate } = props;
   const { id } = ingredient;
-  const [ name, setName ] = useState(ingredient.name);
-  const [ value, setValue ] = useState(ingredient.value);
-  const [ measure, setMeasure ] = useState(ingredient.measure);
 
   return (
     <div className="input-group">
@@ -132,8 +162,8 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
 
       <input
         name="ingredientName"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
+        value={ingredient.name}
+        onChange={(event) => onUpdate({ ...ingredient, name: event.target.value })}
         className="form-control"
         style={{minWidth: "50%"}}
         placeholder="Name"
@@ -141,8 +171,8 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
 
       <input
         name="ingredientValue"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
+        value={ingredient.value}
+        onChange={(event) => onUpdate({ ...ingredient, value: event.target.value })}
         className="form-control"
         style={{minWidth: "15%"}}
         placeholder="Amount"
@@ -150,8 +180,8 @@ const IngredientFields = (props: { ingredient: Ingredient, onDelete: () => void 
 
       <input
         name="ingredientMeasure"
-        value={measure}
-        onChange={(event) => setMeasure(event.target.value)}
+        value={ingredient.measure}
+        onChange={(event) => onUpdate({ ...ingredient, measure: event.target.value })}
         className="form-control"
         style={{minWidth: "15%"}}
         placeholder="Unit"
