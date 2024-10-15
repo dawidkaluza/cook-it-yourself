@@ -2,13 +2,14 @@
 
 import {RecipeDetails} from "@/app/my-recipes/_dtos/recipe";
 import {useFormState} from "react-dom";
-import {NameInput} from "@/app/my-recipes/[id]/edit/_components/NameInput";
-import {DescriptionInput} from "@/app/my-recipes/[id]/edit/_components/DescriptionInput";
-import {IngredientsInput} from "@/app/my-recipes/[id]/edit/_components/IngredientsInput";
-import {MethodStepsInput} from "@/app/my-recipes/[id]/edit/_components/MethodStepsInput";
-import {CookingTimeInput} from "@/app/my-recipes/[id]/edit/_components/CookingTimeInput";
-import {PortionSizeInput} from "@/app/my-recipes/[id]/edit/_components/PortionSizeInput";
 import {updateRecipe} from "@/app/my-recipes/actions";
+import {NameInput} from "@/app/my-recipes/_components/NameInput";
+import {DescriptionInput} from "@/app/my-recipes/_components/DescriptionInput";
+import {IngredientsInput} from "@/app/my-recipes/_components/IngredientsInput";
+import {MethodStepsInput} from "@/app/my-recipes/_components/MethodStepsInput";
+import React from "react";
+import {CookingTimeInput} from "@/app/my-recipes/_components/CookingTimeInput";
+import {PortionSizeInput} from "@/app/my-recipes/_components/PortionSizeInput";
 
 const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
   const [fieldErrors, action] = useFormState(updateRecipe, []);

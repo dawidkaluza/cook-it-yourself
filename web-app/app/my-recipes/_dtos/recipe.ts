@@ -34,6 +34,11 @@ export type RecipeDetails = Recipe & {
   portionSize: PortionSize;
 };
 
+export type NewRecipeRequest = Omit<RecipeDetails, "id"> & {
+  ingredients: NewIngredient[];
+  methodSteps: NewStep[];
+};
+
 export type UpdateRecipeRequest = {
   basicInformation?: {
     name: string;

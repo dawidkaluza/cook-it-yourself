@@ -3,7 +3,7 @@
 import {ApiError, fetchFromServer} from "@/app/_api/fetch";
 import {Page} from "@/app/my-recipes/_dtos/page";
 import {
-  NewIngredient, NewStep,
+  NewIngredient, NewRecipeRequest, NewStep,
   PersistedIngredient, PersistedStep, PortionSize,
   Recipe,
   RecipeDetails,
@@ -16,6 +16,52 @@ export async function getRecipes(){
   return await fetchFromServer<Page<Recipe>>({ endpoint: "/kitchen/recipe" });
 }
 
+export async function addRecipe(prevState: any, formData: FormData): Promise<FieldError[]> {
+  const { ingredientsToAdd } = toIngredients(
+    formData.getAll("ingredientId") as string[],
+    formData.getAll("ingredientName") as string[],
+    formData.getAll("ingredientValue") as string[],
+    formData.getAll("ingredientMeasure") as string[],
+  );
+
+  const { stepsToAdd } = toSteps(
+    formData.getAll("methodStepId") as string[],
+    formData.getAll("methodStepText") as string[]
+  );
+
+  const requestData: NewRecipeRequest = {
+    name: formData.get("name") as string,
+    description: formData.get("description") as string,
+    ingredients: ingredientsToAdd,
+    methodSteps: stepsToAdd,
+    cookingTime: Number(formData.get("cookingTime")),
+    portionSize: toPortionSize(formData.get("portionSize")?.toString()),
+  };
+  
+  try {
+    const createdRecipe = await fetchFromServer<RecipeDetails>({
+      endpoint: "/kitchen/recipe",
+      method: "POST",
+      body: requestData,
+    }) as RecipeDetails;
+    redirect(`/my-recipes/${createdRecipe.id}/`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      const response = error.response;
+
+      // TODO cover other possible errors
+      if (response.status === 422) {
+        const body = await response.json();
+        return body.fields;
+      }
+
+      return [];
+    }
+
+    throw error;
+  }
+}
+
 export async function getRecipe(id: number) : Promise<RecipeDetails> {
   return await fetchFromServer<RecipeDetails>({
     endpoint: `/kitchen/recipe/${id}`
@@ -24,9 +70,9 @@ export async function getRecipe(id: number) : Promise<RecipeDetails> {
 
 export async function updateRecipe(prevState: any, formData: FormData): Promise<FieldError[]> {
   const requestData: UpdateRecipeRequest = {
-    basicInformation: buildBasicInformation(formData),
-    ingredients: buildIngredients(formData),
-    steps: buildSteps(formData),
+    basicInformation: buildBasicInformationUpdate(formData),
+    ingredients: buildIngredientsUpdate(formData),
+    steps: buildStepsUpdate(formData),
   };
 
   const id = formData.get("id") as string;
@@ -52,8 +98,6 @@ export async function updateRecipe(prevState: any, formData: FormData): Promise<
 
     throw error;
   }
-
-  throw new Error("Couldn't process the request");
 }
 
 export async function deleteRecipe(prevState: any, formData: FormData): Promise<string> {
@@ -64,6 +108,7 @@ export async function deleteRecipe(prevState: any, formData: FormData): Promise<
       endpoint: `/kitchen/recipe/${id}`,
       method: "DELETE"
     });
+    redirect("/my-recipes");
   } catch (error) {
     if (error instanceof ApiError) {
       const response = error.response;
@@ -80,11 +125,9 @@ export async function deleteRecipe(prevState: any, formData: FormData): Promise<
 
     throw error;
   }
-
-  redirect("/my-recipes");
 }
 
-function buildBasicInformation(formData: FormData) {
+function buildBasicInformationUpdate(formData: FormData) {
   return {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
@@ -93,8 +136,8 @@ function buildBasicInformation(formData: FormData) {
   };
 }
 
-function buildIngredients(formData: FormData) {
-  const { ingredientsToAdd, ingredientsToUpdate } = filterIngredients(
+function buildIngredientsUpdate(formData: FormData) {
+  const { ingredientsToAdd, ingredientsToUpdate } = toIngredients(
     formData.getAll("ingredientId") as string[],
     formData.getAll("ingredientName") as string[],
     formData.getAll("ingredientValue") as string[],
@@ -109,8 +152,8 @@ function buildIngredients(formData: FormData) {
   };
 }
 
-function buildSteps(formData: FormData) {
-  const { stepsToAdd, stepsToUpdate } = filterSteps(
+function buildStepsUpdate(formData: FormData) {
+  const { stepsToAdd, stepsToUpdate } = toSteps(
     formData.getAll("methodStepId") as string[],
     formData.getAll("methodStepText") as string[],
   );
@@ -123,7 +166,7 @@ function buildSteps(formData: FormData) {
   };
 }
 
-function filterIngredients(ids: string[], names: string[], values: string[], measures: string[]) {
+function toIngredients(ids: string[], names: string[], values: string[], measures: string[]) {
   const ingredientsToAdd: NewIngredient[] = [];
   const ingredientsToUpdate: PersistedIngredient[] = [];
 
@@ -149,7 +192,7 @@ function filterIngredients(ids: string[], names: string[], values: string[], mea
   return { ingredientsToAdd, ingredientsToUpdate };
 }
 
-function filterSteps(ids: string[], texts: string[]) {
+function toSteps(ids: string[], texts: string[]) {
   const stepsToAdd: NewStep[] = [];
   const stepsToUpdate: PersistedStep[] = [];
 

@@ -22,7 +22,8 @@ exports[`AddRecipeForm component > render empty form 1`] = `
           class="form-control"
           id="name"
           name="name"
-          placeholder="Name of your new recipe"
+          placeholder="Name of your recipe"
+          value=""
         />
       </div>
     </div>
@@ -59,6 +60,9 @@ exports[`AddRecipeForm component > render empty form 1`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -109,6 +113,9 @@ exports[`AddRecipeForm component > render empty form 1`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -169,6 +176,7 @@ exports[`AddRecipeForm component > render empty form 1`] = `
           name="cookingTime"
           placeholder="In minutes"
           type="number"
+          value=""
         />
       </div>
     </div>
@@ -189,6 +197,7 @@ exports[`AddRecipeForm component > render empty form 1`] = `
           id="portionSize"
           name="portionSize"
           placeholder="Amount and unit (e.g., 4 plates, 800g)"
+          value=""
         />
       </div>
     </div>
@@ -244,7 +253,8 @@ exports[`AddRecipeForm component > render with various errors 1`] = `
           class="form-control"
           id="name"
           name="name"
-          placeholder="Name of your new recipe"
+          placeholder="Name of your recipe"
+          value=""
         />
         <div
           class="invalid-feedback d-block"
@@ -286,6 +296,9 @@ exports[`AddRecipeForm component > render with various errors 1`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -336,6 +349,9 @@ exports[`AddRecipeForm component > render with various errors 1`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -396,6 +412,7 @@ exports[`AddRecipeForm component > render with various errors 1`] = `
           name="cookingTime"
           placeholder="In minutes"
           type="number"
+          value=""
         />
       </div>
     </div>
@@ -416,6 +433,7 @@ exports[`AddRecipeForm component > render with various errors 1`] = `
           id="portionSize"
           name="portionSize"
           placeholder="Amount and unit (e.g., 4 plates, 800g)"
+          value=""
         />
       </div>
     </div>
@@ -471,7 +489,8 @@ exports[`AddRecipeForm component > render with various errors 2`] = `
           class="form-control"
           id="name"
           name="name"
-          placeholder="Name of your new recipe"
+          placeholder="Name of your recipe"
+          value=""
         />
       </div>
     </div>
@@ -513,6 +532,9 @@ exports[`AddRecipeForm component > render with various errors 2`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -569,6 +591,9 @@ exports[`AddRecipeForm component > render with various errors 2`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -635,6 +660,7 @@ exports[`AddRecipeForm component > render with various errors 2`] = `
           name="cookingTime"
           placeholder="In minutes"
           type="number"
+          value=""
         />
       </div>
     </div>
@@ -655,6 +681,7 @@ exports[`AddRecipeForm component > render with various errors 2`] = `
           id="portionSize"
           name="portionSize"
           placeholder="Amount and unit (e.g., 4 plates, 800g)"
+          value=""
         />
       </div>
     </div>
@@ -710,7 +737,8 @@ exports[`AddRecipeForm component > render with various errors 3`] = `
           class="form-control"
           id="name"
           name="name"
-          placeholder="Name of your new recipe"
+          placeholder="Name of your recipe"
+          value=""
         />
       </div>
     </div>
@@ -747,6 +775,9 @@ exports[`AddRecipeForm component > render with various errors 3`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -797,6 +828,9 @@ exports[`AddRecipeForm component > render with various errors 3`] = `
       <div
         class="col-md-9"
       >
+        <div
+          class="row"
+        />
         <div
           class="row"
         >
@@ -857,6 +891,7 @@ exports[`AddRecipeForm component > render with various errors 3`] = `
           name="cookingTime"
           placeholder="In minutes"
           type="number"
+          value=""
         />
         <div
           class="invalid-feedback d-block"
@@ -882,6 +917,7 @@ exports[`AddRecipeForm component > render with various errors 3`] = `
           id="portionSize"
           name="portionSize"
           placeholder="Amount and unit (e.g., 4 plates, 800g)"
+          value=""
         />
         <div
           class="invalid-feedback d-block"

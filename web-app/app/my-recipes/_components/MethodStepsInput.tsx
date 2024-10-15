@@ -7,11 +7,11 @@ type StepComponentData = Step & {
 
 type MethodStepsInputProps = {
   errors?: string[];
-  steps: Step[];
+  steps?: Step[];
 };
 
 const MethodStepsInput = (props: MethodStepsInputProps) => {
-  const initialSteps = props.steps.map((step, index) => {
+  const initialSteps = (props.steps ?? []).map((step, index) => {
     return {
       ...step,
       key: index + 1,

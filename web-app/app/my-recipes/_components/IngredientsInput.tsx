@@ -7,11 +7,11 @@ type IngredientComponentData = Ingredient & {
 
 type IngredientsInputProps = {
   errors?: string[];
-  ingredients: Ingredient[];
+  ingredients?: Ingredient[];
 };
 
 const IngredientsInput = (props: IngredientsInputProps) => {
-  const initialIngredients = props.ingredients.map((ingredient, index) => {
+  const initialIngredients = (props.ingredients ?? []).map((ingredient, index) => {
     return {
       ...ingredient,
       value: Number(ingredient.value).toString(), //temporary workaround
