@@ -153,13 +153,11 @@ const IngredientFields = (props: IngredientFieldsProps) => {
 
   return (
     <div className="input-group">
-      {id && (
-        <input
-          type="hidden"
-          name="ingredientId"
-          value={id}
-        />
-      )}
+      <input
+        type="hidden"
+        name="ingredientId"
+        value={id}
+      />
 
       <input
         name="ingredientName"

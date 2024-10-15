@@ -21,7 +21,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         name={recipe.name}
         errors={
           fieldErrors
-            .filter(fieldError => fieldError.name.startsWith("name"))
+            .filter(fieldError => fieldError.name == "basicInformation.name")
             .map(fieldError => fieldError.message)
         }
       />
@@ -30,7 +30,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         description={recipe.description}
         errors={
           fieldErrors
-            .filter(fieldError => fieldError.name.startsWith("name"))
+            .filter(fieldError => fieldError.name == "basicInformation.description")
             .map(fieldError => fieldError.message)
         }
       />
@@ -39,7 +39,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         ingredients={recipe.ingredients}
         errors={
           fieldErrors
-            .filter(fieldError => fieldError.name.startsWith("ingredient"))
+            .filter(fieldError => fieldError.name.startsWith("ingredients"))
             .map(fieldError => fieldError.message)
         }
       />
@@ -48,7 +48,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         steps={recipe.methodSteps}
         errors={
           fieldErrors
-            .filter(fieldError => fieldError.name.startsWith("methodStep"))
+            .filter(fieldError => fieldError.name.startsWith("steps"))
             .map(fieldError => fieldError.message)
         }
       />
@@ -57,7 +57,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         cookingTime={recipe.cookingTime}
         errors={
           fieldErrors
-            .filter(fieldError => fieldError.name.startsWith("cookingTime"))
+            .filter(fieldError => fieldError.name == "basicInformation.cookingTime")
             .map(fieldError => fieldError.message)
         }
       />
@@ -66,7 +66,7 @@ const EditRecipeForm = ({ recipe }: { recipe: RecipeDetails }) => {
         portionSize={recipe.portionSize}
         errors={
           fieldErrors
-            .filter(fieldError => fieldError.name.startsWith("portionSize"))
+            .filter(fieldError => fieldError.name.startsWith("basicInformation.portionSize"))
             .map(fieldError => fieldError.message)
         }
       />

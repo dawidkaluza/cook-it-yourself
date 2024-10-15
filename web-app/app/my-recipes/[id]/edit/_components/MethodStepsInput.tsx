@@ -117,13 +117,11 @@ const MethodStepFields = (props: MethodStepFieldsProps) => {
 
   return (
     <div className="input-group">
-      {id && (
-        <input
-          type="hidden"
-          name="methodStepId"
-          value={id}
-        />
-      )}
+      <input
+        type="hidden"
+        name="methodStepId"
+        value={id}
+      />
 
       <textarea
         name="methodStepText"

@@ -11,10 +11,16 @@ export type Ingredient = {
   measure: string;
 };
 
+export type NewIngredient = Omit<Ingredient, "id">;
+export type PersistedIngredient = Ingredient & { id: number };
+
 export type Step = {
   id?: number;
   text: string;
 };
+
+export type NewStep = Omit<Step, "id">;
+export type PersistedStep = Step & { id: number };
 
 export type PortionSize = {
   value: string;
@@ -36,13 +42,13 @@ export type UpdateRecipeRequest = {
     portionSize: PortionSize;
   };
   ingredients?: {
-    ingredientsToAdd: (Ingredient & { id: undefined })[],
-    ingredientsToUpdate: (Ingredient & { id: number })[],
+    ingredientsToAdd: NewIngredient[],
+    ingredientsToUpdate: PersistedIngredient[],
     ingredientsToDelete: number[],
   };
   steps?: {
-    stepsToAdd: (Step & { id: undefined })[],
-    stepsToUpdate: (Step & { id: number })[],
+    stepsToAdd: NewStep[],
+    stepsToUpdate: PersistedStep[],
     stepsToDelete: number[],
   };
 };
