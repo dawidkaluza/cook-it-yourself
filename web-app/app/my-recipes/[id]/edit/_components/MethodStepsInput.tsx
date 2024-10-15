@@ -1,19 +1,32 @@
 import React, {useState} from "react";
 import {Step} from "@/app/my-recipes/_dtos/recipe";
-import CryptoJS from 'crypto-js';
 
-type Props = {
+type StepComponentData = Step & {
+  key: number;
+};
+
+type MethodStepsInputProps = {
   errors?: string[];
   steps: Step[];
 };
 
-const MethodStepsInput = (props: Props) => {
-  const [newStep, setNewStep] = useState("");
-  const [steps, setSteps] = useState<Step[]>(props.steps);
-  const [stepsToDelete, setStepsToDelete] = useState<Number[]>([]);
+const MethodStepsInput = (props: MethodStepsInputProps) => {
+  const initialSteps = props.steps.map((step, index) => {
+    return {
+      ...step,
+      key: index + 1,
+    }
+  });
 
-  const calcKey = (step: Step) => {
-    return CryptoJS.MD5(step.text).toString();
+  const [newStep, setNewStep] = useState("");
+  const [steps, setSteps] = useState<StepComponentData[]>(initialSteps);
+  const [stepsToDelete, setStepsToDelete] = useState<number[]>([]);
+  const [lastKey, setLastKey] = useState(initialSteps.length);
+
+  const generateKey = () => {
+    const generatedKey = lastKey + 1;
+    setLastKey(generatedKey);
+    return generatedKey;
   };
 
   const addStep = () => {
@@ -22,12 +35,20 @@ const MethodStepsInput = (props: Props) => {
     }
 
     const newSteps = [...steps];
-    newSteps.push({ text: newStep });
+    newSteps.push({ text: newStep, key: generateKey() });
     setSteps(newSteps);
     setNewStep("");
   };
 
-  const deleteStep = (index: number) => {
+  const updateStep = (step: StepComponentData) => {
+    const newSteps = [...steps];
+    const stepToUpdate = newSteps.find(filteredStep => filteredStep.key === step.key) as StepComponentData;
+    stepToUpdate.text = step.text;
+    setSteps(newSteps);
+  };
+
+  const deleteStep = (key: number) => {
+    const index = steps.findIndex(step => step.key === key);
     const step = steps[index];
     if (step.id) {
       const newStepsToDelete = [ ...stepsToDelete ];
@@ -38,8 +59,6 @@ const MethodStepsInput = (props: Props) => {
     setSteps(
       steps.slice(0, index).concat(steps.slice(index + 1))
     );
-
-    // TODO add shifting indexes down?
   };
 
   const errors = props.errors;
@@ -49,19 +68,20 @@ const MethodStepsInput = (props: Props) => {
       <div className="col-md-9">
         <div className="row">
           {stepsToDelete.map(stepId => (
-            <input key={stepId.toString()}
+            <input key={stepId}
                    type="hidden"
                    name="stepsToDelete"
-                   value={stepId.toString()}
+                   value={stepId}
             />
           ))}
         </div>
 
-        {steps.map((step, index) => (
-          <div key={calcKey(step)} className="row">
+        {steps.map(step => (
+          <div key={step.key} className="row">
             <MethodStepFields
               step={step}
-              onDelete={() => deleteStep(index)}
+              onUpdate={(step) => updateStep(step)}
+              onDelete={() => deleteStep(step.key)}
             />
           </div>
         ))}
@@ -84,17 +104,22 @@ const MethodStepsInput = (props: Props) => {
   );
 };
 
-const MethodStepFields = (props: { step: Step, onDelete: () => void }) => {
-  const { step, onDelete } = props;
+type MethodStepFieldsProps = {
+  step: StepComponentData;
+  onDelete: () => void;
+  onUpdate: (step: StepComponentData) => void;
+};
+
+const MethodStepFields = (props: MethodStepFieldsProps) => {
+  const { step, onDelete, onUpdate } = props;
   const { id } = step;
-  const [ text, setText ] = useState(step.text);
 
   return (
     <div className="input-group">
       {id && (
         <input
           type="hidden"
-          name="stepid"
+          name="methodStepId"
           value={id}
         />
       )}
@@ -103,8 +128,8 @@ const MethodStepFields = (props: { step: Step, onDelete: () => void }) => {
         name="methodStepText"
         className="form-control"
         placeholder="Method step"
-        value={text}
-        onChange={(event) => setText(event.target.value)}
+        value={step.text}
+        onChange={(event) => onUpdate({ ...step, text: event.target.value })}
         style={{height: "100px"}}
       />
 
