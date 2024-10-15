@@ -15,7 +15,7 @@ const MethodStepsInput = (props: MethodStepsInputProps) => {
     return {
       ...step,
       key: index + 1,
-    }
+    };
   });
 
   const [newStep, setNewStep] = useState("");
@@ -23,6 +23,7 @@ const MethodStepsInput = (props: MethodStepsInputProps) => {
   const [stepsToDelete, setStepsToDelete] = useState<number[]>([]);
   const [lastKey, setLastKey] = useState(initialSteps.length);
 
+  // TODO maybe extract it to a separate hook?
   const generateKey = () => {
     const generatedKey = lastKey + 1;
     setLastKey(generatedKey);
@@ -42,8 +43,8 @@ const MethodStepsInput = (props: MethodStepsInputProps) => {
 
   const updateStep = (step: StepComponentData) => {
     const newSteps = [...steps];
-    const stepToUpdate = newSteps.find(filteredStep => filteredStep.key === step.key) as StepComponentData;
-    stepToUpdate.text = step.text;
+    const index = newSteps.findIndex(filteredStep => filteredStep.key === step.key);
+    newSteps[index] = step;
     setSteps(newSteps);
   };
 
