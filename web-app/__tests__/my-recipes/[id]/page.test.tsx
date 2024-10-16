@@ -1,8 +1,8 @@
-import {Mock} from "vitest";
-import {render, screen} from "@testing-library/react";
-import {ReviewRecipe} from "@/app/my-recipes/[id]/_components/ReviewRecipe";
 import {RecipeDetails} from "@/app/my-recipes/_dtos/recipe";
 import {getRecipe} from "@/app/my-recipes/actions";
+import {Mock} from "vitest";
+import {render, screen} from "@testing-library/react";
+import Page from "@/app/my-recipes/[id]/page";
 
 vi.mock("@/app/my-recipes/actions", () => {
   return {
@@ -10,7 +10,7 @@ vi.mock("@/app/my-recipes/actions", () => {
   };
 });
 
-describe("ReviewRecipe component", () => {
+describe("page component", () => {
   test("renders given recipe", async () => {
     // Given
     const recipe : RecipeDetails = {
@@ -40,7 +40,7 @@ describe("ReviewRecipe component", () => {
     (getRecipe as Mock).mockResolvedValue(recipe);
 
     // When
-    const reviewComponent = render(await ReviewRecipe({ id: 1 }));
+    const reviewComponent = render(await Page({ params: { id: 1 } }));
 
     // Then
     const nameHeader = screen.getByRole("heading", { name: /Boiled sausages/ });
@@ -67,6 +67,14 @@ describe("ReviewRecipe component", () => {
       const stepElement = screen.getByText(step.text);
       expect(stepElement).not.toBeNull();
     }
+
+    const modifyLink = screen.getByRole("link", { name: /modify/i });
+    expect(modifyLink).not.toBeNull();
+    expect(modifyLink?.getAttribute("href")).toBe("/my-recipes/1/edit");
+
+    const deleteLink = screen.getByRole("link", { name: /delete/i });
+    expect(deleteLink).not.toBeNull();
+    expect(deleteLink?.getAttribute("href")).toBe("/my-recipes/1/delete");
 
     expect(reviewComponent.container).toMatchSnapshot();
   });

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ReviewRecipe component > renders given recipe 1`] = `
+exports[`page component > renders given recipe 1`] = `
 <div>
   <div
     class="container-fluid"
