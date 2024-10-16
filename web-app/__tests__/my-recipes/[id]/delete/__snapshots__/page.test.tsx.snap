@@ -1,0 +1,134 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`page component > render 1`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row justify-content-center"
+    >
+      <div
+        class="col-12 text-center"
+      >
+        <h1>
+          Delete the recipe
+        </h1>
+        <form
+          novalidate=""
+        >
+          <input
+            name="id"
+            type="hidden"
+            value="1"
+          />
+          <p>
+            Are you sure that you want to delete the recipe?
+          </p>
+          <div
+            class="my-4 d-flex justify-content-center btn-group"
+          >
+            <div
+              class="btn-group"
+            >
+              <button
+                class="btn btn-danger"
+                type="submit"
+              >
+                <svg
+                  class="bi bi-x"
+                  fill="currentColor"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                  />
+                </svg>
+                 Delete 
+              </button>
+              <a
+                class="btn btn-outline-secondary"
+                href="/my-recipes/1"
+              >
+                Cancel
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`page component > render 2`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row justify-content-center"
+    >
+      <div
+        class="col-12 text-center"
+      >
+        <h1>
+          Delete the recipe
+        </h1>
+        <form
+          novalidate=""
+        >
+          <input
+            name="id"
+            type="hidden"
+            value="1"
+          />
+          <p>
+            Are you sure that you want to delete the recipe?
+          </p>
+          <div
+            class="my-4 d-flex justify-content-center btn-group"
+          >
+            <div
+              class="btn-group"
+            >
+              <button
+                class="btn btn-danger"
+                type="submit"
+              >
+                <svg
+                  class="bi bi-x"
+                  fill="currentColor"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                  />
+                </svg>
+                 Delete 
+              </button>
+              <a
+                class="btn btn-outline-secondary"
+                href="/my-recipes/1"
+              >
+                Cancel
+              </a>
+            </div>
+          </div>
+          <p
+            class="text-danger"
+          >
+            The recipe does not exist.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+`;

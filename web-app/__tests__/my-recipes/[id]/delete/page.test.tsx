@@ -1,7 +1,7 @@
 import {useFormState} from "react-dom";
 import {Mock} from "vitest";
 import {render, screen} from "@testing-library/react";
-import {DeleteRecipeForm} from "@/app/my-recipes/[id]/delete/_components/DeleteRecipeForm";
+import Page from "@/app/my-recipes/[id]/delete/page";
 
 vi.mock("react-dom", () => {
   return {
@@ -9,7 +9,7 @@ vi.mock("react-dom", () => {
   };
 });
 
-describe("DeleteRecipeForm component", () => {
+describe("page component", () => {
   test.each([
     [ "" ],
     [ "The recipe does not exist." ],
@@ -22,7 +22,7 @@ describe("DeleteRecipeForm component", () => {
     ]);
 
     // When
-    const formComponent = render(<DeleteRecipeForm id={recipeId} />);
+    const formComponent = render(<Page params={{ id: 1 }} />);
 
     // Then
     const questionText = screen.getByText(/are you sure/i);
