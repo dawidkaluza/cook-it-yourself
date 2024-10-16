@@ -1,13 +1,8 @@
 # Cook it yourself
 
-Simple app to put some software development skills into practice.
+Simple app where you can manage your recipes. The goal was to show how to create web app based on microservice architecture.
 
 # Overview
-
-## Functionality
-
-From functional point of view, the purpose was to create application that would help in all cooking activities like choosing what to cook for dinner today, check off ingredients required to cook given dish during shopping and so on. 
-However, for now, to keep things simple, all you can do is simply manage your recipes.
 
 ## Technical details
 
