@@ -1,8 +1,8 @@
-import {Mock} from "vitest";
 import {useFormState} from "react-dom";
+import {Mock} from "vitest";
 import {render, screen} from "@testing-library/react";
-import {AddRecipeForm} from "@/app/my-recipes/add/_components/AddRecipeForm";
 import {FieldError} from "@/app/my-recipes/_dtos/errors";
+import Page from "@/app/my-recipes/add/page";
 
 vi.mock("react-dom", () => {
   return {
@@ -10,7 +10,7 @@ vi.mock("react-dom", () => {
   };
 });
 
-describe("AddRecipeForm component", () => {
+describe("page component", () => {
   test("render empty form", () => {
     // Given
     (useFormState as Mock).mockReturnValue([
@@ -19,7 +19,7 @@ describe("AddRecipeForm component", () => {
     ]);
 
     // When
-    const formComponent = render(<AddRecipeForm />);
+    const formComponent = render(<Page />);
 
     // Then
     const nameInput = screen.getByLabelText("Name");
@@ -96,7 +96,7 @@ describe("AddRecipeForm component", () => {
     ]);
 
     // When
-    const formComponent = render(<AddRecipeForm />);
+    const formComponent = render(<Page />);
 
     // Then
     for (const fieldError of fieldErrors) {
