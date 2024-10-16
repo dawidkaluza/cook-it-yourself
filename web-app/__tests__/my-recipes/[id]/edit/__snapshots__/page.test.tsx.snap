@@ -1,0 +1,708 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`page component > render 1`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row justify-content-center"
+    >
+      <div
+        class="col-12 col-md-10 col-lg-8 col-xl-6"
+      >
+        <h1>
+          Edit the recipe
+        </h1>
+        <form
+          class="mt-4"
+          novalidate=""
+        >
+          <input
+            name="id"
+            type="hidden"
+            value="1"
+          />
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="name"
+            >
+              Name
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <input
+                class="form-control"
+                id="name"
+                name="name"
+                placeholder="Name of your recipe"
+                value="Boiled sausages"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="description"
+            >
+              Description
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                placeholder="A few words describing your recipe"
+                style="height: 100px;"
+              >
+                How to boil delicious sausages
+              </textarea>
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="newIngredient"
+            >
+              Ingredients
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <div
+                class="row"
+              />
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <input
+                    name="ingredientId"
+                    type="hidden"
+                    value="1"
+                  />
+                  <input
+                    class="form-control"
+                    name="ingredientName"
+                    placeholder="Name"
+                    style="min-width: 50%;"
+                    value="Sausage"
+                  />
+                  <input
+                    class="form-control"
+                    name="ingredientValue"
+                    placeholder="Amount"
+                    style="min-width: 15%;"
+                    value="3"
+                  />
+                  <input
+                    class="form-control"
+                    name="ingredientMeasure"
+                    placeholder="Unit"
+                    style="min-width: 15%;"
+                    value="pc"
+                  />
+                  <button
+                    class="btn btn-outline-danger"
+                    type="button"
+                  >
+                    <svg
+                      class="bi bi-dash-lg"
+                      fill="currentColor"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <input
+                    class="form-control"
+                    id="newIngredient"
+                    name="newIngredient"
+                    placeholder="e.g., water, apple 2, sugar 250g"
+                    value=""
+                  />
+                  <button
+                    class="btn btn-success"
+                    type="button"
+                  >
+                    <svg
+                      class="bi bi-plus-lg"
+                      fill="currentColor"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="row"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="newMethodStep"
+            >
+              Method steps
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <div
+                class="row"
+              />
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <input
+                    name="methodStepId"
+                    type="hidden"
+                    value="1"
+                  />
+                  <textarea
+                    class="form-control"
+                    name="methodStepText"
+                    placeholder="Method step"
+                    style="height: 100px;"
+                  >
+                    Boil sausages for about 3 mins
+                  </textarea>
+                  <div
+                    class="input-group-text"
+                  >
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      type="button"
+                    >
+                      <svg
+                        class="bi bi-dash-lg"
+                        fill="currentColor"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <textarea
+                    class="form-control"
+                    id="newMethodStep"
+                    name="newMethodStep"
+                    placeholder="Instructions step-by-step to cook your recipe"
+                    style="height: 100px;"
+                  />
+                  <div
+                    class="input-group-text"
+                  >
+                    <button
+                      class="btn btn-sm btn-success"
+                      type="button"
+                    >
+                      <svg
+                        class="bi bi-plus-lg"
+                        fill="currentColor"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="row"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="cookingTime"
+            >
+              Cooking time
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <input
+                class="form-control"
+                id="cookingTime"
+                name="cookingTime"
+                placeholder="In minutes"
+                type="number"
+                value="3"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="portionSize"
+            >
+              Portion size
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <input
+                class="form-control"
+                id="portionSize"
+                name="portionSize"
+                placeholder="Amount and unit (e.g., 4 plates, 800g)"
+                value="1 plate"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <div
+              class="col-12 text-center"
+            >
+              <button
+                class="btn btn-primary"
+                type="submit"
+              >
+                <svg
+                  class="bi bi-check2"
+                  fill="currentColor"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"
+                  />
+                </svg>
+                 Submit 
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`page component > render with errors 1`] = `
+<div>
+  <div
+    class="container-fluid"
+  >
+    <div
+      class="row justify-content-center"
+    >
+      <div
+        class="col-12 col-md-10 col-lg-8 col-xl-6"
+      >
+        <h1>
+          Edit the recipe
+        </h1>
+        <form
+          class="mt-4"
+          novalidate=""
+        >
+          <input
+            name="id"
+            type="hidden"
+            value="1"
+          />
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="name"
+            >
+              Name
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <input
+                class="form-control"
+                id="name"
+                name="name"
+                placeholder="Name of your recipe"
+                value="Boiled sausages"
+              />
+              <div
+                class="invalid-feedback d-block"
+              >
+                Some name error.
+              </div>
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="description"
+            >
+              Description
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                placeholder="A few words describing your recipe"
+                style="height: 100px;"
+              >
+                How to boil delicious sausages
+              </textarea>
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="newIngredient"
+            >
+              Ingredients
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <div
+                class="row"
+              />
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <input
+                    name="ingredientId"
+                    type="hidden"
+                    value="1"
+                  />
+                  <input
+                    class="form-control"
+                    name="ingredientName"
+                    placeholder="Name"
+                    style="min-width: 50%;"
+                    value="Sausage"
+                  />
+                  <input
+                    class="form-control"
+                    name="ingredientValue"
+                    placeholder="Amount"
+                    style="min-width: 15%;"
+                    value="3"
+                  />
+                  <input
+                    class="form-control"
+                    name="ingredientMeasure"
+                    placeholder="Unit"
+                    style="min-width: 15%;"
+                    value="pc"
+                  />
+                  <button
+                    class="btn btn-outline-danger"
+                    type="button"
+                  >
+                    <svg
+                      class="bi bi-dash-lg"
+                      fill="currentColor"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <input
+                    class="form-control"
+                    id="newIngredient"
+                    name="newIngredient"
+                    placeholder="e.g., water, apple 2, sugar 250g"
+                    value=""
+                  />
+                  <button
+                    class="btn btn-success"
+                    type="button"
+                  >
+                    <svg
+                      class="bi bi-plus-lg"
+                      fill="currentColor"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="row"
+              >
+                <div
+                  class="invalid-feedback d-block"
+                >
+                  Some ingredients error.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="newMethodStep"
+            >
+              Method steps
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <div
+                class="row"
+              />
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <input
+                    name="methodStepId"
+                    type="hidden"
+                    value="1"
+                  />
+                  <textarea
+                    class="form-control"
+                    name="methodStepText"
+                    placeholder="Method step"
+                    style="height: 100px;"
+                  >
+                    Boil sausages for about 3 mins
+                  </textarea>
+                  <div
+                    class="input-group-text"
+                  >
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      type="button"
+                    >
+                      <svg
+                        class="bi bi-dash-lg"
+                        fill="currentColor"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="row"
+              >
+                <div
+                  class="input-group"
+                >
+                  <textarea
+                    class="form-control"
+                    id="newMethodStep"
+                    name="newMethodStep"
+                    placeholder="Instructions step-by-step to cook your recipe"
+                    style="height: 100px;"
+                  />
+                  <div
+                    class="input-group-text"
+                  >
+                    <button
+                      class="btn btn-sm btn-success"
+                      type="button"
+                    >
+                      <svg
+                        class="bi bi-plus-lg"
+                        fill="currentColor"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="row"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="cookingTime"
+            >
+              Cooking time
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <input
+                class="form-control"
+                id="cookingTime"
+                name="cookingTime"
+                placeholder="In minutes"
+                type="number"
+                value="3"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <label
+              class="col-md-3 col-form-label text-md-end"
+              for="portionSize"
+            >
+              Portion size
+            </label>
+            <div
+              class="col-md-9"
+            >
+              <input
+                class="form-control"
+                id="portionSize"
+                name="portionSize"
+                placeholder="Amount and unit (e.g., 4 plates, 800g)"
+                value="1 plate"
+              />
+            </div>
+          </div>
+          <div
+            class="row mb-4"
+          >
+            <div
+              class="col-12 text-center"
+            >
+              <button
+                class="btn btn-primary"
+                type="submit"
+              >
+                <svg
+                  class="bi bi-check2"
+                  fill="currentColor"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"
+                  />
+                </svg>
+                 Submit 
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+`;
