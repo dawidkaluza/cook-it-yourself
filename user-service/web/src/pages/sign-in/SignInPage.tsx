@@ -38,7 +38,7 @@ export const SignInPage = () => {
         label="E-mail"
         value={fields.email}
         onChange={onFieldChange}
-        style="w-full mb-3"
+        style="w-full mb-3 px-8"
       />
 
       <TextField
@@ -47,7 +47,7 @@ export const SignInPage = () => {
         type="password"
         value={fields.password}
         onChange={onFieldChange}
-        style="w-full mb-3"
+        style="w-full mb-3 px-8"
       />
 
       <SubmitButton loading={loading} style="mb-5">Sign in</SubmitButton>

@@ -43,7 +43,7 @@ export const SignUpPage = () => {
         value={fields.email}
         error={changedFields.has("email") ? undefined : fieldsErrors.email}
         onChange={onFieldChange}
-        style="w-full mb-3"
+        style="w-full mb-3 px-8"
       />
 
       <TextField
@@ -52,7 +52,7 @@ export const SignUpPage = () => {
         value={fields.name}
         error={changedFields.has("name") ? undefined : fieldsErrors.name}
         onChange={onFieldChange}
-        style="w-full mb-3"
+        style="w-full mb-3 px-8"
       />
 
       <TextField
@@ -62,7 +62,7 @@ export const SignUpPage = () => {
         value={fields.password}
         error={changedFields.has("password") ? undefined : fieldsErrors.password}
         onChange={onFieldChange}
-        style="w-full mb-3"
+        style="w-full mb-3 px-8"
       />
 
       <SubmitButton loading={loading} style="mb-5">Sign up</SubmitButton>
