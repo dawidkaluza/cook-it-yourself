@@ -1,8 +1,8 @@
 import {render, screen} from "@testing-library/react";
 import Page from "@/app/page";
 import {isSignedIn} from "@/app/_api/auth";
-import {Mock} from "vitest";
-
+import {afterEach, Mock} from "vitest";
+import {redirect} from "next/navigation";
 
 vi.mock("@/app/_api/auth", () => {
   return {
@@ -10,8 +10,18 @@ vi.mock("@/app/_api/auth", () => {
   };
 });
 
+vi.mock("next/navigation", () => {
+  return {
+    redirect: vi.fn(),
+  };
+});
+
 describe("page component", () => {
-  test("render", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("render as a new user", () => {
     // Given
     (isSignedIn as Mock).mockImplementation(() => false);
 
@@ -24,5 +34,16 @@ describe("page component", () => {
     expect(signInLink?.getAttribute("href")).toBe("/sign-in");
 
     expect(page.container).toMatchSnapshot();
+  });
+
+  test("render as a signed-in user", () => {
+    // Given
+    (isSignedIn as Mock).mockImplementation(() => true);
+
+    // When
+    const page = render(<Page />);
+
+    // Then
+    expect(redirect).toHaveBeenCalledOnce();
   });
 });
