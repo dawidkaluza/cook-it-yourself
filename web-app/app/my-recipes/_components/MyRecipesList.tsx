@@ -4,7 +4,7 @@ import {Recipe} from "@/app/my-recipes/_dtos/recipe";
 
 export const MyRecipesList = async () => {
   const recipesResponse = await getRecipes();
-  const recipes : Recipe[] = recipesResponse ? recipesResponse.items : [];
+  const recipes: Recipe[] = recipesResponse ? recipesResponse.items : [];
 
   return (
     <div className="container-fluid">

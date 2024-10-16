@@ -1,6 +1,5 @@
 import {render, screen} from "@testing-library/react";
 import RootLayout from "@/app/layout";
-import Page from "@/app/page";
 
 vi.mock("@/app/_api/auth", () => {
   return {
@@ -8,16 +7,10 @@ vi.mock("@/app/_api/auth", () => {
   };
 });
 
-vi.mock("next/navigation", () => {
-  return {
-    usePathname: () => "/",
-  };
-});
-
 describe("layout component", () => {
   test("renders", () => {
     // Given, when
-    const layout = render(<RootLayout><Page /></RootLayout>);
+    const layout = render(<RootLayout><p>Hello World</p></RootLayout>);
 
     // Then
     const header = screen.getByRole("banner");
@@ -25,6 +18,9 @@ describe("layout component", () => {
 
     const main = screen.getByRole("main");
     expect(main).not.toBeNull();
+
+    const text = screen.getByText(/hello world/i);
+    expect(text).not.toBeNull();
 
     expect(layout.container).toMatchSnapshot();
   });

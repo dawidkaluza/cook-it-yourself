@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`layout component > renders 1`] = `
+<div>
+  <nav
+    class="m-3"
+  >
+    <ol
+      class="breadcrumb"
+    >
+      <li
+        class="breadcrumb-item"
+      >
+        <a
+          href="/my-recipes"
+        >
+          My recipes
+        </a>
+      </li>
+      <li
+        class="breadcrumb-item active"
+      />
+    </ol>
+  </nav>
+  <div
+    class="container"
+  >
+    <div
+      class="row"
+    >
+      <div
+        class="col"
+      >
+        <p>
+          Hello World
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
