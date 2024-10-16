@@ -1,4 +1,4 @@
-import {MyRecipes} from "@/app/my-recipes/_components/MyRecipes";
+import {Navigation} from "@/app/my-recipes/_components/Navigation";
 
 const Layout = ({
   children
@@ -6,13 +6,16 @@ const Layout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col">
-          {children}
+    <>
+      <Navigation />
+      <div className="container">
+        <div className="row">
+          <div className="col">
+            {children}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

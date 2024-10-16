@@ -1,8 +1,7 @@
 import {render, screen} from "@testing-library/react";
 import {usePathname} from "next/navigation";
 import {Mock} from "vitest";
-import {Navigation} from "@/app/_components/Navigation";
-
+import {Navigation} from "@/app/my-recipes/_components/Navigation";
 
 vi.mock("next/navigation", () => {
   return {
@@ -13,56 +12,46 @@ vi.mock("next/navigation", () => {
 describe("Navigation component", () => {
   test.each([
     {
-      pathname: "/",
+      pathname: "/my-recipes",
       expectedNavItems: [
         {
-          name: "Home",
-          path: "/",
+          name: "My recipes",
+          path: "/my-recipes",
           active: true,
         }
       ]
     },
     {
-      pathname: "/recipes/1",
+      pathname: "/my-recipes/1",
       expectedNavItems: [
         {
-          name: "Home",
-          path: "/",
+          name: "My recipes",
+          path: "/my-recipes",
           active: false,
         },
         {
-          name: "Recipes",
-          path: "/recipes",
-          active: false,
-        },
-        {
-          name: "View",
-          path: "/recipes/1",
+          name: "Review",
+          path: "/my-recipes/1",
           active: true,
         }
       ]
     },
     {
-      pathname: "/recipes/1/edit",
+      pathname: "/my-recipes/1/edit",
       expectedNavItems: [
         {
-          name: "Home",
-          path: "/",
+          name: "My recipes",
+          path: "/my-recipes",
           active: false,
         },
         {
-          name: "Recipes",
-          path: "/recipes",
-          active: false,
-        },
-        {
-          name: "View",
-          path: "/recipes/1",
+          name: "Review",
+          path: "/my-recipes/1",
           active: false,
         },
         {
           name: "Edit",
-          path: "/recipes/1/edit",
+          path: "/my-recipes/1/edit",
           active: true,
         }
       ]
