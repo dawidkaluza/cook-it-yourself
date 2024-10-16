@@ -26,7 +26,7 @@ exports[`page component > render 1`] = `
             Are you sure that you want to delete the recipe?
           </p>
           <div
-            class="my-4 d-flex justify-content-center btn-group"
+            class="my-4 d-flex justify-content-center"
           >
             <div
               class="btn-group"
@@ -90,7 +90,7 @@ exports[`page component > render 2`] = `
             Are you sure that you want to delete the recipe?
           </p>
           <div
-            class="my-4 d-flex justify-content-center btn-group"
+            class="my-4 d-flex justify-content-center"
           >
             <div
               class="btn-group"

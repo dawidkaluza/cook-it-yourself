@@ -14,7 +14,7 @@ const DeleteRecipeForm = ({ id } : { id: number }) => {
         Are you sure that you want to delete the recipe?
       </p>
 
-      <div className="my-4 d-flex justify-content-center btn-group">
+      <div className="my-4 d-flex justify-content-center">
         <div className="btn-group">
           <button className="btn btn-danger" type="submit">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x"
