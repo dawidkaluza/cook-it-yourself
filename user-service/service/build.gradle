@@ -22,7 +22,7 @@ repositories {
 
     // Repo for common internal libraries
     maven {
-        url = 'https://repsy.io/mvn/dawidkaluza/cook-it-yourself/'
+        url = 'https://repo.repsy.io/mvn/dawidkaluza/cook-it-yourself'
     }
 }
 
